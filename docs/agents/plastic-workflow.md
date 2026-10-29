@@ -26,9 +26,11 @@ plasticd --console --port=8087 --dbpath="$env:LOCALAPPDATA\plastic4\server"
 **端口说明**：`--port=8087` 指定的是公开端口，服务端实际监听的是**私有端口 8084**（= 公开端口 - 3）。客户端要连的是 8084：
 
 ```powershell
-cm configure --language=en --workingmode=NameWorkingMode --server=localhost --port=8084
+cm configure --language=en --workingmode=UPWorkingMode --server=localhost --port=8084 --user=eafen405 --password=<本地口令>
 cm checkconnection      # 期望输出：Test connection executed successfully
 ```
+
+**为什么用 UPWorkingMode**：服务端是 `NameWorkingMode`，只认用户名、不校验口令。若客户端也用 NameWorkingMode，提交身份会取自 Windows 账号（本机是 `user`），changeset 的 owner 就会变成 `user`。改用 UPWorkingMode 后客户端发送 `eafen405`，服务端照单接受并自动建号，changeset 归属就对了。本地口令只存在 `%LOCALAPPDATA%\plastic4\client.conf`，不对外暴露。
 
 服务端不随会话结束而停止。要长期运行可改用服务方式：`plasticd --installservice` / `--start`。
 
@@ -56,7 +58,11 @@ cm repository create <repo>
 | 分支     | `cm branch list` / `cm switch "<分支>"`     |
 | 工作区   | `cm workspace list`                         |
 
-**已知坑**：`cm add <目录>` 在本版本**不会递归添加子项**，目录会变成 Added 而子文件仍是 Private。目录加完后再逐个 add 子文件，或对每个叶子文件单独 add。
+**已知坑 1**：`cm add <目录>` 在本版本**不会递归添加子项**，目录会变成 Added 而子文件仍是 Private。目录加完后再逐个 add 子文件，或对每个叶子文件单独 add。
+
+**已知坑 2**：`cm changeset delete <n>` 会把该 changeset 新增的文件**从工作区一并删除**（回滚到该节点之前的状态）。删之前先确认另一套版本控制里有副本，否则用 `git restore --worktree .` 找回。
+
+**已知坑 3**：`ignore.conf` 必须存在于工作区根目录才生效；文件缺失时 `.git/` 之类会重新出现在待添加列表里。
 
 ## 忽略规则
 
