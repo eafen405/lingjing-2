@@ -8,6 +8,18 @@
 - `gh auth status` 显示已认证且具备 `repo` scope，issue 才能创建与打标。
 - 五个 triage 标签必须已存在于仓库标签集；缺失的用 `gh label create "<name>" --description "<text>" --color "<hex>"` 补齐。
 
+### 当前机器的环境差异
+
+这台机器上有两套环境，`gh` 只在 WSL 侧是登录态：
+
+- **WSL（Ubuntu，用户 eafen405）**：`gh` 已登录账号 eafen405，token scopes 含 `repo`；SSH key 在 `~/.ssh/id_ed25519`，已注册到 GitHub。**所有 `gh` 命令都从这里执行**：
+  ```powershell
+  wsl.exe -u eafen405 -- gh <子命令> --repo eafen405/lingjing-2
+  ```
+- **Windows 侧**：`gh` 的 keyring token 已失效（`gh auth status` 报 invalid），直接调用会失败。Git 推拉同样建议走 WSL（`wsl.exe -u eafen405 -- git -C /mnt/c/Users/user/Desktop/lingjing_2 push`），Windows 侧 `git` 只用来读状态与提交。
+
+remote 已配成 SSH 形式：`git@github.com:eafen405/lingjing-2.git`。
+
 ## 与版本管理的关系
 
 本仓库双轨版本管理：**PlasticSCM 是开发节点的权威记录**（考核【必须】项），GitHub 是公开镜像并承载 issue 跟踪。详见 `docs/agents/plastic-workflow.md`。
