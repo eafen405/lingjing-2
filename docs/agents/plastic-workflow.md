@@ -16,14 +16,21 @@
 
 ### 服务端
 
-服务端以进程方式运行（本机，无需云账号）：
+winget 安装时已把服务端注册成 Windows 服务，装完就在跑：
+
+- 服务名 `Plastic Server 6`，启动类型 Automatic，运行账户 LocalSystem，父进程是 `services.exe`
+- 仓库数据落在 `%LOCALAPPDATA%\plastic4\server\rep_1`，工作区元数据在仓库根目录的 `.plastic\`
+
+管理命令（需要管理员权限）：
 
 ```powershell
-# 需要管理员权限：服务端要往 Program Files 下的 cloudconfig 写目录
-plasticd --console --port=8087 --dbpath="$env:LOCALAPPDATA\plastic4\server"
+Get-Service 'Plastic Server 6'   # 看状态
+plasticd --restart               # 重启
+plasticd --stop / --start
+plasticd --uninstallservice      # 卸载服务
 ```
 
-**端口说明**：`--port=8087` 指定的是公开端口，服务端实际监听的是**私有端口 8084**（= 公开端口 - 3）。客户端要连的是 8084：
+**端口说明**：客户端连的是 **8084**（私有端口 = 公开端口 8087 - 3）：
 
 ```powershell
 cm configure --language=en --workingmode=UPWorkingMode --server=localhost --port=8084 --user=eafen405 --password=<本地口令>
@@ -32,7 +39,7 @@ cm checkconnection      # 期望输出：Test connection executed successfully
 
 **为什么用 UPWorkingMode**：服务端是 `NameWorkingMode`，只认用户名、不校验口令。若客户端也用 NameWorkingMode，提交身份会取自 Windows 账号（本机是 `user`），changeset 的 owner 就会变成 `user`。改用 UPWorkingMode 后客户端发送 `eafen405`，服务端照单接受并自动建号，changeset 归属就对了。本地口令只存在 `%LOCALAPPDATA%\plastic4\client.conf`，不对外暴露。
 
-服务端不随会话结束而停止。要长期运行可改用服务方式：`plasticd --installservice` / `--start`。
+**只有服务起不来时才手工起实例**：`plasticd --console --port=8087 --dbpath="$env:LOCALAPPDATA\plastic4\server"`。这条路径需要管理员权限 —— 服务端要往 `Program Files\PlasticSCM5\server\cloudconfig` 写目录，普通权限会抛 `UnauthorizedAccessException` 直接崩。
 
 ### 换成 Plastic Cloud（可选）
 
@@ -89,7 +96,7 @@ cm repository create <repo>
 考核交付物之一是「PlasticSCM 项目及开发节点记录」。导出方式：
 
 - **节点记录**：`cm log --xml --encoding=utf-8 > docs/delivery/plastic-changesets.xml`（人读版直接用 `cm log`）。
-- **项目本体**：仓库数据在服务端 `dbpath` 下，工作区在本仓库目录；两者一起打包提交，或用 `cm fast-export` 导出为 fast-export 格式。
+- **项目本体**：仓库数据在 `%LOCALAPPDATA%\plastic4\server\rep_1`，工作区元数据在仓库根目录的 `.plastic\`，两者一起打包提交；或用 `cm fast-export` 导出为 fast-export 格式。
 
 ## 与 GitHub 镜像的关系
 
