@@ -1,0 +1,36 @@
+# Normalise text files to LF so Unity YAML diffs stay clean on Windows.
+* text=auto eol=lf
+
+*.unity text eol=lf
+*.prefab text eol=lf
+*.asset text eol=lf
+*.meta text eol=lf
+*.mat text eol=lf
+*.anim text eol=lf
+*.controller text eol=lf
+*.physicMaterial text eol=lf
+*.shader text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.cs text eol=lf
+*.ps1 text eol=lf
+*.yml text eol=lf
+*.conf text eol=lf
+
+# Binary assets
+*.fbx binary
+*.png binary
+*.jpg binary
+*.tga binary
+*.psd binary
+*.wav binary
+*.mp3 binary
+*.ogg binary
+*.ttf binary
+*.otf binary
+*.exr binary
+*.unitypackage binary
+*.zip binary
+*.mov binary
+*.mp4 binary
+*.pdf binary
