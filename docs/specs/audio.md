@@ -142,13 +142,41 @@
 
 ### 4. 合成流水线
 
+脚本：`tools/voice/synth.py`，用 GPT-SoVITS 自带的解释器跑：
+
+```
+D:\Agents\GPT-Sovits\GPT-SoVITS-1007-cu128\runtime\python.exe tools\voice\synth.py
+```
+
 - 环境：`D:\Agents\GPT-Sovits\GPT-SoVITS-1007-cu128`（Python 3.11、torch 2.8+cu128、RTX 5060 8GB 可用）。
-- 权重：GPT `D:\Agents\Fairy\Fairy\Fairy-e10.ckpt`；SoVITS `D:\Agents\Fairy\Fairy\Fairy_e10_s870.pth`。
-- 参考音频：同目录下的中文 wav；参考文本用该 wav 的文件名句子。
-- 参数固定并记录在脚本里（便于复现）：固定 seed、固定 temperature/top_k，逐条生成。
-- 后处理：44.1kHz **mono** → 去首尾静默 → 峰值 −1 dBFS → 响度 **−16 LUFS** → **Ogg Vorbis q5**。
-- 输出：`vo_fairy_<id>.ogg` + `voice_manifest.json`（id、时长、文本、触发、优先级）。
-- 一条命令重建全部；支持 `--only <id>` 单条重跑。
+- 权重：GPT `D:\Agents\Fairy\Fairy\Fairy\Fairy-e10.ckpt`；SoVITS `D:\Agents\Fairy\Fairy\Fairy\Fairy_e10_s870.pth`。
+- **版本是 v2**：ckpt 里的 `pretrained_s1` 指向 `gsv-v2final-pretrained`，所以在 `TTS_Config` 里写死 `version: v2`，不读安装目录的 `weight.json`（它指向芙宁娜）。
+- 参考音频：同目录下唯一那条 wav，48k mono；**参考文本 = 该 wav 的文件名**（去掉扩展名），不另维护。
+- 合成参数固定：seed `20261030`、top_k 5、top_p 1.0、temperature 1.0、repetition_penalty 1.35、`text_split_method=cut5`，half 精度。
+
+#### 4.1 分段合成与停顿（关键）
+
+模型自己给的句读间隔偏短，且逗号与句号几乎一样长。所以**不整句合成**，而是切成短段逐段合成再拼：
+
+| 切分标点 | 拼接静音 |
+| --- | --- |
+| `，` `、` | 0.40s |
+| `；` | 0.45s |
+| `。` `？` `！` | 0.55s |
+| `（停顿）` | 0.60s |
+
+- 每段单独送 TTS，生成后裁掉首尾静音（相对峰值 −45 dB，各留 20ms），再按上表插静音拼起来。
+- 段与段之间的间隔由我们定，不由模型定；要改节奏只改这张表，不需要重训。
+- 冒号**不切**：`结论：数据回收完毕。` 这种引语整体送合成，硬切会让「结论：」单独成句。
+- 实测（v1）：逗号 0.44s、句号 0.59s、`（停顿）` 0.64s（含两端的 20ms 余量）。
+
+#### 4.2 后处理与输出
+
+- 后处理：32kHz int16 拼接 → 重采样 **44.1kHz mono** → 线性增益到 **−16 LUFS**；若峰值会超过 **−1 dBFS** 则以峰值为准（个别句子因此落在 −16.6 LUFS，属正常）。
+- 编码：**Ogg Vorbis q5**。
+- 输出：`vo_fairy_*.ogg` + `voice_manifest.json`（id、文件、时长、文本、触发、优先级、冷却、可否打断、朗读提示、分段、实测响度与增益）。
+- 落点：`tools/voice/out/v1/`，整目录不入库（`out/.gitignore`）；是否随 APK 提交由 T25 定。
+- 一条命令重建全部；`--only <id1,id2>` 单条重跑；`--dry-run` 只解析台词表并打印分段，不加载模型（改文案时先跑这个）。
 
 ### 5. 运行时
 
