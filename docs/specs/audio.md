@@ -67,6 +67,7 @@
 | --- | --- | --- |
 | `level_start` | levelId | 关卡开场，进场后 1s 播放 |
 | `boss_intro` | bossId | Boss 血条出现时 |
+| `enemy_first_sight` | enemyKey | 某类以骸第一次出现（进视野或生成），每种只播一次 |
 | `daika_start` / `daika_end` | — | 代行开始 / 结束 |
 | `low_hp` | — | 血量首次低于 35%，冷却 60s |
 | `player_death` | — | 死亡结算 |
@@ -82,7 +83,7 @@
 | id | 事件 | 文案（同时作字幕） | 朗读 | P | 冷却 | 可打断 |
 | --- | --- | --- | --- | --- | --- | --- |
 | `vo_fairy_level_start_1` | `level_start(1)` | 已进入空洞入口，请主人保持移动。 | 平静·上报 | P2 | 30 | 是 |
-| `vo_fairy_level_start_2` | `level_start(2)` | 检测到空降以骸，请主人注意躲避。 | 平静·提醒 | P2 | 30 | 是 |
+| `vo_fairy_first_sight_airdrop` | `enemy_first_sight(坠物)` | 检测到空降以骸，请主人注意躲避。 | 平静·提醒 | P2 | 30 | 是 |
 | `vo_fairy_boss_intro` | `boss_intro(*)` | 警告，恶名以骸接近。 | 警告·战术 | P1 | 30 | 是 |
 | `vo_fairy_daika_start` | `daika_start` | 授权已确认。 | 冷淡·自信 | P1 | 30 | 是 |
 | `vo_fairy_daika_end` | `daika_end` | 控制权已归还，请主人查看本次电费账单。 | 冷淡·收束 | P1 | 30 | 是 |
@@ -94,7 +95,7 @@
 
 - **预算 10 条**：只留能改变玩家下一步动作的句子；重复解释与「屏幕已经写了」的内容一律不进语音。
 - **分数只上字幕、不念**：`vo_fairy_death` 的朗读范围到「数据回收完毕。」为止，`〔〕` 里那段是纯字幕。合成脚本遇到朗读范围内的 `<变量>` 直接报错——这条是硬规则，不做例外。
-- 事件覆盖：`level_start` 2、`boss_intro` 1（两个 Boss 共用，参数写 `*` 表示任意 bossId）、`daika_start` / `daika_end` 各 1、`low_hp` 1、`player_death` 1、`tutorial` 1、`menu_idle` 2。**`level_clear` 目前没有句子**，缺口见 §2.2。
+- 事件覆盖：`level_start` 1、`enemy_first_sight` 1、`boss_intro` 1（两个 Boss 共用，参数写 `*` 表示任意 bossId）、`daika_start` / `daika_end` 各 1、`low_hp` 1、`player_death` 1、`tutorial` 1、`menu_idle` 2。**第二关开场（`level_start(2)`）和 `level_clear` 都没有句子**，缺口见 §2.2。
 - `menu_idle` 是第一个有真实变体的事件（`_2` 后缀）：`VoiceCueResolver` 随机选且不连续重复。
 - 教学句按 §3 是 P2：教学发生在战斗中，P3 会被「战斗中禁播」挡掉。
 
@@ -116,6 +117,8 @@
 
 #### 敌人与阶段
 
+`enemy_first_sight` 已经在 §2 立住，坠物那条（`vo_fairy_first_sight_airdrop`）也已进 §2.1；下面三条是同一事件的剩余位置：
+
 | 事件 | 条件 | 建议文案 | 理由 |
 | --- | --- | --- | --- |
 | `enemy_first_sight(撞针)` | 撞针首次进视野 | 撞针蓄力时，横向躲。 | 0.6s 预警后直线突刺，横向是唯一正解 |
@@ -131,7 +134,7 @@
 
 - 第一关通关是过程节点，交给结算 UI；只有真正结束的一局需要一句。
 - **不做**：三种拾取（`sfx_pickup_*` 已覆盖）、充能满（`sfx_charge_full`）、刀碎、受伤、三选一弹窗——屏幕已经说清楚，再加语音就是噪音。
-- 采用任何一条都要先扩 §2 的事件表（新增 `enemy_first_sight`、`boss_phase`，以及 `tutorial` 的 `move` / `skill` 键），再进 §2.1：事件名和参数名一起定，避免代码里出现第二套事件名。
+- 采用上表任何一条前，先确认 §2 里有对应事件：`enemy_first_sight` 已有，`boss_phase` 与 `tutorial` 的 `move` / `skill` 键还需要补进 §2；事件名和参数名一起定，避免代码里出现第二套事件名。
 
 ### 3. 优先级与抢占
 
@@ -163,12 +166,18 @@ D:\Agents\GPT-Sovits\GPT-SoVITS-1007-cu128\runtime\python.exe tools\voice\synth.
 | `，` `、` | 0.40s |
 | `；` | 0.45s |
 | `。` `？` `！` | 0.55s |
+| `：` | 0.35s |
 | `（停顿）` | 0.60s |
 
 - 每段单独送 TTS，生成后裁掉首尾静音（相对峰值 −45 dB，各留 20ms），再按上表插静音拼起来。
 - 段与段之间的间隔由我们定，不由模型定；要改节奏只改这张表，不需要重训。
-- 冒号**不切**：`结论：数据回收完毕。` 这种引语整体送合成，硬切会让「结论：」单独成句。
+- 冒号也切：`结论：数据回收完毕。` 需要「结论」之后的一口气，但停顿比逗号短。
 - 实测（v1）：逗号 0.44s、句号 0.59s、`（停顿）` 0.64s（含两端的 20ms 余量）。
+
+**段内停顿检查**：切段只能控制段与段之间；模型仍可能在段内把词拆开（例：`恶名以骸` 被读成 `恶名……以骸`，中间插了 80ms）。脚本对每段做一次段内静音检测，超过 0.06s 就打 `[warn]`，并把该条记为需复查：
+
+- 处理办法是给这一条换 seed 重合成，取段内没有停顿的那版；换过的值写进脚本的 `SEED_OVERRIDES`，并记进 manifest，保证可复现。
+- 目前只有 `vo_fairy_boss_intro` 需要覆盖（seed 7）。
 
 #### 4.2 后处理与输出
 

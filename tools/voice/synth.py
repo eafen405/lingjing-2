@@ -39,13 +39,17 @@ TEMPERATURE = 1.0
 REPETITION_PENALTY = 1.35
 TEXT_SPLIT_METHOD = "cut5"
 
-# 停顿表：分段之间插入的静音（秒）。规格 §4。
+# 停顿表：分段之间插入的静音（秒）。规格 §4.1。
 # 逗号和句号都单独切成段，拼接静音随之有层级：逗号 0.40 < 句号 0.55。
-# 不切 ，除非需要：冒号留着让模型自己处理「结论：数据回收完毕。」这种引语。
-PAUSE_DEFAULT = {"，": 0.40, "、": 0.40, "；": 0.45, "。": 0.55, "？": 0.55, "！": 0.55}
+PAUSE_DEFAULT = {"，": 0.40, "、": 0.40, "；": 0.45, "。": 0.55, "？": 0.55, "！": 0.55, "：": 0.35}
 PAUSE_BEAT = 0.60  # （停顿）
 TRIM_PEAK_DB = -45.0  # 相对峰值的静音门限
 TRIM_PAD = 0.02  # 裁静音后保留的余量（秒）
+GAP_WARN = 0.06  # 段内静音超过这个长度就报警：模型把词拆开了
+
+# 个别句子固定 seed 时会被读成两个词（例如「恶名/以骸」之间插 80ms 停顿）。
+# 这里按 id 覆盖，取验证过没有段内停顿的那版；批次默认 seed 不变。
+SEED_OVERRIDES = {"vo_fairy_boss_intro": 7}
 
 TARGET_LUFS = -16.0
 TARGET_PEAK_DBFS = -1.0
@@ -162,7 +166,7 @@ def find_ref_audio():
     return path, os.path.splitext(wavs[0])[0]
 
 
-def synth_segment(pipeline, text, ref_wav, prompt_text):
+def synth_segment(pipeline, text, ref_wav, prompt_text, seed=SEED):
     inputs = {
         "text": text,
         "text_lang": "zh",
@@ -176,7 +180,7 @@ def synth_segment(pipeline, text, ref_wav, prompt_text):
         "batch_size": 1,
         "speed_factor": 1.0,
         "return_fragment": False,
-        "seed": SEED,
+        "seed": seed,
         "parallel_infer": True,
         "repetition_penalty": REPETITION_PENALTY,
     }
@@ -186,6 +190,29 @@ def synth_segment(pipeline, text, ref_wav, prompt_text):
     if audio is None:
         raise RuntimeError(f"合成没有返回音频：{text!r}")
     return int(sr), np.asarray(audio, dtype=np.int16)
+
+
+def internal_gaps(audio, sr, thresh_db=-35.0):
+    """段内静音（首尾不算）：返回 [(长度秒, 起点秒)]，用于发现模型把词拆开。"""
+    x = np.abs(audio.astype(np.float32))
+    peak = float(x.max()) or 1.0
+    th = peak * 10 ** (thresh_db / 20)
+    silent = x < th
+    gaps, start = [], None
+    for i, s in enumerate(silent):
+        if s and start is None:
+            start = i
+        elif not s and start is not None:
+            gaps.append((start, i))
+            start = None
+    if start is not None:
+        gaps.append((start, len(silent)))
+    out = []
+    for a, b in gaps:
+        if a == 0 or b == len(silent):
+            continue
+        out.append(((b - a) / sr, a / sr))
+    return out
 
 
 def trim_silence(audio, sr):
@@ -198,12 +225,17 @@ def trim_silence(audio, sr):
 
 def render_line(pipeline, line, ref_wav, prompt_text, out_dir):
     segs = split_segments(strip_audio_marks(line["text"]))
+    seed = SEED_OVERRIDES.get(line["id"], SEED)
     sr_used = None
-    parts, pauses = [], []
+    parts, pauses, warns = [], [], []
     for text, pause in segs:
-        sr, audio = synth_segment(pipeline, text, ref_wav, prompt_text)
+        sr, audio = synth_segment(pipeline, text, ref_wav, prompt_text, seed)
         sr_used = sr
-        parts.append(trim_silence(audio, sr))
+        audio = trim_silence(audio, sr)
+        for length, at in internal_gaps(audio, sr):
+            if length >= GAP_WARN:
+                warns.append(f"段内 {length:.2f}s 静音 @{at:.2f}s：「{text}」")
+        parts.append(audio)
         pauses.append(pause)
     raw = [parts[0]]
     for part, pause in zip(parts[1:], pauses[:-1]):
@@ -216,7 +248,7 @@ def render_line(pipeline, line, ref_wav, prompt_text, out_dir):
     import soundfile as sf
 
     sf.write(tmp_wav, joined, sr_used, subtype="PCM_16")
-    return tmp_wav, [s for s, _ in segs]
+    return tmp_wav, [s for s, _ in segs], seed, warns
 
 
 # ---------------------------------------------------------------- 后处理
@@ -344,12 +376,15 @@ def main(argv=None):
         "peak_dbfs": TARGET_PEAK_DBFS,
         "reference": os.path.basename(ref_wav),
         "seed": SEED,
+        "seed_overrides": SEED_OVERRIDES,
         "lines": [],
     }
 
     for ln in lines:
         t0 = time.time()
-        wav, segs = render_line(pipeline, ln, ref_wav, prompt_text, args.out)
+        wav, segs, seed, warns = render_line(pipeline, ln, ref_wav, prompt_text, args.out)
+        for w in warns:
+            print(f"[warn] {ln['id']}: {w}", flush=True)
         ogg = os.path.join(args.out, ln["id"] + ".ogg")
         gain, lufs = normalize_ogg(wav, ogg)
         dur = probe_duration(ogg)
@@ -366,12 +401,14 @@ def main(argv=None):
                 "text": strip_subtitle_marks(ln["text"]),
                 "mood": ln["mood"],
                 "segments": segs,
+                "seed": seed,
                 "duration": dur,
                 "lufs": round(lufs, 1),
                 "gain_db": round(gain, 2),
+                "warnings": warns,
             }
         )
-        print(f"[ok] {ln['id']:<28} {dur:5.2f}s  {lufs:6.1f} LUFS  gain{gain:+6.2f}dB  {time.time() - t0:5.1f}s", flush=True)
+        print(f"[ok] {ln['id']:<32} {dur:5.2f}s  {lufs:6.1f} LUFS  gain{gain:+6.2f}dB  {time.time() - t0:5.1f}s", flush=True)
 
     with open(os.path.join(args.out, "voice_manifest.json"), "w", encoding="utf-8") as f:
         json.dump(manifest, f, ensure_ascii=False, indent=2)
