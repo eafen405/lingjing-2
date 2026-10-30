@@ -100,10 +100,8 @@ def strip_subtitle_marks(text):
 
 
 def strip_audio_marks(text):
-    """朗读文本：去掉只上字幕的 〔…〕 与朗读标记。"""
-    text = re.sub(r"〔.*?〕", "", text)
-    text = text.replace("（停顿）", "（停顿）")
-    text = text.strip()
+    """朗读文本：去掉只上字幕的 〔…〕；保留（停顿）交给分段器当作气口。"""
+    text = re.sub(r"〔.*?〕", "", text).strip()
     # 只剩半句时补句号，避免以逗号结尾让模型拖尾
     if text.endswith(("，", ",", "、", "：", ":")):
         text = text[:-1] + "。"
