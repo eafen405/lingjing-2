@@ -182,6 +182,30 @@ Sprite (2D and UI) · PPU 32 · Filter **Point** · Compression **None** · Mip 
 - 边界墙用 4 位掩码（`n=1,e=2,s=4,w=8`）决定朝向，每块只画朝外的一侧及其对面，避免拼成网格。
 - 重跑：`python tools/art-pipeline/build_terrain.py`（同时输出 `out/terrain_review.png` 与 `out/terrain_room.png`）。
 
+### 7.5 已完成的素材：飞刀、掉落、警示区与特效（T23 像素部分）
+
+| 项 | 值 |
+| --- | --- |
+| 生成器 | `tools/art-pipeline/misc_draw.py`（画法）+ `build_misc.py`（批量导出） |
+| 落点 | `Assets/_Project/Art/Items/`、`Assets/_Project/Art/Fx/`，各带 `items.json` / `effects.json` |
+| 色板 | **不新增颜色**：钢色用台地灰阶、刀柄用以骸黑青、血包用兜帽米白 + 预警红、能量球与代行用眼睛酸绿 |
+
+| 素材 | 画布 | 帧 | 锚点 | 说明 |
+| --- | --- | --- | --- | --- |
+| 飞刀 | 16×16 | 8 | (8,8) | 8 个旋转帧，引擎按角度取帧；比旋转贴图更脆，不会被重采样糊掉 |
+| 血包 / 能量球 / 掉落飞刀 | 32×32 | 2 | (16,6) | 第 2 帧是亮芯，做 1 次呼吸；都带 1px 描边（§4 允许可拾取物描边） |
+| 警示区 normal / danger | 32×32 九宫格 | 各 1 | — | border 8，中心与边条走 Tiled 平铺；2px 亮边 + 8px 周期点阵 |
+| 命中 | 24×24 | 3 | 中心 | 20fps |
+| 碎裂 | 16×16 | 4 | 中心 | 18fps |
+| 拾取 | 24×24 | 3 | 中心 | 20fps |
+| 代行进入 / 结束 | 128×128 | 各 4 | 中心 | 14fps；双环 + 八刻度，不做半透明 |
+
+- 这批**不属于 §3 的角色帧预算**：都是单帧小图，不参与朝向表，单独记在 `items.json` / `effects.json`。
+- 尺寸依据：飞刀按 §2 的 16×16；掉落与警示区要能和 56px 高的伊埃斯同屏读清，所以给到 32×32；代行光环要套住 2 单位高的角色，给到 128×128。
+- 重跑：`python tools/art-pipeline/build_misc.py`（输出 `out/misc_items.png`、`out/misc_fx.png`、`out/misc_scene.png` 与 `misc_scene_2x.png`）。
+
+UI 皮肤（主菜单、HUD、三选一卡面、天赋图标）**未做**：按本文 Out of Scope，它属于非像素资产，另立规格。
+
 ## Testing Decisions
 
 - **唯一接缝**：`SpriteResolver`——纯 C#，输入 `(entityId, state, directionVector, speed)`，输出帧序列与是否镜像。渲染层只拿结果做 `flipX`。美术换图不改代码。
@@ -199,7 +223,7 @@ Sprite (2D and UI) · PPU 32 · Filter **Point** · Compression **None** · Mip 
 ## Out of Scope
 
 - UI 皮肤、图标、Fairy 气泡（非像素，另立规格）。
-- 特效/粒子、地面阴影、屏幕后处理。
+- 粒子系统与屏幕后处理（命中/碎裂/拾取/代行的**帧动画**已在 §7.5，粒子与 shader 不在此列）。
 - 地形 tileset 的详细规格（已在 `docs/specs/terrain-tileset.md` 定稿：只做边界 / 障碍 / 传送门，不做地板）。
 - BGM、音效、Fairy 语音。
 - 多邦布、关卡背景插画、商店页/宣传图。
