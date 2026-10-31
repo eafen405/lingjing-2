@@ -40,6 +40,7 @@ namespace Lingjing.Editor
 
             var battleGo = new GameObject("Battle");
             var runner = battleGo.AddComponent<BattleRunner>();
+            runner.art = AssetDatabase.LoadAssetAtPath<ArtLibrary>(ArtLibraryBuilder.AssetPath);
             runner.playerSprite = LoadSprite(EousIdle);
             runner.enemySprite = LoadSprite(TailLightIdle);
             runner.bladeSprite = LoadSprite(Knife);

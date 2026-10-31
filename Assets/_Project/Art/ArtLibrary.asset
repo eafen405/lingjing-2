@@ -1,0 +1,416 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10b2b34bf47a43046bb3944be0192e0c, type: 3}
+  m_Name: ArtLibrary
+  m_EditorClassIdentifier: 
+  entities:
+  - entity: eous
+    states:
+    - state: death
+      fps: 12
+      loop: 0
+      dirNames:
+      - s
+      rows:
+      - frames:
+        - {fileID: 21300000, guid: 9fea545219351d542b0af3ea6a3c7ffd, type: 3}
+        - {fileID: 21300000, guid: bc2703eb9b88fb647a004ee4781c8851, type: 3}
+        - {fileID: 21300000, guid: f3bb4538576b44444be71968ace3159b, type: 3}
+        - {fileID: 21300000, guid: a7d153d6014c2f244822b185b6662bf9, type: 3}
+    - state: idle
+      fps: 12
+      loop: 1
+      dirNames:
+      - s
+      - se
+      - e
+      - ne
+      - n
+      rows:
+      - frames:
+        - {fileID: 21300000, guid: 693a3f46e88714144835e6077b6e0e88, type: 3}
+        - {fileID: 21300000, guid: bf8a75565ab228f48b19d4418b86abf2, type: 3}
+      - frames:
+        - {fileID: 21300000, guid: a87c556632727fd46a2b368b6e217771, type: 3}
+        - {fileID: 21300000, guid: 3efbfa0150d4a61468307797d123e8d5, type: 3}
+      - frames:
+        - {fileID: 21300000, guid: 2bb01a79e7d6dc34193b14dd175bbe2c, type: 3}
+        - {fileID: 21300000, guid: a3d7905cee0706c4f852771fc4a5f64b, type: 3}
+      - frames:
+        - {fileID: 21300000, guid: d972ad221a9286d43bfb766240e9fd7d, type: 3}
+        - {fileID: 21300000, guid: 6287bf34ea97b9a4fa8dde28192b19e9, type: 3}
+      - frames:
+        - {fileID: 21300000, guid: 1a0a4c63e039b7a45b4c9b6713854482, type: 3}
+        - {fileID: 21300000, guid: aa1ae419f235b5c4fb40fff5cd4119a8, type: 3}
+    - state: walk
+      fps: 12
+      loop: 1
+      dirNames:
+      - s
+      - se
+      - e
+      - ne
+      - n
+      rows:
+      - frames:
+        - {fileID: 21300000, guid: c2f134d36311752479a6d313cf8a058a, type: 3}
+        - {fileID: 21300000, guid: b4dd48008c05bb2428aea5594ee272d0, type: 3}
+        - {fileID: 21300000, guid: 06e5a18894e5de64a86e16c895c4f7a7, type: 3}
+        - {fileID: 21300000, guid: 779a2cb4716b7b64e9f6b4fccf3ae30e, type: 3}
+      - frames:
+        - {fileID: 21300000, guid: dd2d3c4dbb6029b4fa887beae16e4371, type: 3}
+        - {fileID: 21300000, guid: 79c61c672b2d76045a0f5f5ad2b7e0b3, type: 3}
+        - {fileID: 21300000, guid: 63c207c03ce49324caf246f9959cb4c7, type: 3}
+        - {fileID: 21300000, guid: 6223c4b0b0561a24cafa477ca3cda1d1, type: 3}
+      - frames:
+        - {fileID: 21300000, guid: 6bf7b99b87953094f9ea92f682feecab, type: 3}
+        - {fileID: 21300000, guid: 618332a24976e2c4f8ab7f888484dea9, type: 3}
+        - {fileID: 21300000, guid: ca0156211e2a48f42b69fcf9dc8bde77, type: 3}
+        - {fileID: 21300000, guid: 4b5e5c96f2f114641b1a1f05d90da8de, type: 3}
+      - frames:
+        - {fileID: 21300000, guid: 65bf7fe4e2be18043a4e9511a04d262e, type: 3}
+        - {fileID: 21300000, guid: 9340ef8930d7df149a5df19c630b3887, type: 3}
+        - {fileID: 21300000, guid: 7c6c7bbafaebda34592251f860670ebd, type: 3}
+        - {fileID: 21300000, guid: 9924997e4416c6146a844cf89fcebc10, type: 3}
+      - frames:
+        - {fileID: 21300000, guid: 43a6f7e1a4426b04c8548fa68c113492, type: 3}
+        - {fileID: 21300000, guid: bfe4a6de4c130ef40b37646489a0956c, type: 3}
+        - {fileID: 21300000, guid: c752cd7ec7b0c564c9abe334fb79ee23, type: 3}
+        - {fileID: 21300000, guid: c66344abdabdfa3479a0b76a7dec84db, type: 3}
+    mirrorFrom:
+    - sw
+    - w
+    - nw
+    mirrorTo:
+    - se
+    - e
+    - ne
+  - entity: dropper
+    states:
+    - state: death
+      fps: 12
+      loop: 0
+      dirNames:
+      - s
+      rows:
+      - frames:
+        - {fileID: 21300000, guid: 54c371fabe064ae4e8b653e40c103a0d, type: 3}
+        - {fileID: 21300000, guid: 20701a0826b0c2a4eac2af49ab632730, type: 3}
+    - state: idle
+      fps: 12
+      loop: 1
+      dirNames:
+      - s
+      rows:
+      - frames:
+        - {fileID: 21300000, guid: b8f945c8b47b1034f853ec6a2bcf79f9, type: 3}
+        - {fileID: 21300000, guid: d1d0bee4a24eae244b40f1df474369ea, type: 3}
+    - state: impact
+      fps: 12
+      loop: 0
+      dirNames:
+      - s
+      rows:
+      - frames:
+        - {fileID: 21300000, guid: 1e70dbb9c9684394093576d0564551e7, type: 3}
+        - {fileID: 21300000, guid: 82ff2f6c19e720b4587675b99e5c5410, type: 3}
+        - {fileID: 21300000, guid: d61e173f9725c5743a1173974da708a0, type: 3}
+    - state: telegraph
+      fps: 12
+      loop: 1
+      dirNames:
+      - s
+      rows:
+      - frames:
+        - {fileID: 21300000, guid: 8e1a69db8ebde3745858795990e4cf36, type: 3}
+        - {fileID: 21300000, guid: c73930cba8260d342baf4592ad606d2e, type: 3}
+    mirrorFrom: []
+    mirrorTo: []
+  - entity: nailgun
+    states:
+    - state: death
+      fps: 12
+      loop: 0
+      dirNames:
+      - s
+      rows:
+      - frames:
+        - {fileID: 21300000, guid: 8ea0aeff219cd8043b6d6388df311830, type: 3}
+        - {fileID: 21300000, guid: af278e7730f82254fb20d5bf0d44abd8, type: 3}
+        - {fileID: 21300000, guid: fc5c81fd82b1c66498425e9456909efc, type: 3}
+    - state: fire
+      fps: 12
+      loop: 1
+      dirNames:
+      - s
+      - e
+      - n
+      rows:
+      - frames:
+        - {fileID: 21300000, guid: 1e45dfb43c6457c42918996a72f31e8a, type: 3}
+        - {fileID: 21300000, guid: c8843f4a45de9bd49a6a1db7d97b939b, type: 3}
+      - frames:
+        - {fileID: 21300000, guid: eff86d0550aa80b4e854882f525727d4, type: 3}
+        - {fileID: 21300000, guid: 2e3ebf630e2ea484cbeae486e8ba094c, type: 3}
+      - frames:
+        - {fileID: 21300000, guid: 46cd2aaeac0bf9d4c903f2ff14aa60cb, type: 3}
+        - {fileID: 21300000, guid: 4a990e45c32afe74b802beacde1c3c1d, type: 3}
+    - state: idle
+      fps: 12
+      loop: 1
+      dirNames:
+      - s
+      - e
+      - n
+      rows:
+      - frames:
+        - {fileID: 21300000, guid: 3e70576356097b84aa318d97555b79a5, type: 3}
+      - frames:
+        - {fileID: 21300000, guid: 469ba3ddeac099d43bd9c37fbf62f61e, type: 3}
+      - frames:
+        - {fileID: 21300000, guid: 1bd891fe55ef9d8439cbacd103a618a3, type: 3}
+    - state: move
+      fps: 12
+      loop: 1
+      dirNames:
+      - s
+      - e
+      - n
+      rows:
+      - frames:
+        - {fileID: 21300000, guid: 7ac8370b705dc3c4ab29f4aacb3b730b, type: 3}
+        - {fileID: 21300000, guid: 01aadb19f5bf4e84e9070ddb67eadb93, type: 3}
+      - frames:
+        - {fileID: 21300000, guid: 9c26ff9626acce94690fbfe6c32fb066, type: 3}
+        - {fileID: 21300000, guid: ca2364901e7b0414987a981e57c70279, type: 3}
+      - frames:
+        - {fileID: 21300000, guid: bce8bd2f944866a48a244108b85995a2, type: 3}
+        - {fileID: 21300000, guid: 1e9affe73d8a3d94db9a773eadcceb14, type: 3}
+    mirrorFrom:
+    - w
+    mirrorTo:
+    - e
+  - entity: striker
+    states:
+    - state: charge
+      fps: 12
+      loop: 1
+      dirNames:
+      - s
+      - e
+      - n
+      rows:
+      - frames:
+        - {fileID: 21300000, guid: a1d956cdefb63704a9d2b67cb3e6ac26, type: 3}
+        - {fileID: 21300000, guid: aa4dc483142f7f24aa3652dfdfd3b541, type: 3}
+      - frames:
+        - {fileID: 21300000, guid: 3964d26a54c8c844694520f5bcb58795, type: 3}
+        - {fileID: 21300000, guid: 3190cf8fe02db104cbe0f0d2c5749fd6, type: 3}
+      - frames:
+        - {fileID: 21300000, guid: a79216c4c6962474cb958e6441b1d742, type: 3}
+        - {fileID: 21300000, guid: 3fe7ace7ea49eea4eaf2e39b6ee5c589, type: 3}
+    - state: death
+      fps: 12
+      loop: 0
+      dirNames:
+      - s
+      rows:
+      - frames:
+        - {fileID: 21300000, guid: 92254d9a47eb3024e8fb910bca6590b7, type: 3}
+        - {fileID: 21300000, guid: 30988b3ed7e47c04d8b3a1c1a5d6df06, type: 3}
+        - {fileID: 21300000, guid: 9abc0515777ec794587739950ba087ef, type: 3}
+    - state: idle
+      fps: 12
+      loop: 1
+      dirNames:
+      - s
+      - e
+      - n
+      rows:
+      - frames:
+        - {fileID: 21300000, guid: 69036b81b29435b4788a995d0f15712a, type: 3}
+      - frames:
+        - {fileID: 21300000, guid: f4d8e92f225fd254dba729c732d8d6e2, type: 3}
+      - frames:
+        - {fileID: 21300000, guid: 510e7817b625538428081bc12bb37a74, type: 3}
+    - state: move
+      fps: 12
+      loop: 1
+      dirNames:
+      - s
+      - e
+      - n
+      rows:
+      - frames:
+        - {fileID: 21300000, guid: 67bb6be07c36ef34f974c029440cb9a6, type: 3}
+        - {fileID: 21300000, guid: d5cb515b16ef8c842b7f47adfd0459df, type: 3}
+      - frames:
+        - {fileID: 21300000, guid: ba1ddda9cf9bcde45aedcdbe821e73d7, type: 3}
+        - {fileID: 21300000, guid: 3264c8db31ce2764eb01ee08229f53c5, type: 3}
+      - frames:
+        - {fileID: 21300000, guid: f3885b3d7ae605e4fb3c21f7e992650b, type: 3}
+        - {fileID: 21300000, guid: b8e106b0733c977438ba2bb390511239, type: 3}
+    - state: telegraph
+      fps: 12
+      loop: 1
+      dirNames:
+      - s
+      - e
+      - n
+      rows:
+      - frames:
+        - {fileID: 21300000, guid: e3a85ab3e420b874786f7a9477187ba5, type: 3}
+        - {fileID: 21300000, guid: 7761e2749f56bee48a45e17e575e1242, type: 3}
+      - frames:
+        - {fileID: 21300000, guid: 28cfe34c7ee209247b24430e702cb7de, type: 3}
+        - {fileID: 21300000, guid: a1999fd888be0be43b10516301e9bb7f, type: 3}
+      - frames:
+        - {fileID: 21300000, guid: da6bf52628f0a67489a147093ad639e7, type: 3}
+        - {fileID: 21300000, guid: f25139a0bd0095d46b58b87d2466bcf4, type: 3}
+    mirrorFrom:
+    - w
+    mirrorTo:
+    - e
+  - entity: taillight
+    states:
+    - state: death
+      fps: 12
+      loop: 0
+      dirNames:
+      - s
+      rows:
+      - frames:
+        - {fileID: 21300000, guid: 1e9c05fabd1cdb94ebcc953a2b565a58, type: 3}
+        - {fileID: 21300000, guid: 4429964c8797b5c41b020453f8620bce, type: 3}
+        - {fileID: 21300000, guid: d853b3672d6000b45947e70a1a20f971, type: 3}
+    - state: idle
+      fps: 12
+      loop: 1
+      dirNames:
+      - s
+      rows:
+      - frames:
+        - {fileID: 21300000, guid: bf1fe550996f30049877a2d0edc1f467, type: 3}
+        - {fileID: 21300000, guid: 8b98bbada75cc74428f94818e0f4ad8f, type: 3}
+    - state: move
+      fps: 12
+      loop: 1
+      dirNames:
+      - s
+      rows:
+      - frames:
+        - {fileID: 21300000, guid: de8175530dc65224a9a5d0843d5d40df, type: 3}
+        - {fileID: 21300000, guid: e81a73e31995ee44d85300f39af3ffab, type: 3}
+    mirrorFrom: []
+    mirrorTo: []
+  - entity: chain
+    states:
+    - state: charge
+      fps: 10
+      loop: 1
+      dirNames:
+      - s
+      - e
+      - n
+      rows:
+      - frames:
+        - {fileID: 21300000, guid: 09f065a63fefa144eb5d2750795f1dd9, type: 3}
+        - {fileID: 21300000, guid: f657ddee066848b4cb92b1391338e8a7, type: 3}
+      - frames:
+        - {fileID: 21300000, guid: 15fd91fc8d2ae314499c4ca34c868adb, type: 3}
+        - {fileID: 21300000, guid: 096d94781cb42ec4bb5e72495ad09a7c, type: 3}
+      - frames:
+        - {fileID: 21300000, guid: 4d6206262920ce247a96bf3100ea17cb, type: 3}
+        - {fileID: 21300000, guid: ba5a52a4c274a414bb73a0112ee90ec2, type: 3}
+    - state: death
+      fps: 10
+      loop: 0
+      dirNames:
+      - s
+      rows:
+      - frames:
+        - {fileID: 21300000, guid: bf77688ae69e69148b37a7abe8a80b10, type: 3}
+        - {fileID: 21300000, guid: 4439f1bfe7f2b9c49abbdbbed109162d, type: 3}
+        - {fileID: 21300000, guid: 225253ad451d11342bc5821a52884146, type: 3}
+        - {fileID: 21300000, guid: 68c5755805a78d449a288ab19ebaa8c8, type: 3}
+    - state: idle
+      fps: 10
+      loop: 1
+      dirNames:
+      - s
+      - e
+      - n
+      rows:
+      - frames:
+        - {fileID: 21300000, guid: 403e30b46932c8f459aa28b081f589aa, type: 3}
+        - {fileID: 21300000, guid: 78afea0f7448d1847a6c3b6212ec05bc, type: 3}
+      - frames:
+        - {fileID: 21300000, guid: 331d90842af621047882b25ba2959ea8, type: 3}
+        - {fileID: 21300000, guid: 0b29b1a083163094aaa218d97328a22c, type: 3}
+      - frames:
+        - {fileID: 21300000, guid: b8514f42b5ad1914aac7eb68c308859c, type: 3}
+        - {fileID: 21300000, guid: 908b14ca62ad77e459f6c1dc94742000, type: 3}
+    - state: summon
+      fps: 10
+      loop: 1
+      dirNames:
+      - s
+      - e
+      - n
+      rows:
+      - frames:
+        - {fileID: 21300000, guid: 7805d8157896f444bbd15d0dc88f16dc, type: 3}
+        - {fileID: 21300000, guid: 2f228deb9ffaa874cb0a772356528d3a, type: 3}
+      - frames:
+        - {fileID: 21300000, guid: 13170206369f4c14fbc8ac9cf3eb30f4, type: 3}
+        - {fileID: 21300000, guid: bb0aab26bb1138648a6fa98a4b9e6363, type: 3}
+      - frames:
+        - {fileID: 21300000, guid: 3046334737fa64447acc59d784274755, type: 3}
+        - {fileID: 21300000, guid: 18574c3c71740ff4c8a1b69eadee33d9, type: 3}
+    mirrorFrom:
+    - w
+    mirrorTo:
+    - e
+  - entity: downpour
+    states:
+    - state: cast
+      fps: 10
+      loop: 1
+      dirNames:
+      - s
+      rows:
+      - frames:
+        - {fileID: 21300000, guid: 867490ffaae088843a13c144ea01674d, type: 3}
+        - {fileID: 21300000, guid: 13c89ace2b99e274d9ad81c3d2b09f99, type: 3}
+        - {fileID: 21300000, guid: b3b63186987921c469c79a18143853b0, type: 3}
+    - state: death
+      fps: 10
+      loop: 0
+      dirNames:
+      - s
+      rows:
+      - frames:
+        - {fileID: 21300000, guid: baa0ecd5ab5a7bb4cbe83101fa47def9, type: 3}
+        - {fileID: 21300000, guid: a40931b492cc2904fbd90e254b702d07, type: 3}
+        - {fileID: 21300000, guid: 05157c8635667914980289c36af085c5, type: 3}
+        - {fileID: 21300000, guid: ef6a382a81bec4745b7596fb6872c382, type: 3}
+    - state: idle
+      fps: 10
+      loop: 1
+      dirNames:
+      - s
+      rows:
+      - frames:
+        - {fileID: 21300000, guid: 5cfc7c6d557bc09488f9c95811b45b0e, type: 3}
+        - {fileID: 21300000, guid: 31f8233c8a64a2e49aa4120a002e39e3, type: 3}
+    mirrorFrom: []
+    mirrorTo: []

@@ -16,6 +16,7 @@ namespace Lingjing.View
     public sealed class BattleRunner : MonoBehaviour
     {
         [Header("精灵")]
+        public ArtLibrary art;
         public Sprite playerSprite;
         public Sprite enemySprite;
         public Sprite bladeSprite;
@@ -38,8 +39,16 @@ namespace Lingjing.View
         SpriteRenderer _playerSr;
         Transform _bladeRoot;
         readonly List<Transform> _blades = new List<Transform>();
-        readonly Dictionary<int, Transform> _enemyViews = new Dictionary<int, Transform>();
+        readonly Dictionary<int, EnemyView> _enemyViews = new Dictionary<int, EnemyView>();
         readonly List<int> _staleIds = new List<int>();
+        ActorAnimator _playerAnim;
+
+        sealed class EnemyView
+        {
+            public Transform tx;
+            public ActorAnimator anim;
+            public Vector3 last;
+        }
 
         double _accumulator;
         double _hits;
@@ -87,7 +96,7 @@ namespace Lingjing.View
 
             _world = new BattleWorld(grid, new Vec2(mapWidth * 0.5, mapHeight * 0.5), seed);
             _world.BladeHit += (_, __) => _hits++;
-            _world.EnemyKilled += _ => _kills++;
+            _world.EnemyKilled += OnEnemyKilled;
 
             CreatePlayer();
             CreateBlades();
@@ -102,6 +111,42 @@ namespace Lingjing.View
             _playerSr = go.AddComponent<SpriteRenderer>();
             _playerSr.sprite = playerSprite;
             _playerSr.sortingOrder = 10;
+
+            _playerAnim = go.AddComponent<ActorAnimator>();
+            _playerAnim.target = _playerSr;
+            _playerAnim.Init(art, "eous", "idle");
+        }
+
+        /// <summary>以骸死亡：留一具放死亡帧的尸体，播完自毁。</summary>
+        void OnEnemyKilled(Enemy enemy)
+        {
+            _kills++;
+
+            var go = new GameObject("Corpse" + enemy.Id);
+            go.transform.position = new Vector3((float)enemy.Pos.X, (float)enemy.Pos.Y, 0f);
+            var sr = go.AddComponent<SpriteRenderer>();
+            sr.sortingOrder = 7;
+
+            var anim = go.AddComponent<ActorAnimator>();
+            anim.target = sr;
+            string entity = EntityOf(enemy.Kind);
+            anim.Init(art, entity, "death");
+            anim.Face(new Vec2(enemy.Pos.X < World.World.Player.Pos.X ? -1 : 1, 0));
+
+            Destroy(go, Mathf.Max(0.2f, anim.Duration("death")));
+        }
+
+        static string EntityOf(EnemyKind kind)
+        {
+            switch (kind)
+            {
+                case EnemyKind.TailLight: return "taillight";
+                case EnemyKind.Striker: return "striker";
+                case EnemyKind.NailGun: return "nailgun";
+                case EnemyKind.Dropper: return "dropper";
+                case EnemyKind.ChainBoss: return "chain";
+                default: return "taillight";
+            }
         }
 
         void CreateBlades()
@@ -182,9 +227,14 @@ namespace Lingjing.View
             Player p = _world.World.Player;
             _playerTx.position = new Vector3((float)p.Pos.X, (float)p.Pos.Y, 0f);
 
-            if (Mathf.Abs((float)p.Vel.X) > 0.01f)
+            bool moving = p.Vel.LengthSquared > 0.04;
+            if (_playerAnim != null)
             {
-                _playerSr.flipX = p.Vel.X < 0;
+                _playerAnim.SetState(moving ? "walk" : "idle");
+                if (moving)
+                {
+                    _playerAnim.Face(p.Vel);
+                }
             }
 
             for (int i = 0; i < _blades.Count; i++)
@@ -202,21 +252,34 @@ namespace Lingjing.View
             for (int i = 0; i < enemies.Count; i++)
             {
                 Enemy enemy = enemies[i];
-                if (!_enemyViews.TryGetValue(enemy.Id, out Transform tx))
+                if (!_enemyViews.TryGetValue(enemy.Id, out EnemyView view))
                 {
                     var go = new GameObject("Enemy" + enemy.Id);
                     var sr = go.AddComponent<SpriteRenderer>();
                     sr.sprite = enemySprite;
                     sr.sortingOrder = 8;
-                    tx = go.transform;
-                    _enemyViews.Add(enemy.Id, tx);
+
+                    var anim = go.AddComponent<ActorAnimator>();
+                    anim.target = sr;
+                    anim.Init(art, EntityOf(enemy.Kind), "idle");
+
+                    view = new EnemyView { tx = go.transform, anim = anim, last = go.transform.position };
+                    _enemyViews.Add(enemy.Id, view);
                 }
 
-                tx.position = new Vector3((float)enemy.Pos.X, (float)enemy.Pos.Y, 0f);
+                var now = new Vector3((float)enemy.Pos.X, (float)enemy.Pos.Y, 0f);
+                Vector3 delta = now - view.last;
+                view.last = now;
+                view.tx.position = now;
+
+                if (view.anim != null)
+                {
+                    view.anim.Face(new Vec2(delta.x, delta.y));
+                }
             }
 
             _staleIds.Clear();
-            foreach (KeyValuePair<int, Transform> pair in _enemyViews)
+            foreach (KeyValuePair<int, EnemyView> pair in _enemyViews)
             {
                 bool alive = false;
                 for (int i = 0; i < enemies.Count; i++)
@@ -236,10 +299,10 @@ namespace Lingjing.View
 
             for (int i = 0; i < _staleIds.Count; i++)
             {
-                Transform tx = _enemyViews[_staleIds[i]];
-                if (tx != null)
+                EnemyView view = _enemyViews[_staleIds[i]];
+                if (view.tx != null)
                 {
-                    Destroy(tx.gameObject);
+                    Destroy(view.tx.gameObject);
                 }
 
                 _enemyViews.Remove(_staleIds[i]);
