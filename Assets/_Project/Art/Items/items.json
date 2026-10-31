@@ -1,0 +1,80 @@
+{
+  "kind": "item_set",
+  "ppu": 32,
+  "items": {
+    "knife": {
+      "frames": 8,
+      "frameSize": [
+        16,
+        16
+      ],
+      "pivot": [
+        8,
+        8
+      ],
+      "pattern": "knife/knife_{frame:02}.png",
+      "atlas": "knife/knife.png"
+    },
+    "pickup_health": {
+      "frames": 2,
+      "frameSize": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        6
+      ],
+      "pattern": "pickup_health/pickup_health_{frame:02}.png",
+      "atlas": "pickup_health/pickup_health.png"
+    },
+    "pickup_energy": {
+      "frames": 2,
+      "frameSize": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        6
+      ],
+      "pattern": "pickup_energy/pickup_energy_{frame:02}.png",
+      "atlas": "pickup_energy/pickup_energy.png"
+    },
+    "pickup_blade": {
+      "frames": 2,
+      "frameSize": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        6
+      ],
+      "pattern": "pickup_blade/pickup_blade_{frame:02}.png",
+      "atlas": "pickup_blade/pickup_blade.png"
+    }
+  },
+  "palette": {
+    "outline": "#14161a",
+    "hood_light": "#fbf7ee",
+    "hood": "#ebe4d8",
+    "hood_shade": "#cfc6b8",
+    "hood_deep": "#a89d8e",
+    "eye": "#c9f24d",
+    "eye_hi": "#e8ffa6",
+    "eye_dark": "#8ec32c",
+    "scarf_light": "#e69347",
+    "scarf_deep": "#7c3d12",
+    "warn": "#ff415f",
+    "warn_hi": "#ffb0bf",
+    "warn_deep": "#7d1330",
+    "shell": "#1a232d",
+    "shell_deep": "#10171e",
+    "shell_light": "#33455a",
+    "steel": "#97aeb8",
+    "steel_hi": "#b4c9d2",
+    "steel_dark": "#384651"
+  },
+  "generator": "tools/art-pipeline/build_misc.py"
+}

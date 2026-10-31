@@ -1,0 +1,113 @@
+{
+  "kind": "fx_set",
+  "ppu": 32,
+  "groups": {
+    "warn": {
+      "frameSize": [
+        32,
+        32
+      ],
+      "frames": 2,
+      "fps": 0,
+      "loop": false,
+      "pattern": "warn/{frame}.png",
+      "atlas": "warn/fx_warn.png",
+      "names": [
+        "warn_normal",
+        "warn_danger"
+      ]
+    },
+    "hit": {
+      "frameSize": [
+        24,
+        24
+      ],
+      "frames": 3,
+      "fps": 20,
+      "loop": false,
+      "pattern": "hit/{frame}.png",
+      "atlas": "hit/fx_hit.png",
+      "names": [
+        "hit_00",
+        "hit_01",
+        "hit_02"
+      ]
+    },
+    "break": {
+      "frameSize": [
+        16,
+        16
+      ],
+      "frames": 4,
+      "fps": 18,
+      "loop": false,
+      "pattern": "break/{frame}.png",
+      "atlas": "break/fx_break.png",
+      "names": [
+        "break_00",
+        "break_01",
+        "break_02",
+        "break_03"
+      ]
+    },
+    "pickup": {
+      "frameSize": [
+        24,
+        24
+      ],
+      "frames": 3,
+      "fps": 20,
+      "loop": false,
+      "pattern": "pickup/{frame}.png",
+      "atlas": "pickup/fx_pickup.png",
+      "names": [
+        "pickup_fx_00",
+        "pickup_fx_01",
+        "pickup_fx_02"
+      ]
+    },
+    "proxy": {
+      "frameSize": [
+        128,
+        128
+      ],
+      "frames": 8,
+      "fps": 14,
+      "loop": false,
+      "pattern": "proxy/{frame}.png",
+      "atlas": "proxy/fx_proxy.png",
+      "names": [
+        "proxy_enter_00",
+        "proxy_enter_01",
+        "proxy_enter_02",
+        "proxy_enter_03",
+        "proxy_exit_00",
+        "proxy_exit_01",
+        "proxy_exit_02",
+        "proxy_exit_03"
+      ]
+    }
+  },
+  "palette": {
+    "outline": "#14161a",
+    "hood_light": "#fbf7ee",
+    "hood": "#ebe4d8",
+    "hood_shade": "#cfc6b8",
+    "hood_deep": "#a89d8e",
+    "eye": "#c9f24d",
+    "eye_hi": "#e8ffa6",
+    "eye_dark": "#8ec32c",
+    "scarf_light": "#e69347",
+    "scarf_deep": "#7c3d12",
+    "warn": "#ff415f",
+    "warn_hi": "#ffb0bf",
+    "warn_deep": "#7d1330",
+    "shell": "#1a232d",
+    "shell_deep": "#10171e",
+    "shell_light": "#33455a",
+    "steel": "#97aeb8",
+    "steel_hi": "#b4c9d2",
+    "steel_dark": "#384651"
+  },
+  "generator": "tools/art-pipeline/build_misc.py"
+}
