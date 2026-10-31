@@ -95,7 +95,7 @@ namespace Lingjing.View
             grid.FillRect(26, 12, 1, 6);
 
             _world = new BattleWorld(grid, new Vec2(mapWidth * 0.5, mapHeight * 0.5), seed);
-            _world.SetFairyPlanner(new BaselinePlanner());
+            _world.SetFairyPlanner(new LexPlanner());
             _world.BladeHit += (_, __) => _hits++;
             _world.EnemyKilled += OnEnemyKilled;
 
