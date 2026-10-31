@@ -13,7 +13,7 @@ namespace Lingjing.Editor
     public static class AndroidBuilder
     {
         const string BundleId = "cn.lingjing.eous";
-        const string OutputPath = "Build/M1.apk";
+        const string OutputPath = "Build/Lingjing.apk";
 
         public static void Build()
         {
@@ -35,7 +35,7 @@ namespace Lingjing.Editor
 
             var options = new BuildPlayerOptions
             {
-                scenes = new[] { M1SceneBuilder.ScenePath },
+                scenes = EnabledScenes(),
                 locationPathName = OutputPath,
                 target = BuildTarget.Android,
                 options = BuildOptions.Development
@@ -51,6 +51,27 @@ namespace Lingjing.Editor
                 Debug.LogError("[apk] BUILD FAILED");
                 EditorApplication.Exit(1);
             }
+        }
+
+        /// <summary>Build Settings 里勾选的场景，顺序即启动顺序（MainMenu 在第 0）。</summary>
+        static string[] EnabledScenes()
+        {
+            var scenes = new System.Collections.Generic.List<string>();
+            foreach (EditorBuildSettingsScene scene in EditorBuildSettings.scenes)
+            {
+                if (scene.enabled && !string.IsNullOrEmpty(scene.path))
+                {
+                    scenes.Add(scene.path);
+                }
+            }
+
+            if (scenes.Count == 0)
+            {
+                scenes.Add(M1SceneBuilder.ScenePath);
+            }
+
+            Debug.Log("[apk] scenes=" + string.Join(", ", scenes));
+            return scenes.ToArray();
         }
     }
 }

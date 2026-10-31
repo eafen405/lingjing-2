@@ -4,6 +4,7 @@ using Lingjing.Combat;
 using Lingjing.Core;
 using Lingjing.Fairy;
 using Lingjing.Sim;
+using Lingjing.UI;
 using UnityEngine;
 using Grid = Lingjing.Nav.Grid;
 
@@ -54,9 +55,20 @@ namespace Lingjing.View
         double _hits;
         double _kills;
 
+        HudView _hud;
+        PauseScreen _pause;
+        ResultScreen _result;
+        bool _paused;
+        bool _resultShown;
+
         public BattleWorld World => _world;
         public bool Ready => _world != null;
         public Transform PlayerTransform => _playerTx;
+        public bool Paused => _paused;
+        public bool ResultShown => _resultShown;
+
+        /// <summary>占位结算口径：击杀 ×100 + 命中 ×10；正式数值接入后替换。</summary>
+        public int Score => Mathf.RoundToInt((float)(_kills * 100.0 + _hits * 10.0));
 
         void Awake()
         {
@@ -67,6 +79,7 @@ namespace Lingjing.View
 
             _source = input as ICommandSource;
             Build();
+            BuildUi();
         }
 
         /// <summary>建世界。测试与探针可直接调用，不必进播放模式。</summary>
@@ -179,7 +192,8 @@ namespace Lingjing.View
 
         void Update()
         {
-            if (_world == null)
+            // 暂停/结算期间直接不推进世界；Time.timeScale 只负责停表现层动画。
+            if (_world == null || _paused || _resultShown)
             {
                 return;
             }
@@ -205,12 +219,18 @@ namespace Lingjing.View
             }
 
             Sync();
+            UpdateHud();
+
+            if (_world.PlayerDead)
+            {
+                Finish(false);
+            }
         }
 
         /// <summary>推进 n 个固定步长并同步。无头探针与回归都走这里。</summary>
         public void StepFixed(int count, Command command)
         {
-            if (_world == null)
+            if (_world == null || _paused || _resultShown)
             {
                 return;
             }
@@ -221,6 +241,12 @@ namespace Lingjing.View
             }
 
             Sync();
+            UpdateHud();
+
+            if (_world.PlayerDead)
+            {
+                Finish(false);
+            }
         }
 
         /// <summary>把世界状态同步到精灵。只在表现层做读写，不回写世界。</summary>
@@ -317,23 +343,93 @@ namespace Lingjing.View
             }
         }
 
-        void OnGUI()
+        void BuildUi()
         {
-            if (_world == null)
+            UiKit.EnsureEventSystem();
+            _hud = HudView.Build(Pause);
+            _pause = PauseScreen.Build(Resume, Restart, ToMainMenu);
+            _result = ResultScreen.Build(Restart, ToMainMenu);
+            UpdateHud();
+        }
+
+        void UpdateHud()
+        {
+            if (_hud == null || _world == null)
             {
                 return;
             }
 
             Player p = _world.World.Player;
-            var style = new GUIStyle(GUI.skin.label) { fontSize = 18 };
-            GUI.Label(new Rect(16, 12, 420, 28), $"HP {p.Hp:0}/{p.MaxHp:0}", style);
-            GUI.Label(new Rect(16, 40, 420, 28), $"充能 {p.Energy:0}/{DamageRules.EnergyMax:0}", style);
-            GUI.Label(new Rect(16, 68, 420, 28), $"命中 {_hits:0}  击杀 {_kills:0}  以骸 {_world.World.Enemies.Count}", style);
+            float fairySeconds = (float)(_world.FairyTicksLeft * SimConstants.Dt);
+            _hud.SetStats((float)p.Hp, (float)p.MaxHp, (float)p.Energy,
+                (float)DamageRules.EnergyMax, _world.FairyActive, fairySeconds);
+        }
 
-            if (_world.FairyActive)
+        /// <summary>暂停：冻结时间缩放并停掉世界推进，界面只负责显示。</summary>
+        public void Pause()
+        {
+            if (_world == null || _paused || _resultShown || _world.PlayerDead || _pause == null)
             {
-                GUI.Label(new Rect(16, 96, 420, 28), $"Fairy 代行中 {(float)_world.FairyTicksLeft / 60f:0.0}s", style);
+                return;
             }
+
+            _paused = true;
+            Time.timeScale = 0f;
+            _pause.Show();
+        }
+
+        public void Resume()
+        {
+            if (!_paused)
+            {
+                return;
+            }
+
+            _paused = false;
+            Time.timeScale = 1f;
+            _pause?.Hide();
+        }
+
+        void Restart()
+        {
+            Time.timeScale = 1f;
+            UiNav.Restart();
+        }
+
+        void ToMainMenu()
+        {
+            Time.timeScale = 1f;
+            UiNav.MainMenu();
+        }
+
+        /// <summary>死亡结算：提交占位分数后冻结世界并弹结算面板。</summary>
+        void Finish(bool clear)
+        {
+            if (_resultShown || _result == null)
+            {
+                return;
+            }
+
+            _resultShown = true;
+            _paused = false;
+
+            int score = Score;
+            GameSave.SubmitScore(score);
+
+            Time.timeScale = 0f;
+            if (_hud != null)
+            {
+                _hud.SetVisible(false);
+            }
+
+            _pause?.Hide();
+            _result.Show(clear, score, GameSave.HighScore);
+        }
+
+        void OnDestroy()
+        {
+            // 暂停/结算把 timeScale 压成 0，切场景或退出时恢复，避免污染后续场景。
+            Time.timeScale = 1f;
         }
     }
 }
