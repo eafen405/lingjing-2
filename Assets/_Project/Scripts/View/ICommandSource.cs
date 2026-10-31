@@ -6,5 +6,8 @@ namespace Lingjing.View
     public interface ICommandSource
     {
         Command CurrentCommand { get; }
+
+        /// <summary>本帧是否按下了技能键（Fairy 代行）。读到即消耗，同一帧只触发一次。</summary>
+        bool TakeSkillPress();
     }
 }

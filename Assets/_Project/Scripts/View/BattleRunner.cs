@@ -95,6 +95,7 @@ namespace Lingjing.View
             grid.FillRect(26, 12, 1, 6);
 
             _world = new BattleWorld(grid, new Vec2(mapWidth * 0.5, mapHeight * 0.5), seed);
+            _world.SetFairyPlanner(new BaselinePlanner());
             _world.BladeHit += (_, __) => _hits++;
             _world.EnemyKilled += OnEnemyKilled;
 
@@ -184,6 +185,12 @@ namespace Lingjing.View
             }
 
             _accumulator += Time.deltaTime;
+
+            if (_source != null && _source.TakeSkillPress())
+            {
+                _world.TryActivateFairy();
+            }
+
             int guard = 0;
             while (_accumulator >= SimConstants.Dt && guard++ < 8)
             {
@@ -321,6 +328,11 @@ namespace Lingjing.View
             GUI.Label(new Rect(16, 12, 420, 28), $"HP {p.Hp:0}/{p.MaxHp:0}", style);
             GUI.Label(new Rect(16, 40, 420, 28), $"充能 {p.Energy:0}/{DamageRules.EnergyMax:0}", style);
             GUI.Label(new Rect(16, 68, 420, 28), $"命中 {_hits:0}  击杀 {_kills:0}  以骸 {_world.World.Enemies.Count}", style);
+
+            if (_world.FairyActive)
+            {
+                GUI.Label(new Rect(16, 96, 420, 28), $"Fairy 代行中 {(float)_world.FairyTicksLeft / 60f:0.0}s", style);
+            }
         }
     }
 }

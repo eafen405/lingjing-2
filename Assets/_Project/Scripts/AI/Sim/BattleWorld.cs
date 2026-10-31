@@ -36,6 +36,44 @@ namespace Lingjing.Sim
         int _nextEnemyId = 1;
         bool _deathAnnounced;
 
+        IPlanner _planner;
+        int _fairyTicksLeft;
+        Command _fairyCommand = Command.None;
+
+        /// <summary>代行进行中：玩家输入被屏蔽，指令来自规划器，且不获得充能。</summary>
+        public bool FairyActive => _fairyTicksLeft > 0;
+
+        public int FairyTicksLeft => _fairyTicksLeft;
+
+        public event Action FairyStarted;
+        public event Action FairyEnded;
+
+        /// <summary>注入代行规划器；不注入则技能键无效。</summary>
+        public void SetFairyPlanner(IPlanner planner)
+        {
+            _planner = planner;
+        }
+
+        /// <summary>满槽且不在代行中时接管 4 秒。返回是否真的接管。</summary>
+        public bool TryActivateFairy()
+        {
+            if (_planner == null || FairyActive || World.Player.Dead)
+            {
+                return false;
+            }
+
+            if (World.Player.Energy < DamageRules.EnergyMax - 1e-9)
+            {
+                return false;
+            }
+
+            World.Player.Energy = 0.0;
+            _fairyTicksLeft = SimConstants.FairyDurationTicks;
+            _fairyCommand = new Command(World.Player.MoveDir, World.Player.SpinSign, false);
+            FairyStarted?.Invoke();
+            return true;
+        }
+
         public BattleWorld(Grid grid, Vec2 playerStart, ulong seed, double initialCharge = 0.0)
         {
             World.Grid = grid;
@@ -70,7 +108,18 @@ namespace Lingjing.Sim
 
             if (!w.Player.Dead)
             {
-                ApplyPlayerCommand(command);
+                Command applied = command;
+                if (FairyActive)
+                {
+                    if (Tick % SimConstants.DecisionTicks == 0 && _planner != null)
+                    {
+                        _fairyCommand = _planner.Decide(SnapshotFactory.Create(w, true));
+                    }
+
+                    applied = _fairyCommand;
+                }
+
+                ApplyPlayerCommand(applied);
                 IntegratePlayer();
 
                 if (Tick % SimConstants.NavRecalcTicks == 0)
@@ -93,6 +142,15 @@ namespace Lingjing.Sim
             {
                 _deathAnnounced = true;
                 PlayerDied?.Invoke();
+            }
+
+            if (_fairyTicksLeft > 0)
+            {
+                _fairyTicksLeft--;
+                if (_fairyTicksLeft == 0)
+                {
+                    FairyEnded?.Invoke();
+                }
             }
 
             Tick++;
@@ -187,13 +245,20 @@ namespace Lingjing.Sim
             enemy.BladeCooldown[blade] = DamageRules.BladePerTargetCooldownTicks;
 
             Player p = World.Player;
-            p.Energy = Math.Min(DamageRules.EnergyMax, p.Energy + DamageRules.EnergyPerHit);
+            if (!FairyActive)
+            {
+                p.Energy = Math.Min(DamageRules.EnergyMax, p.Energy + DamageRules.EnergyPerHit);
+            }
 
             BladeHit?.Invoke(enemy, DamageRules.BladeHitDamage);
 
             if (!enemy.Alive)
             {
-                p.Energy = Math.Min(DamageRules.EnergyMax, p.Energy + DamageRules.EnergyPerKill);
+                if (!FairyActive)
+                {
+                    p.Energy = Math.Min(DamageRules.EnergyMax, p.Energy + DamageRules.EnergyPerKill);
+                }
+
                 EnemyKilled?.Invoke(enemy);
             }
         }

@@ -18,6 +18,14 @@ namespace Lingjing.View
         public Command CurrentCommand { get; private set; } = Command.None;
 
         int _spinSign = 1;
+        bool _skillQueued;
+
+        public bool TakeSkillPress()
+        {
+            bool queued = _skillQueued;
+            _skillQueued = false;
+            return queued;
+        }
 
         void Update()
         {
@@ -33,6 +41,11 @@ namespace Lingjing.View
 
             if (skillButton != null)
             {
+                if (skillButton.PressedThisFrame)
+                {
+                    _skillQueued = true;
+                }
+
                 skillButton.ConsumeFrame();
             }
 
