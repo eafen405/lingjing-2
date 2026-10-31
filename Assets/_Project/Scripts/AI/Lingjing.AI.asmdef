@@ -1,0 +1,17 @@
+{
+    "name": "Lingjing.AI",
+    "rootNamespace": "Lingjing.AI",
+    "references": [
+        "Lingjing.Core",
+        "Lingjing.Combat"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": true
+}
