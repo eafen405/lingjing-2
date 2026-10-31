@@ -72,3 +72,11 @@ __pycache__/
 
 # Unity 批处理日志
 /unity-*.log
+# ── 第三方付费/免费资产（只进 Plastic，不进 GitHub 公开镜像）──────────
+# DoozyUI v3 是付费资产，公开镜像里不放；DOTween 与它同批安装，一并排除。
+/Assets/Doozy/
+/Assets/Plugins/Demigiant/
+/Assets/Gizmos/Doozy/
+/Assets/Doozy.meta
+/Assets/Gizmos/Doozy.meta
+/Assets/Plugins/Demigiant.meta
