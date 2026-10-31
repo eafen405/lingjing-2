@@ -1,0 +1,194 @@
+{
+  "kind": "tileset",
+  "name": "hollow_arena",
+  "tileSize": [
+    32,
+    32
+  ],
+  "ppu": 32,
+  "outline": false,
+  "floorTile": null,
+  "background": null,
+  "edgeMask": {
+    "n": 1,
+    "e": 2,
+    "s": 4,
+    "w": 8
+  },
+  "walls": [
+    {
+      "name": "wall_n",
+      "mask": 1,
+      "size": [
+        32,
+        32
+      ],
+      "file": "wall/wall_n.png",
+      "atlas": "wall/terrain_wall.png",
+      "cell": [
+        0,
+        0
+      ]
+    },
+    {
+      "name": "wall_e",
+      "mask": 2,
+      "size": [
+        32,
+        32
+      ],
+      "file": "wall/wall_e.png",
+      "atlas": "wall/terrain_wall.png",
+      "cell": [
+        1,
+        0
+      ]
+    },
+    {
+      "name": "wall_s",
+      "mask": 4,
+      "size": [
+        32,
+        32
+      ],
+      "file": "wall/wall_s.png",
+      "atlas": "wall/terrain_wall.png",
+      "cell": [
+        2,
+        0
+      ]
+    },
+    {
+      "name": "wall_w",
+      "mask": 8,
+      "size": [
+        32,
+        32
+      ],
+      "file": "wall/wall_w.png",
+      "atlas": "wall/terrain_wall.png",
+      "cell": [
+        3,
+        0
+      ]
+    },
+    {
+      "name": "wall_nw",
+      "mask": 9,
+      "size": [
+        32,
+        32
+      ],
+      "file": "wall/wall_nw.png",
+      "atlas": "wall/terrain_wall.png",
+      "cell": [
+        4,
+        0
+      ]
+    },
+    {
+      "name": "wall_ne",
+      "mask": 3,
+      "size": [
+        32,
+        32
+      ],
+      "file": "wall/wall_ne.png",
+      "atlas": "wall/terrain_wall.png",
+      "cell": [
+        5,
+        0
+      ]
+    },
+    {
+      "name": "wall_sw",
+      "mask": 12,
+      "size": [
+        32,
+        32
+      ],
+      "file": "wall/wall_sw.png",
+      "atlas": "wall/terrain_wall.png",
+      "cell": [
+        6,
+        0
+      ]
+    },
+    {
+      "name": "wall_se",
+      "mask": 6,
+      "size": [
+        32,
+        32
+      ],
+      "file": "wall/wall_se.png",
+      "atlas": "wall/terrain_wall.png",
+      "cell": [
+        7,
+        0
+      ]
+    }
+  ],
+  "props": [
+    {
+      "name": "prop_crystal",
+      "size": [
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        0
+      ],
+      "file": "props/prop_crystal.png"
+    },
+    {
+      "name": "prop_block",
+      "size": [
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        0
+      ],
+      "file": "props/prop_block.png"
+    }
+  ],
+  "portal": {
+    "frameSize": [
+      96,
+      96
+    ],
+    "pivot": [
+      48,
+      0
+    ],
+    "frames": 4,
+    "fps": 10,
+    "loop": true,
+    "atlas": "portal/terrain_portal.png",
+    "pattern": "portal/portal_{frame:02}.png"
+  },
+  "palette": {
+    "void": "#0b0f12",
+    "chasm": "#161d22",
+    "grout": "#232e36",
+    "shade": "#384651",
+    "base": "#556b78",
+    "light": "#77909c",
+    "hi": "#97aeb8",
+    "rim": "#b4c9d2",
+    "shell": "#1a232d",
+    "shell_lt": "#33455a",
+    "eye": "#c9f24d",
+    "eye_hi": "#e8ffa6",
+    "portal_deep": "#2a0f3a",
+    "portal_body": "#6a2fa8",
+    "portal_light": "#a35ce8",
+    "portal_cyan": "#5ce0ff",
+    "portal_pink": "#ff7ad9",
+    "portal_rim": "#ffe6f7"
+  },
+  "generator": "tools/art-pipeline/build_terrain.py"
+}
