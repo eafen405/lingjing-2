@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fairy 代行 · 算法逻辑原型</title>
+<style>
+:root{color-scheme:light;--ink:#202d32;--muted:#63757c;--accent:#087d71;--paper:#f4f6f5;--line:#d9e2df;--warn:#aa5a2b}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.65 system-ui,"Microsoft YaHei",sans-serif}main{max-width:1320px;margin:30px auto;padding:0 26px 44px}h1{font-size:30px;line-height:1.35;margin:9px 0}h2{font-size:20px;margin:0 0 12px}h3{font-size:16px;margin:8px 0}p{margin:8px 0}.tag{font-size:12px;letter-spacing:.1em;color:var(--accent);font-weight:700}.muted,small{color:var(--muted)}.intro{max-width:1030px}.notice{border-left:3px solid var(--accent);padding:8px 14px;margin:16px 0;background:#e7f1ed}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.tabs{margin:22px 0 14px}button,select,input{font:inherit}button,select{border:1px solid var(--line);background:white;border-radius:7px;padding:7px 13px;color:var(--ink)}button{cursor:pointer}button:hover{border-color:var(--accent)}button.active{background:var(--accent);color:white;border-color:var(--accent)}button:disabled{opacity:.5;cursor:default}button:focus-visible,select:focus-visible{outline:3px solid #80c4b8;outline-offset:2px}.card{background:white;border:1px solid var(--line);border-radius:11px;padding:20px;margin-bottom:16px}.grid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(280px,1fr);gap:16px}.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:12px 0}.stat{border-bottom:1px solid var(--line);padding:3px 0 9px}.stat b{display:block;font-size:19px;font-weight:650}.stat span{font-size:12px;color:var(--muted)}canvas{display:block;width:100%;height:auto;background:#fafcfa;border:1px solid var(--line);border-radius:7px}.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:8px 0}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px}.scroll{overflow:auto;max-height:480px}table{border-collapse:collapse;width:100%;font-size:13px;white-space:nowrap}th,td{text-align:left;padding:8px 10px;border-bottom:1px solid #e8eeeb}th{color:var(--muted);font-weight:500;position:sticky;top:0;background:white}tr.selected{background:#e3f1ec}tr.preview{outline:2px solid var(--accent);outline-offset:-2px}tbody tr[data-candidate]{cursor:pointer}code{font:12px ui-monospace,Consolas,monospace;color:#38545a}.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:12px}.steps button{text-align:left;white-space:normal;padding:11px}.steps small{display:block}.controls{margin:14px 0}input[type=range]{width:100%;accent-color:var(--accent)}.hidden{display:none!important}.warning{color:var(--warn)}.reason{background:#f1f6f3;padding:10px 12px;border-radius:5px;font-size:13px}.split{display:grid;grid-template-columns:1fr 1fr;gap:16px}a{color:var(--accent)}footer{margin-top:25px;font-size:12px;color:var(--muted)}details{margin:12px 0}summary{cursor:pointer}@media(max-width:880px){.grid,.split{grid-template-columns:1fr}.steps{grid-template-columns:1fr 1fr}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}main{padding:0 14px;margin-top:18px}}
+</style>
+</head>
+<body><main>
+<header class="intro"><div class="tag">THROWAWAY / 逻辑原型 / 非正式游戏实现</div>
+<h1>Fairy 怎样选择下一步？</h1>
+<p>研究问题：相同四秒起点下，短时前瞻与安全分层能否改善走位？只精评少量候选，是否会漏掉更好的动作？</p>
+<div class="notice">本页内嵌 C# 实验结果，双击即可重放；不联网、不保存状态。按钮改变的是<strong>观察位置与候选预览</strong>，不是在浏览器里另造一套战斗规则。所有结论只适用于这些小场景，不能当作手机性能或无伤保证。</div></header>
+<nav class="tabs row" id="mode-tabs"><button data-mode="battle" class="active">代行对照</button><button data-mode="navigation">导航探针</button><button data-mode="phase">输出代理探针</button></nav>
+<section id="battle-panel">
+<div class="card"><h2>场景与引导</h2><div class="row" id="scenario-tabs"></div><p class="muted" id="scenario-description"></p>
+<div class="row"><label for="strategy">策略</label><select id="strategy"></select><span class="muted" id="strategy-description"></span></div>
+<div class="steps" id="steps"></div></div>
+<div class="grid"><div>
+<div class="card"><h2>当前战场</h2><canvas id="battle-canvas" width="960" height="576" aria-label="玩家、刀环、敌人、弹丸、落区及运动轨迹"></canvas>
+<div class="legend"><span><i class="dot" style="background:#087d71"></i>玩家 / 刀环</span><span><i class="dot" style="background:#ad6854"></i>敌人</span><span><i class="dot" style="background:#d4a04c"></i>弹丸 / 落区</span><span>实线：真实轨迹；虚线：当前选中动作的预测</span></div>
+<div class="row controls" id="free-controls"><button data-step="-6">← 上次决策</button><button data-step="-1">上一帧</button><button data-step="1">下一帧</button><button data-step="6">下次决策 →</button><button data-step="30">前进 0.5 秒</button><button id="reset">重置</button><button id="end">到结尾</button></div>
+<label for="tick-slider" class="muted">观察时刻 <span id="tick-label"></span></label><input id="tick-slider" type="range" min="0" max="240" value="0" step="1">
+<p class="muted" id="preview-note">点击候选行可查看其移动方向；不会改写真实轨迹。</p></div>
+<div class="card"><h2>候选为什么留下或被淘汰？</h2><p class="reason" id="decision-reason"></p><div class="scroll"><table id="candidate-table"><thead><tr><th>动作</th><th>移动</th><th>旋转</th><th>预测伤害 D</th><th>环上驻留 R</th><th>输出代理 V</th><th>连续性</th><th>精评</th><th>阶段</th></tr></thead><tbody></tbody></table></div><small>粗筛淘汰的候选没有同等精度的评价；表内数值不能跨精度直接当真值比较。预测伤害单位与积分定义见实验说明。</small></div>
+</div><aside>
+<div class="card"><h2>完整观察状态</h2><div class="stats" id="current-stats"></div><p id="command-state"></p><p class="muted" id="hash-state"></p><div id="world-state"></div></div>
+<div class="card"><h2>同一四秒窗口的结果</h2><div class="scroll"><table id="comparison-table"><thead><tr><th>策略</th><th>掉血</th><th>命中</th><th>击杀</th><th>决策 P95/ms</th><th>重放一致</th></tr></thead><tbody></tbody></table></div><p class="muted">切换策略后，每一组都展示其<strong>自身执行后的世界</strong>；同刻不代表仍处于相同快照。</p></div>
+<div class="card"><h2>同一快照的决策沙盘</h2><p class="muted">只用已精评的候选分量重新筛选，不推进世界、不改回放。体验“零伤优先”和“允许微伤”是否表达同一个意图。</p><div class="row" id="rule-controls"><button data-rule="zero">零伤优先</button><button data-rule="tolerance">允许 2 点生命容差</button></div><p class="reason" id="rule-result"></p></div>
+<div class="card"><h3>先观察什么？</h3><p>① 有安全动作时，危险动作是否仍被选中？</p><p>② 预测路线和真实路线是否明显分离？</p><p>③ 粗筛是否只省计算，还是也丢掉了好动作？</p><p>④ 输出代理更高，实际四秒命中是否也更多？</p></div>
+</aside></div>
+<details class="card"><summary>实验输入、边界与计时说明</summary><div id="configuration"></div><p>计时是本机 .NET 进程的观测值，受 JIT、调度与分配影响。规划耗时不等于整帧 AI 耗时；整场模拟耗时也不能直接当作某一帧预算。实验未覆盖拾取、完整 Boss 和移动端。</p><p><a href="README.md">运行说明与输入清单</a> · <a href="../../docs/research/ai-exploration-findings.md">实验结论</a> · <a href="../../docs/research/ai-navigation-planning-sources.md">一手资料研究</a></p></details>
+</section>
+<section id="navigation-panel" class="hidden"><div class="card"><h2>流场距离正确，后继一定最短吗？</h2><p>原实现以邻格距离最小选后继；八邻接含不同边代价时，正确比较项应是「边代价 + 邻格距离」。本探针使用现有关卡和原始流场，参考树只用于对照，不修改原实现。</p><div class="stats" id="nav-stats"></div><canvas id="navigation-canvas" width="960" height="576"></canvas><div class="legend"><span>棕色：现有流场路线</span><span style="color:var(--accent)">绿色：参考最短路线</span></div></div><div class="card"><h2>多目标搜索的本机观测</h2><div class="scroll"><table id="navigation-table"><thead><tr><th>候选数</th><th>逐点 A* P50/ms</th><th>共享树 P50/ms</th><th>逐点 A* P95/ms</th><th>共享树 P95/ms</th><th>半径 0.4 检查拒绝路径</th></tr></thead><tbody></tbody></table></div><p id="navigation-caveat" class="warning"></p><p>原 A* 包含平滑，实验树只回溯格点，因此不是输出等价的提速证明。是否值得共享搜索，仍需正式候选分布与一致平滑规则下测量。</p></div></section>
+<section id="phase-panel" class="hidden"><div class="card"><h2>输出代理越大，一秒内命中一定越多吗？</h2><p>相对角速度是便宜的代理量；有限刀相位、敌人运动、离环和每刀冷却可能改变实际命中排序。本探针复用现有刀环与伤害常量，但它是受控几何小模型，不是完整战斗胜率研究。</p><div class="stats" id="phase-stats"></div><label for="phase-case">选择一个受控输入</label> <select id="phase-case"></select><div id="phase-case-details"></div><div class="scroll"><table id="phase-options"><thead><tr><th>移动候选</th><th>旋转</th><th>代理 V</th><th>实际几何命中</th><th>选择说明</th></tr></thead><tbody></tbody></table></div><p class="muted">先看是否发生排序失配，再决定是否把命中预测纳入精评。不要因为一个反例就把所有场景改成昂贵的完整模拟。</p></div></section>
+<footer>一次性探索材料 · 无服务器、无数据库、无持久化 · <span id="generated-label"></span></footer>
+</main>
+<script id="prototype-data" type="application/json">__PROTOTYPE_DATA__</script>
+<script>
+'use strict';
+// Portable pure observation model. No DOM access; the shell below only renders/dispatches.
+const DemoLogic = (() => {
+  const names = {greedy:'短视加权', 'lex-full':'分层完整前瞻', 'lex-coarse4':'粗筛 + 前四精评'};
+  const clamp = (value,min,max) => Math.max(min,Math.min(max,value));
+  function runs(data,scenarioId) { return data.summary.runs.filter(r=>r.scenarioId===scenarioId); }
+  function run(data,state) { return runs(data,state.scenarioId).find(r=>r.strategy===state.strategy) || runs(data,state.scenarioId)[0]; }
+  function frames(data,state) { const r=run(data,state); return data.traces[`${r.scenarioId}|${r.strategy}`]?.frames || []; }
+  function decisions(data,state) { const r=run(data,state); return data.decisions[`${r.scenarioId}|${r.strategy}`]?.decisions || []; }
+  function frame(data,state) { const list=frames(data,state); return list.find(f=>f.tick===state.tick)||list.filter(f=>f.tick<=state.tick).at(-1)||list[0]; }
+  function decision(data,state) { return decisions(data,state).filter(d=>d.tick<=state.tick).at(-1)||null; }
+  // Re-rank recorded fine evaluations only; physics and authoritative scores remain in C#.
+  function prioritize(candidates,rule) {
+    const fine=candidates.filter(c=>c.fineEvaluated&&[c.damage,c.ring,c.v].every(Number.isFinite));
+    if(!fine.length)return null;
+    const minimum=Math.min(...fine.map(c=>c.damage)),limit=rule==='tolerance'?Math.max(2,minimum):minimum<=1e-9?1e-9:minimum+1e-9;
+    const safe=fine.filter(c=>c.damage<=limit),coverage=Math.max(...safe.map(c=>c.ring));
+    const retained=safe.filter(c=>c.ring>=coverage*.85-1e-9);
+    let selected=retained[0];
+    for(const c of retained)if(c.v>selected.v+1e-9||(Math.abs(c.v-selected.v)<=1e-9&&(c.continuity||0)>(selected.continuity||0)))selected=c;
+    return {selected,minimum,limit,coverage,safeCount:safe.length,retainedCount:retained.length,total:fine.length};
+  }
+  function initial(data) { const r=data.summary.runs[0]; return {mode:'battle',scenarioId:r.scenarioId,strategy:r.strategy,tick:0,preview:null,step:0,phaseIndex:0,rule:'zero'}; }
+  function reduce(data,state,action) {
+    const next={...state};
+    if(action.type==='mode') next.mode=action.value;
+    if(action.type==='scenario') { next.scenarioId=action.value; next.tick=0; next.preview=null; next.step=0; if(!runs(data,next.scenarioId).some(r=>r.strategy===next.strategy)) next.strategy=runs(data,next.scenarioId)[0].strategy; }
+    if(action.type==='strategy') {next.strategy=action.value;next.preview=null;}
+    if(action.type==='tick') {next.tick=Number(action.value);next.preview=null;}
+    if(action.type==='step') {next.tick+=action.value;next.preview=null;next.step=-1;}
+    if(action.type==='preview') next.preview=action.value;
+    if(action.type==='phase') next.phaseIndex=Number(action.value);
+    if(action.type==='rule') next.rule=action.value;
+    if(action.type==='guide') {next.step=action.value;next.preview=null;next.tick=[0,decisions(data,next)[0]?.tick||6,60,240][action.value];}
+    const list=frames(data,next); next.tick=clamp(next.tick,list[0]?.tick||0,list.at(-1)?.tick||240);
+    return next;
+  }
+  return {names,runs,run,frames,frame,decisions,decision,prioritize,initial,reduce};
+})();
+const DATA=JSON.parse(document.getElementById('prototype-data').textContent);
+let state=DemoLogic.initial(DATA);
+const $=id=>document.getElementById(id);
+const escapeHtml=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const number=(value,digits=3)=>typeof value==='number'&&Number.isFinite(value)?value.toFixed(digits):'—';
+const point=value=>Array.isArray(value)?value:[value?.x||0,value?.y||0];
+const spin=value=>value>0?'逆时针 +':value<0?'顺时针 −':'保持';
+const strategyName=value=>DemoLogic.names[value]||value;
+const metric=(value,label)=>`<div class="stat"><b>${escapeHtml(value)}</b><span>${escapeHtml(label)}</span></div>`;
+function dispatch(action){state=DemoLogic.reduce(DATA,state,action);render();}
+function stageLabel(value){return ({selected:'选中',eligible:'可选','p0-filtered':'安全层淘汰','p1-filtered':'覆盖层淘汰','coarse-pruned':'粗筛淘汰',coarse:'仅粗评',fine:'已精评'})[value]||value||'—';}
+function worldTable(title,headers,rows){return `<h3>${escapeHtml(title)} · ${rows.length}</h3><div class="scroll"><table><thead><tr>${headers.map(h=>`<th>${escapeHtml(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr>${row.map(v=>`<td>${escapeHtml(v)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;}
+function mapCanvas(canvas,width,height,walls){const ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);const scale=Math.min((canvas.width-32)/width,(canvas.height-32)/height),ox=(canvas.width-width*scale)/2,oy=(canvas.height-height*scale)/2;const xy=p=>[ox+p[0]*scale,oy+(height-p[1])*scale];ctx.strokeStyle='#edf1ed';ctx.lineWidth=1;for(let x=0;x<=width;x++){const a=xy([x,0]),b=xy([x,height]);ctx.beginPath();ctx.moveTo(...a);ctx.lineTo(...b);ctx.stroke();}for(let y=0;y<=height;y++){const a=xy([0,y]),b=xy([width,y]);ctx.beginPath();ctx.moveTo(...a);ctx.lineTo(...b);ctx.stroke();}ctx.fillStyle='#c6cfcb';for(const wall of walls||[]){const p=xy([wall[0],wall[1]+1]);ctx.fillRect(p[0],p[1],scale,scale);}return {ctx,xy,scale};}
+function line(map,points,color,dash=[]){if(!points?.length)return;const {ctx,xy}=map;ctx.save();ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.setLineDash(dash);ctx.beginPath();points.forEach((p,i)=>{const q=xy(point(p));i?ctx.lineTo(...q):ctx.moveTo(...q);});ctx.stroke();ctx.restore();}
+function circle(map,p,r,color,fill=true){const {ctx,xy,scale}=map;ctx.beginPath();ctx.arc(...xy(point(p)),Math.max(2,r*scale),0,Math.PI*2);if(fill){ctx.fillStyle=color;ctx.fill();}else{ctx.strokeStyle=color;ctx.lineWidth=2;ctx.stroke();}}
+function renderBattle(){
+ const run=DemoLogic.run(DATA,state),scene=DATA.summary.scenarios.find(s=>(s.id||s.scenarioId)===state.scenarioId)||{},frame=DemoLogic.frame(DATA,state),decision=DemoLogic.decision(DATA,state);
+ if(!frame)return;
+ $('scenario-tabs').innerHTML=DATA.summary.scenarios.map(s=>`<button data-scenario="${escapeHtml(s.id||s.scenarioId)}" class="${(s.id||s.scenarioId)===state.scenarioId?'active':''}">${escapeHtml(s.label||s.id)}</button>`).join('');
+ $('scenario-description').textContent=scene.description||'';
+ $('strategy').innerHTML=DemoLogic.runs(DATA,state.scenarioId).map(r=>`<option value="${escapeHtml(r.strategy)}" ${r.strategy===run.strategy?'selected':''}>${escapeHtml(strategyName(r.strategy))}</option>`).join('');
+ $('strategy-description').textContent=run.strategy==='greedy'?'同候选集合的短视对照，不等同于原基线逐字复刻。':run.strategy==='lex-full'?'所有候选精评，作为小模型下的完整搜索对照。':'先粗评全部候选，再对前四个动作精评；可能误删好动作。';
+ const guide=[['回到起点','同一输入，重置观察状态。'],['首次规划','查看本次候选与分层筛选。'],['看一秒后','对照预测和实际走法。'],['看四秒结果','比较安全、命中与计算开销。']];
+ $('steps').innerHTML=guide.map((s,i)=>`<button data-guide="${i}" class="${state.step===i?'active':''}">${i+1}. ${s[0]}<small>${s[1]}</small></button>`).join('');
+ const p=frame.player,command=frame.command||{},candidates=decision?.candidates||[],chosen=candidates.find(c=>c.selected||c.id===decision?.selectedId),preview=candidates.find(c=>String(c.id)===String(state.preview))||chosen;
+ $('tick-label').textContent=`${number(frame.tick/60,2)} 秒 / tick ${frame.tick}`;$('tick-slider').max=DemoLogic.frames(DATA,state).at(-1)?.tick||240;$('tick-slider').value=frame.tick;
+ $('current-stats').innerHTML=metric(number(p.hp,2),'当前生命')+metric(spin(p.spinSign),'当前旋转')+metric(`${number(p.x,2)}, ${number(p.y,2)}`,'当前位置 x, y')+metric(`${number(p.vx,2)}, ${number(p.vy,2)}`,'实际速度 x, y')+metric(number(p.phase,3),'刀环相位 / 弧度')+metric(decision?`tick ${decision.tick}`:'尚未规划','当前持有的决策');
+ $('command-state').textContent=`移动输入：(${number(command.x,3)}, ${number(command.y,3)})；期望旋转：${spin(command.spinSign)}；翻向事件：${command.requestReverse?'是':'否'}。`;
+ $('hash-state').textContent=`tick 哈希：${frame.tickHash||'未记录'}。全窗口重复运行：${run.determinism?.allTickHashesEqual?'逐 tick 一致':'未确认一致'}。`;
+ $('world-state').innerHTML=worldTable('敌人',['编号 / 类型','位置','生命','状态'],(frame.enemies||[]).map(e=>[`${e.id} / ${e.kind}`,`${number(e.x,2)}, ${number(e.y,2)}`,number(e.hp,1),e.state]))+worldTable('弹丸',['位置','速度'],(frame.projectiles||[]).map(e=>[`${number(e.x,2)}, ${number(e.y,2)}`,`${number(e.vx,2)}, ${number(e.vy,2)}`]))+worldTable('落区',['左下角','尺寸','剩余预警'],(frame.zones||[]).map(z=>[`${number(z.x,1)}, ${number(z.y,1)}`,`${z.width} × ${z.height}`,`${z.warnTicksLeft} tick`]));
+ $('decision-reason').textContent=decision?`本轮选中 ${decision.selectedId}。最小预测伤害 ${number(decision.p0BestDamage)} HP；覆盖层保留阈值 ${number(decision.p1Threshold)}。${decision.reason||'安全优先，输出不能补偿更高的预测伤害。'}`:'尚未到首次 Fairy 规划；先查看初始状态，再点击“首次规划”。';
+ const sandbox=DemoLogic.prioritize(candidates,state.rule);document.querySelectorAll('[data-rule]').forEach(b=>b.classList.toggle('active',b.dataset.rule===state.rule));
+ $('rule-result').textContent=sandbox?`沙盘会选 ${sandbox.selected.id}：D=${number(sandbox.selected.damage)} HP，R=${number(sandbox.selected.ring)}，V=${number(sandbox.selected.v)}。${sandbox.total} 个精评候选中，${sandbox.safeCount} 个通过安全层，${sandbox.retainedCount} 个通过覆盖层。当前真实回放仍选 ${decision.selectedId}。`:'到达一次包含精评候选的规划后，即可在同一快照比较两种安全规则。';
+ $('candidate-table').querySelector('tbody').innerHTML=candidates.map(c=>`<tr data-candidate="${escapeHtml(c.id)}" class="${c.selected||c.id===decision.selectedId?'selected ':''}${String(c.id)===String(state.preview)?'preview':''}"><td>${escapeHtml(c.id)}</td><td>${escapeHtml((c.move||[]).map(v=>number(v,2)).join(', '))}</td><td>${spin(c.spinSign)}</td><td>${number(c.damage)}</td><td>${number(c.ring)}</td><td>${number(c.v)}</td><td>${number(c.continuity)}</td><td>${c.fineEvaluated?'是':'否'}</td><td>${escapeHtml(stageLabel(c.stage))}</td></tr>`).join('');
+ $('comparison-table').querySelector('tbody').innerHTML=DemoLogic.runs(DATA,state.scenarioId).map(r=>`<tr class="${r.strategy===state.strategy?'selected':''}"><td>${escapeHtml(strategyName(r.strategy))}</td><td>${number(r.damageTaken,2)}</td><td>${r.hits}</td><td>${r.kills}</td><td>${number(r.timing?.plannerMs?.p95,4)}</td><td>${r.determinism?.allTickHashesEqual?'是':'否'}</td></tr>`).join('');
+ const map=mapCanvas($('battle-canvas'),scene.width||40,scene.height||24,scene.walls||[]),{ctx,xy,scale}=map;
+ for(const z of frame.zones||[]){const a=xy([z.x,z.y+z.height]);ctx.fillStyle='#ddb25b44';ctx.fillRect(a[0],a[1],z.width*scale,z.height*scale);ctx.strokeStyle='#b38a37';ctx.strokeRect(a[0],a[1],z.width*scale,z.height*scale);}
+ line(map,DemoLogic.frames(DATA,state).filter(f=>f.tick<=frame.tick).map(f=>[f.player.x,f.player.y]),'#7aaca1');
+ const predicted=chosen?.path||chosen?.predictedPath||decision?.predictedPath; if(predicted)line(map,predicted,'#087d71',[6,5]);
+ for(const e of frame.enemies||[]){circle(map,[e.x,e.y],e.radius||.35,'#ad6854');ctx.fillStyle='#785044';ctx.font='13px system-ui';ctx.fillText(String(e.id),...xy([e.x+.4,e.y+.4]));}
+ for(const e of frame.projectiles||[])circle(map,[e.x,e.y],.12,'#c99739');
+ circle(map,[p.x,p.y],2,'#70aa98',false);circle(map,[p.x,p.y],.4,'#087d71');for(let i=0;i<4;i++){const a=p.phase+i*Math.PI/2;circle(map,[p.x+2*Math.cos(a),p.y+2*Math.sin(a)],.07,'#087d71');}
+ if(preview){const m=preview.move||[0,0];line(map,[[p.x,p.y],[p.x+m[0]*1.5,p.y+m[1]*1.5]],'#253e43');$('preview-note').textContent=`预览 ${preview.id}：移动 (${m.map(v=>number(v,2)).join(', ')})，${spin(preview.spinSign)}。仅查看，不改写真实轨迹。`;}else $('preview-note').textContent='尚无候选；点击首次规划。';
+ const config=DATA.summary.configuration||{};$('configuration').innerHTML=Object.entries(config).map(([k,v])=>`<p><code>${escapeHtml(k)}</code>：${escapeHtml(typeof v==='object'?JSON.stringify(v):v)}</p>`).join('');
+}
+function renderNavigation(){const nav=DATA.summary.navigation;if(!nav){$('nav-stats').textContent='本次结果未包含导航探针。';return;}const f=nav.flow||{};$('nav-stats').innerHTML=metric(f.reachableNonRootCells,'可达非根格')+metric(f.nonShortestSuccessorCells,'未选最短后继的格数')+metric(number(f.worstRouteExcess,3),'示例路线额外图代价');const map=mapCanvas($('navigation-canvas'),nav.width,nav.height,nav.walls);line(map,f.actualRoute,'#ad6854');line(map,f.optimalRoute,'#087d71',[7,3]);circle(map,nav.origin,.4,'#087d71');circle(map,f.start,.35,'#253e43');$('navigation-table').querySelector('tbody').innerHTML=(nav.search||[]).map(r=>`<tr><td>${r.candidateCount}</td><td>${number(r.repeatedAStar?.p50Ms,4)}</td><td>${number(r.oneTreeAndBacktrace?.p50Ms,4)}</td><td>${number(r.repeatedAStar?.p95Ms,4)}</td><td>${number(r.oneTreeAndBacktrace?.p95Ms,4)}</td><td>${r.pathsRejectedByRadius04SampleCheck}</td></tr>`).join('');$('navigation-caveat').textContent=nav.timingCaveat||'';}
+function renderPhase(){const probe=DATA.phase||{},cases=probe.cases||[],c=cases[state.phaseIndex]||cases[0],summary=probe.summary||{};$('phase-stats').innerHTML=metric(cases.length,'输入组合数')+metric(summary.regretCases??'—','代理未选中最多命中的组合')+metric(summary.maxRegret??'—','最大少命中数')+metric(number((summary.exactBestFraction||0)*100,1)+'%','选中最多命中的比例');$('phase-case').innerHTML=cases.map((row,i)=>`<option value="${i}" ${i===state.phaseIndex?'selected':''}>${i+1}. 距离 ${number(row.distance,2)} / 敌速 ${number(row.enemySpeed,2)} / 相位 ${number(row.initialPhase,2)} / 命中损失 ${row.regret??'—'}</option>`).join('');if(!c)return;$('phase-case-details').innerHTML=`<p>输入：距离 ${number(c.distance,3)}，敌人切向速度 ${number(c.enemySpeed,3)}，初始相位 ${number(c.initialPhase,3)}。代理选中后的命中 ${c.selectedHits}，候选最佳命中 ${c.bestHits}，差额 ${c.regret}。</p>`;$('phase-options').querySelector('tbody').innerHTML=(c.options||[]).map((o,i)=>{const id=o.id??o.optionId??i,selected=String(id)===String(c.vSelectedId);return `<tr class="${selected?'selected':''}"><td>${escapeHtml(o.moveId??id)}</td><td>${spin(o.spinSign)}</td><td>${number(o.v,4)}</td><td>${o.hits}</td><td>${selected?'代理选择':o.hits===c.bestHits?'实际命中最佳':''}</td></tr>`;}).join('');}
+function render(){for(const mode of ['battle','navigation','phase']){$(`${mode}-panel`).classList.toggle('hidden',state.mode!==mode);}document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode===state.mode));if(state.mode==='battle')renderBattle();else if(state.mode==='navigation')renderNavigation();else renderPhase();$('generated-label').textContent=DATA.generatedAt||'固定实验数据';}
+document.addEventListener('click',event=>{const b=event.target.closest('button');if(b?.dataset.mode)dispatch({type:'mode',value:b.dataset.mode});else if(b?.dataset.rule)dispatch({type:'rule',value:b.dataset.rule});else if(b?.dataset.scenario)dispatch({type:'scenario',value:b.dataset.scenario});else if(b?.dataset.guide)dispatch({type:'guide',value:Number(b.dataset.guide)});else if(b?.dataset.step)dispatch({type:'step',value:Number(b.dataset.step)});else if(b?.id==='reset')dispatch({type:'tick',value:0});else if(b?.id==='end')dispatch({type:'tick',value:100000});else{const row=event.target.closest('[data-candidate]');if(row)dispatch({type:'preview',value:row.dataset.candidate});}});
+$('strategy').addEventListener('change',e=>dispatch({type:'strategy',value:e.target.value}));$('tick-slider').addEventListener('input',e=>dispatch({type:'tick',value:e.target.value}));$('phase-case').addEventListener('change',e=>dispatch({type:'phase',value:e.target.value}));
+const initialParams=new URLSearchParams(location.hash.slice(1));if(initialParams.has('scenario')&&DATA.summary.scenarios.some(s=>s.id===initialParams.get('scenario')))state=DemoLogic.reduce(DATA,state,{type:'scenario',value:initialParams.get('scenario')});if(initialParams.has('strategy')&&DemoLogic.runs(DATA,state.scenarioId).some(r=>r.strategy===initialParams.get('strategy')))state=DemoLogic.reduce(DATA,state,{type:'strategy',value:initialParams.get('strategy')});if(initialParams.has('tick'))state=DemoLogic.reduce(DATA,state,{type:'tick',value:Number(initialParams.get('tick'))||0});if(['battle','navigation','phase'].includes(initialParams.get('mode')))state.mode=initialParams.get('mode');
+render();
+</script></body></html>

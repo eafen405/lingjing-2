@@ -1,0 +1,2769 @@
+{
+  "schemaVersion": 1,
+  "experiment": "Fairy fixed-candidate greedy vs lexicographic trajectory probe",
+  "environment": {
+    "runtime": ".NET 8.0.33",
+    "os": "Microsoft Windows 10.0.26200",
+    "architecture": "X64",
+    "processorCount": 32,
+    "performanceScope": "Desktop Release, not mobile; no cross-platform deterministic guarantee"
+  },
+  "configuration": {
+    "warmupsPerScenarioStrategy": 3,
+    "measuredRepeats": 7,
+    "exportRunOutsideTiming": true,
+    "scenarioTicks": 241,
+    "fairyTicks": 240,
+    "candidateMoves": 18,
+    "candidateSigns": 2,
+    "decisionEveryTicks": 6,
+    "horizonTicks": 60,
+    "coarseStrideTicks": 6,
+    "refineTopK": 4,
+    "p1Retention": 0.85,
+    "damageUnit": "raw HP",
+    "percentileMethod": "nearest rank",
+    "wholeSimDefinition": "wall clock around BattleSimulation.Run only; includes hash/metrics, excludes constructor and export capture",
+    "strategies": [
+      "greedy",
+      "lex-full",
+      "lex-coarse4"
+    ]
+  },
+  "scenarios": [
+    {
+      "id": "single-tail",
+      "label": "\u5355\u654C\u8FFD\u8E2A",
+      "description": "\u5C3E\u706F\u6301\u7EED\u8FFD\u51FB\uFF1B\u73A9\u5BB6\u4ECE\u9759\u6B62\u51FA\u53D1\u3002",
+      "seed": 1,
+      "ticks": 241,
+      "width": 24,
+      "height": 16,
+      "walls": []
+    },
+    {
+      "id": "near-wall",
+      "label": "\u8FD1\u5899\u8F6C\u5411",
+      "description": "\u73A9\u5BB6\u9760\u8FD1\u7AD6\u5899\uFF0C\u4E24\u53EA\u5C3E\u706F\u4F9D\u6B21\u5165\u573A\u3002",
+      "seed": 2,
+      "ticks": 241,
+      "width": 24,
+      "height": 16,
+      "walls": [
+        [
+          12,
+          2
+        ],
+        [
+          12,
+          3
+        ],
+        [
+          12,
+          4
+        ],
+        [
+          12,
+          5
+        ],
+        [
+          12,
+          6
+        ],
+        [
+          12,
+          7
+        ],
+        [
+          12,
+          8
+        ],
+        [
+          12,
+          9
+        ],
+        [
+          12,
+          10
+        ],
+        [
+          12,
+          11
+        ],
+        [
+          12,
+          12
+        ],
+        [
+          12,
+          13
+        ]
+      ]
+    },
+    {
+      "id": "nails-zones",
+      "label": "\u5F39\u4E38\u4E0E\u843D\u533A",
+      "description": "\u9489\u67AA\u4E0E\u5760\u7269\u6309\u539F\u72B6\u6001\u673A\u751F\u6210\u5F39\u4E38\u548C\u843D\u533A\u3002",
+      "seed": 3,
+      "ticks": 241,
+      "width": 24,
+      "height": 16,
+      "walls": []
+    },
+    {
+      "id": "mixed",
+      "label": "\u6DF7\u5408\u654C\u4EBA",
+      "description": "\u56DB\u79CD\u654C\u4EBA\u5171\u540C\u5165\u573A\uFF0C\u5E76\u5728\u7B2C90 tick\u589E\u52A0\u4E00\u53EA\u5C3E\u706F\u3002",
+      "seed": 7,
+      "ticks": 241,
+      "width": 24,
+      "height": 16,
+      "walls": [
+        [
+          8,
+          5
+        ],
+        [
+          8,
+          6
+        ],
+        [
+          8,
+          7
+        ]
+      ]
+    },
+    {
+      "id": "trap",
+      "label": "\u62E5\u6324\u9677\u9631",
+      "description": "\u516D\u4E58\u516D\u5C01\u95ED\u7A7A\u95F4\uFF0C\u5C3E\u706F\u3001\u649E\u9488\u4E0E\u5760\u7269\u5171\u540C\u65BD\u538B\u3002",
+      "seed": 11,
+      "ticks": 241,
+      "width": 24,
+      "height": 16,
+      "walls": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          4,
+          0
+        ],
+        [
+          5,
+          0
+        ],
+        [
+          6,
+          0
+        ],
+        [
+          7,
+          0
+        ],
+        [
+          8,
+          0
+        ],
+        [
+          9,
+          0
+        ],
+        [
+          10,
+          0
+        ],
+        [
+          11,
+          0
+        ],
+        [
+          12,
+          0
+        ],
+        [
+          13,
+          0
+        ],
+        [
+          14,
+          0
+        ],
+        [
+          15,
+          0
+        ],
+        [
+          16,
+          0
+        ],
+        [
+          17,
+          0
+        ],
+        [
+          18,
+          0
+        ],
+        [
+          19,
+          0
+        ],
+        [
+          20,
+          0
+        ],
+        [
+          21,
+          0
+        ],
+        [
+          22,
+          0
+        ],
+        [
+          23,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          4,
+          1
+        ],
+        [
+          5,
+          1
+        ],
+        [
+          6,
+          1
+        ],
+        [
+          7,
+          1
+        ],
+        [
+          8,
+          1
+        ],
+        [
+          9,
+          1
+        ],
+        [
+          10,
+          1
+        ],
+        [
+          11,
+          1
+        ],
+        [
+          12,
+          1
+        ],
+        [
+          13,
+          1
+        ],
+        [
+          14,
+          1
+        ],
+        [
+          15,
+          1
+        ],
+        [
+          16,
+          1
+        ],
+        [
+          17,
+          1
+        ],
+        [
+          18,
+          1
+        ],
+        [
+          19,
+          1
+        ],
+        [
+          20,
+          1
+        ],
+        [
+          21,
+          1
+        ],
+        [
+          22,
+          1
+        ],
+        [
+          23,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          2
+        ],
+        [
+          3,
+          2
+        ],
+        [
+          4,
+          2
+        ],
+        [
+          5,
+          2
+        ],
+        [
+          6,
+          2
+        ],
+        [
+          7,
+          2
+        ],
+        [
+          8,
+          2
+        ],
+        [
+          9,
+          2
+        ],
+        [
+          10,
+          2
+        ],
+        [
+          11,
+          2
+        ],
+        [
+          12,
+          2
+        ],
+        [
+          13,
+          2
+        ],
+        [
+          14,
+          2
+        ],
+        [
+          15,
+          2
+        ],
+        [
+          16,
+          2
+        ],
+        [
+          17,
+          2
+        ],
+        [
+          18,
+          2
+        ],
+        [
+          19,
+          2
+        ],
+        [
+          20,
+          2
+        ],
+        [
+          21,
+          2
+        ],
+        [
+          22,
+          2
+        ],
+        [
+          23,
+          2
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          3,
+          3
+        ],
+        [
+          4,
+          3
+        ],
+        [
+          5,
+          3
+        ],
+        [
+          6,
+          3
+        ],
+        [
+          7,
+          3
+        ],
+        [
+          8,
+          3
+        ],
+        [
+          9,
+          3
+        ],
+        [
+          10,
+          3
+        ],
+        [
+          11,
+          3
+        ],
+        [
+          12,
+          3
+        ],
+        [
+          13,
+          3
+        ],
+        [
+          14,
+          3
+        ],
+        [
+          15,
+          3
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          17,
+          3
+        ],
+        [
+          18,
+          3
+        ],
+        [
+          19,
+          3
+        ],
+        [
+          20,
+          3
+        ],
+        [
+          21,
+          3
+        ],
+        [
+          22,
+          3
+        ],
+        [
+          23,
+          3
+        ],
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          5,
+          4
+        ],
+        [
+          6,
+          4
+        ],
+        [
+          7,
+          4
+        ],
+        [
+          8,
+          4
+        ],
+        [
+          9,
+          4
+        ],
+        [
+          10,
+          4
+        ],
+        [
+          11,
+          4
+        ],
+        [
+          12,
+          4
+        ],
+        [
+          13,
+          4
+        ],
+        [
+          14,
+          4
+        ],
+        [
+          15,
+          4
+        ],
+        [
+          16,
+          4
+        ],
+        [
+          17,
+          4
+        ],
+        [
+          18,
+          4
+        ],
+        [
+          19,
+          4
+        ],
+        [
+          20,
+          4
+        ],
+        [
+          21,
+          4
+        ],
+        [
+          22,
+          4
+        ],
+        [
+          23,
+          4
+        ],
+        [
+          0,
+          5
+        ],
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          5
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          5,
+          5
+        ],
+        [
+          6,
+          5
+        ],
+        [
+          7,
+          5
+        ],
+        [
+          8,
+          5
+        ],
+        [
+          15,
+          5
+        ],
+        [
+          16,
+          5
+        ],
+        [
+          17,
+          5
+        ],
+        [
+          18,
+          5
+        ],
+        [
+          19,
+          5
+        ],
+        [
+          20,
+          5
+        ],
+        [
+          21,
+          5
+        ],
+        [
+          22,
+          5
+        ],
+        [
+          23,
+          5
+        ],
+        [
+          0,
+          6
+        ],
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          6
+        ],
+        [
+          3,
+          6
+        ],
+        [
+          4,
+          6
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          6,
+          6
+        ],
+        [
+          7,
+          6
+        ],
+        [
+          8,
+          6
+        ],
+        [
+          15,
+          6
+        ],
+        [
+          16,
+          6
+        ],
+        [
+          17,
+          6
+        ],
+        [
+          18,
+          6
+        ],
+        [
+          19,
+          6
+        ],
+        [
+          20,
+          6
+        ],
+        [
+          21,
+          6
+        ],
+        [
+          22,
+          6
+        ],
+        [
+          23,
+          6
+        ],
+        [
+          0,
+          7
+        ],
+        [
+          1,
+          7
+        ],
+        [
+          2,
+          7
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          4,
+          7
+        ],
+        [
+          5,
+          7
+        ],
+        [
+          6,
+          7
+        ],
+        [
+          7,
+          7
+        ],
+        [
+          8,
+          7
+        ],
+        [
+          15,
+          7
+        ],
+        [
+          16,
+          7
+        ],
+        [
+          17,
+          7
+        ],
+        [
+          18,
+          7
+        ],
+        [
+          19,
+          7
+        ],
+        [
+          20,
+          7
+        ],
+        [
+          21,
+          7
+        ],
+        [
+          22,
+          7
+        ],
+        [
+          23,
+          7
+        ],
+        [
+          0,
+          8
+        ],
+        [
+          1,
+          8
+        ],
+        [
+          2,
+          8
+        ],
+        [
+          3,
+          8
+        ],
+        [
+          4,
+          8
+        ],
+        [
+          5,
+          8
+        ],
+        [
+          6,
+          8
+        ],
+        [
+          7,
+          8
+        ],
+        [
+          8,
+          8
+        ],
+        [
+          15,
+          8
+        ],
+        [
+          16,
+          8
+        ],
+        [
+          17,
+          8
+        ],
+        [
+          18,
+          8
+        ],
+        [
+          19,
+          8
+        ],
+        [
+          20,
+          8
+        ],
+        [
+          21,
+          8
+        ],
+        [
+          22,
+          8
+        ],
+        [
+          23,
+          8
+        ],
+        [
+          0,
+          9
+        ],
+        [
+          1,
+          9
+        ],
+        [
+          2,
+          9
+        ],
+        [
+          3,
+          9
+        ],
+        [
+          4,
+          9
+        ],
+        [
+          5,
+          9
+        ],
+        [
+          6,
+          9
+        ],
+        [
+          7,
+          9
+        ],
+        [
+          8,
+          9
+        ],
+        [
+          15,
+          9
+        ],
+        [
+          16,
+          9
+        ],
+        [
+          17,
+          9
+        ],
+        [
+          18,
+          9
+        ],
+        [
+          19,
+          9
+        ],
+        [
+          20,
+          9
+        ],
+        [
+          21,
+          9
+        ],
+        [
+          22,
+          9
+        ],
+        [
+          23,
+          9
+        ],
+        [
+          0,
+          10
+        ],
+        [
+          1,
+          10
+        ],
+        [
+          2,
+          10
+        ],
+        [
+          3,
+          10
+        ],
+        [
+          4,
+          10
+        ],
+        [
+          5,
+          10
+        ],
+        [
+          6,
+          10
+        ],
+        [
+          7,
+          10
+        ],
+        [
+          8,
+          10
+        ],
+        [
+          15,
+          10
+        ],
+        [
+          16,
+          10
+        ],
+        [
+          17,
+          10
+        ],
+        [
+          18,
+          10
+        ],
+        [
+          19,
+          10
+        ],
+        [
+          20,
+          10
+        ],
+        [
+          21,
+          10
+        ],
+        [
+          22,
+          10
+        ],
+        [
+          23,
+          10
+        ],
+        [
+          0,
+          11
+        ],
+        [
+          1,
+          11
+        ],
+        [
+          2,
+          11
+        ],
+        [
+          3,
+          11
+        ],
+        [
+          4,
+          11
+        ],
+        [
+          5,
+          11
+        ],
+        [
+          6,
+          11
+        ],
+        [
+          7,
+          11
+        ],
+        [
+          8,
+          11
+        ],
+        [
+          9,
+          11
+        ],
+        [
+          10,
+          11
+        ],
+        [
+          11,
+          11
+        ],
+        [
+          12,
+          11
+        ],
+        [
+          13,
+          11
+        ],
+        [
+          14,
+          11
+        ],
+        [
+          15,
+          11
+        ],
+        [
+          16,
+          11
+        ],
+        [
+          17,
+          11
+        ],
+        [
+          18,
+          11
+        ],
+        [
+          19,
+          11
+        ],
+        [
+          20,
+          11
+        ],
+        [
+          21,
+          11
+        ],
+        [
+          22,
+          11
+        ],
+        [
+          23,
+          11
+        ],
+        [
+          0,
+          12
+        ],
+        [
+          1,
+          12
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          12
+        ],
+        [
+          4,
+          12
+        ],
+        [
+          5,
+          12
+        ],
+        [
+          6,
+          12
+        ],
+        [
+          7,
+          12
+        ],
+        [
+          8,
+          12
+        ],
+        [
+          9,
+          12
+        ],
+        [
+          10,
+          12
+        ],
+        [
+          11,
+          12
+        ],
+        [
+          12,
+          12
+        ],
+        [
+          13,
+          12
+        ],
+        [
+          14,
+          12
+        ],
+        [
+          15,
+          12
+        ],
+        [
+          16,
+          12
+        ],
+        [
+          17,
+          12
+        ],
+        [
+          18,
+          12
+        ],
+        [
+          19,
+          12
+        ],
+        [
+          20,
+          12
+        ],
+        [
+          21,
+          12
+        ],
+        [
+          22,
+          12
+        ],
+        [
+          23,
+          12
+        ],
+        [
+          0,
+          13
+        ],
+        [
+          1,
+          13
+        ],
+        [
+          2,
+          13
+        ],
+        [
+          3,
+          13
+        ],
+        [
+          4,
+          13
+        ],
+        [
+          5,
+          13
+        ],
+        [
+          6,
+          13
+        ],
+        [
+          7,
+          13
+        ],
+        [
+          8,
+          13
+        ],
+        [
+          9,
+          13
+        ],
+        [
+          10,
+          13
+        ],
+        [
+          11,
+          13
+        ],
+        [
+          12,
+          13
+        ],
+        [
+          13,
+          13
+        ],
+        [
+          14,
+          13
+        ],
+        [
+          15,
+          13
+        ],
+        [
+          16,
+          13
+        ],
+        [
+          17,
+          13
+        ],
+        [
+          18,
+          13
+        ],
+        [
+          19,
+          13
+        ],
+        [
+          20,
+          13
+        ],
+        [
+          21,
+          13
+        ],
+        [
+          22,
+          13
+        ],
+        [
+          23,
+          13
+        ],
+        [
+          0,
+          14
+        ],
+        [
+          1,
+          14
+        ],
+        [
+          2,
+          14
+        ],
+        [
+          3,
+          14
+        ],
+        [
+          4,
+          14
+        ],
+        [
+          5,
+          14
+        ],
+        [
+          6,
+          14
+        ],
+        [
+          7,
+          14
+        ],
+        [
+          8,
+          14
+        ],
+        [
+          9,
+          14
+        ],
+        [
+          10,
+          14
+        ],
+        [
+          11,
+          14
+        ],
+        [
+          12,
+          14
+        ],
+        [
+          13,
+          14
+        ],
+        [
+          14,
+          14
+        ],
+        [
+          15,
+          14
+        ],
+        [
+          16,
+          14
+        ],
+        [
+          17,
+          14
+        ],
+        [
+          18,
+          14
+        ],
+        [
+          19,
+          14
+        ],
+        [
+          20,
+          14
+        ],
+        [
+          21,
+          14
+        ],
+        [
+          22,
+          14
+        ],
+        [
+          23,
+          14
+        ],
+        [
+          0,
+          15
+        ],
+        [
+          1,
+          15
+        ],
+        [
+          2,
+          15
+        ],
+        [
+          3,
+          15
+        ],
+        [
+          4,
+          15
+        ],
+        [
+          5,
+          15
+        ],
+        [
+          6,
+          15
+        ],
+        [
+          7,
+          15
+        ],
+        [
+          8,
+          15
+        ],
+        [
+          9,
+          15
+        ],
+        [
+          10,
+          15
+        ],
+        [
+          11,
+          15
+        ],
+        [
+          12,
+          15
+        ],
+        [
+          13,
+          15
+        ],
+        [
+          14,
+          15
+        ],
+        [
+          15,
+          15
+        ],
+        [
+          16,
+          15
+        ],
+        [
+          17,
+          15
+        ],
+        [
+          18,
+          15
+        ],
+        [
+          19,
+          15
+        ],
+        [
+          20,
+          15
+        ],
+        [
+          21,
+          15
+        ],
+        [
+          22,
+          15
+        ],
+        [
+          23,
+          15
+        ]
+      ]
+    }
+  ],
+  "runs": [
+    {
+      "scenarioId": "single-tail",
+      "strategy": "greedy",
+      "seed": 1,
+      "ticks": 241,
+      "hits": 3,
+      "kills": 1,
+      "damageTaken": 0,
+      "survived": true,
+      "avgEnemiesOnRing": 0.1908713692946058,
+      "fairyTicks": 240,
+      "plannerDecisionCount": 40,
+      "determinism": {
+        "repeats": 7,
+        "exportRunAlsoCompared": true,
+        "allTickHashesEqual": true,
+        "hashChainTail": "760dce40dbb6e784",
+        "firstMismatchTick": null
+      },
+      "timing": {
+        "plannerMs": {
+          "count": 280,
+          "p50": 0.0519,
+          "p95": 0.0707,
+          "p99": 0.0759
+        },
+        "wholeSimMs": {
+          "count": 7,
+          "p50": 4.5561,
+          "p95": 4.7201,
+          "p99": 4.7201
+        }
+      },
+      "work": {
+        "movementSteps": 10800,
+        "hazardSteps": 0,
+        "contactChecks": 3510,
+        "ringVChecks": 468,
+        "fineCandidates": 0,
+        "coarseCandidates": 0
+      },
+      "traceFile": "single-tail.greedy.trace.json",
+      "decisionsFile": "single-tail.greedy.decisions.json",
+      "maxVisibleProjectiles": 0,
+      "maxVisibleZones": 0
+    },
+    {
+      "scenarioId": "single-tail",
+      "strategy": "lex-full",
+      "seed": 1,
+      "ticks": 241,
+      "hits": 3,
+      "kills": 1,
+      "damageTaken": 0,
+      "survived": true,
+      "avgEnemiesOnRing": 0.1078838174273859,
+      "fairyTicks": 240,
+      "plannerDecisionCount": 40,
+      "determinism": {
+        "repeats": 7,
+        "exportRunAlsoCompared": true,
+        "allTickHashesEqual": true,
+        "hashChainTail": "79f0ba1dc9cb64b8",
+        "firstMismatchTick": null
+      },
+      "timing": {
+        "plannerMs": {
+          "count": 280,
+          "p50": 0.1721,
+          "p95": 0.319,
+          "p99": 0.3298
+        },
+        "wholeSimMs": {
+          "count": 7,
+          "p50": 9.3996,
+          "p95": 9.7896,
+          "p99": 9.7896
+        }
+      },
+      "work": {
+        "movementSteps": 43200,
+        "hazardSteps": 0,
+        "contactChecks": 5400,
+        "ringVChecks": 10800,
+        "fineCandidates": 1440,
+        "coarseCandidates": 0
+      },
+      "traceFile": "single-tail.lex-full.trace.json",
+      "decisionsFile": "single-tail.lex-full.decisions.json",
+      "maxVisibleProjectiles": 0,
+      "maxVisibleZones": 0
+    },
+    {
+      "scenarioId": "single-tail",
+      "strategy": "lex-coarse4",
+      "seed": 1,
+      "ticks": 241,
+      "hits": 3,
+      "kills": 1,
+      "damageTaken": 0,
+      "survived": true,
+      "avgEnemiesOnRing": 0.1078838174273859,
+      "fairyTicks": 240,
+      "plannerDecisionCount": 40,
+      "determinism": {
+        "repeats": 7,
+        "exportRunAlsoCompared": true,
+        "allTickHashesEqual": true,
+        "hashChainTail": "79f0ba1dc9cb64b8",
+        "firstMismatchTick": null
+      },
+      "timing": {
+        "plannerMs": {
+          "count": 280,
+          "p50": 0.2408,
+          "p95": 0.2955,
+          "p99": 0.3582
+        },
+        "wholeSimMs": {
+          "count": 7,
+          "p50": 11.8205,
+          "p95": 12.026,
+          "p99": 12.026
+        }
+      },
+      "work": {
+        "movementSteps": 43200,
+        "hazardSteps": 0,
+        "contactChecks": 5400,
+        "ringVChecks": 3000,
+        "fineCandidates": 160,
+        "coarseCandidates": 1440
+      },
+      "traceFile": "single-tail.lex-coarse4.trace.json",
+      "decisionsFile": "single-tail.lex-coarse4.decisions.json",
+      "maxVisibleProjectiles": 0,
+      "maxVisibleZones": 0
+    },
+    {
+      "scenarioId": "near-wall",
+      "strategy": "greedy",
+      "seed": 2,
+      "ticks": 241,
+      "hits": 6,
+      "kills": 2,
+      "damageTaken": 0,
+      "survived": true,
+      "avgEnemiesOnRing": 0.35269709543568467,
+      "fairyTicks": 240,
+      "plannerDecisionCount": 40,
+      "determinism": {
+        "repeats": 7,
+        "exportRunAlsoCompared": true,
+        "allTickHashesEqual": true,
+        "hashChainTail": "f8454a9440ff5e80",
+        "firstMismatchTick": null
+      },
+      "timing": {
+        "plannerMs": {
+          "count": 280,
+          "p50": 0.0625,
+          "p95": 0.0784,
+          "p99": 0.0834
+        },
+        "wholeSimMs": {
+          "count": 7,
+          "p50": 4.477,
+          "p95": 4.6872,
+          "p99": 4.6872
+        }
+      },
+      "work": {
+        "movementSteps": 10800,
+        "hazardSteps": 0,
+        "contactChecks": 7560,
+        "ringVChecks": 1008,
+        "fineCandidates": 0,
+        "coarseCandidates": 0
+      },
+      "traceFile": "near-wall.greedy.trace.json",
+      "decisionsFile": "near-wall.greedy.decisions.json",
+      "maxVisibleProjectiles": 0,
+      "maxVisibleZones": 0
+    },
+    {
+      "scenarioId": "near-wall",
+      "strategy": "lex-full",
+      "seed": 2,
+      "ticks": 241,
+      "hits": 6,
+      "kills": 2,
+      "damageTaken": 0,
+      "survived": true,
+      "avgEnemiesOnRing": 0.2697095435684647,
+      "fairyTicks": 240,
+      "plannerDecisionCount": 40,
+      "determinism": {
+        "repeats": 7,
+        "exportRunAlsoCompared": true,
+        "allTickHashesEqual": true,
+        "hashChainTail": "d0f488460af45a49",
+        "firstMismatchTick": null
+      },
+      "timing": {
+        "plannerMs": {
+          "count": 280,
+          "p50": 0.1941,
+          "p95": 0.3681,
+          "p99": 0.374
+        },
+        "wholeSimMs": {
+          "count": 7,
+          "p50": 11.5706,
+          "p95": 11.6817,
+          "p99": 11.6817
+        }
+      },
+      "work": {
+        "movementSteps": 43200,
+        "hazardSteps": 0,
+        "contactChecks": 12960,
+        "ringVChecks": 25920,
+        "fineCandidates": 1440,
+        "coarseCandidates": 0
+      },
+      "traceFile": "near-wall.lex-full.trace.json",
+      "decisionsFile": "near-wall.lex-full.decisions.json",
+      "maxVisibleProjectiles": 0,
+      "maxVisibleZones": 0
+    },
+    {
+      "scenarioId": "near-wall",
+      "strategy": "lex-coarse4",
+      "seed": 2,
+      "ticks": 241,
+      "hits": 6,
+      "kills": 2,
+      "damageTaken": 0,
+      "survived": true,
+      "avgEnemiesOnRing": 0.2697095435684647,
+      "fairyTicks": 240,
+      "plannerDecisionCount": 40,
+      "determinism": {
+        "repeats": 7,
+        "exportRunAlsoCompared": true,
+        "allTickHashesEqual": true,
+        "hashChainTail": "d0f488460af45a49",
+        "firstMismatchTick": null
+      },
+      "timing": {
+        "plannerMs": {
+          "count": 280,
+          "p50": 0.0988,
+          "p95": 0.3832,
+          "p99": 0.3961
+        },
+        "wholeSimMs": {
+          "count": 7,
+          "p50": 6.2315,
+          "p95": 18.9753,
+          "p99": 18.9753
+        }
+      },
+      "work": {
+        "movementSteps": 43200,
+        "hazardSteps": 0,
+        "contactChecks": 12960,
+        "ringVChecks": 7200,
+        "fineCandidates": 160,
+        "coarseCandidates": 1440
+      },
+      "traceFile": "near-wall.lex-coarse4.trace.json",
+      "decisionsFile": "near-wall.lex-coarse4.decisions.json",
+      "maxVisibleProjectiles": 0,
+      "maxVisibleZones": 0
+    },
+    {
+      "scenarioId": "nails-zones",
+      "strategy": "greedy",
+      "seed": 3,
+      "ticks": 241,
+      "hits": 3,
+      "kills": 1,
+      "damageTaken": 12,
+      "survived": true,
+      "avgEnemiesOnRing": 0.16597510373443983,
+      "fairyTicks": 240,
+      "plannerDecisionCount": 40,
+      "determinism": {
+        "repeats": 7,
+        "exportRunAlsoCompared": true,
+        "allTickHashesEqual": true,
+        "hashChainTail": "ae3e4804aafde1a0",
+        "firstMismatchTick": null
+      },
+      "timing": {
+        "plannerMs": {
+          "count": 280,
+          "p50": 0.0333,
+          "p95": 0.046,
+          "p99": 0.0494
+        },
+        "wholeSimMs": {
+          "count": 7,
+          "p50": 3.102,
+          "p95": 3.1649,
+          "p99": 3.1649
+        }
+      },
+      "work": {
+        "movementSteps": 10800,
+        "hazardSteps": 19998,
+        "contactChecks": 24030,
+        "ringVChecks": 3204,
+        "fineCandidates": 0,
+        "coarseCandidates": 0
+      },
+      "traceFile": "nails-zones.greedy.trace.json",
+      "decisionsFile": "nails-zones.greedy.decisions.json",
+      "maxVisibleProjectiles": 3,
+      "maxVisibleZones": 1
+    },
+    {
+      "scenarioId": "nails-zones",
+      "strategy": "lex-full",
+      "seed": 3,
+      "ticks": 241,
+      "hits": 5,
+      "kills": 1,
+      "damageTaken": 0,
+      "survived": true,
+      "avgEnemiesOnRing": 0.4149377593360996,
+      "fairyTicks": 240,
+      "plannerDecisionCount": 40,
+      "determinism": {
+        "repeats": 7,
+        "exportRunAlsoCompared": true,
+        "allTickHashesEqual": true,
+        "hashChainTail": "a978ac9a6d905ab4",
+        "firstMismatchTick": null
+      },
+      "timing": {
+        "plannerMs": {
+          "count": 280,
+          "p50": 0.1185,
+          "p95": 0.1507,
+          "p99": 0.1603
+        },
+        "wholeSimMs": {
+          "count": 7,
+          "p50": 6.0783,
+          "p95": 6.1438,
+          "p99": 6.1438
+        }
+      },
+      "work": {
+        "movementSteps": 43200,
+        "hazardSteps": 48933,
+        "contactChecks": 97200,
+        "ringVChecks": 194400,
+        "fineCandidates": 1440,
+        "coarseCandidates": 0
+      },
+      "traceFile": "nails-zones.lex-full.trace.json",
+      "decisionsFile": "nails-zones.lex-full.decisions.json",
+      "maxVisibleProjectiles": 2,
+      "maxVisibleZones": 1
+    },
+    {
+      "scenarioId": "nails-zones",
+      "strategy": "lex-coarse4",
+      "seed": 3,
+      "ticks": 241,
+      "hits": 5,
+      "kills": 1,
+      "damageTaken": 0,
+      "survived": true,
+      "avgEnemiesOnRing": 0.4149377593360996,
+      "fairyTicks": 240,
+      "plannerDecisionCount": 40,
+      "determinism": {
+        "repeats": 7,
+        "exportRunAlsoCompared": true,
+        "allTickHashesEqual": true,
+        "hashChainTail": "a978ac9a6d905ab4",
+        "firstMismatchTick": null
+      },
+      "timing": {
+        "plannerMs": {
+          "count": 280,
+          "p50": 0.1265,
+          "p95": 0.1546,
+          "p99": 0.2326
+        },
+        "wholeSimMs": {
+          "count": 7,
+          "p50": 6.4848,
+          "p95": 6.6537,
+          "p99": 6.6537
+        }
+      },
+      "work": {
+        "movementSteps": 43200,
+        "hazardSteps": 48933,
+        "contactChecks": 97200,
+        "ringVChecks": 54000,
+        "fineCandidates": 160,
+        "coarseCandidates": 1440
+      },
+      "traceFile": "nails-zones.lex-coarse4.trace.json",
+      "decisionsFile": "nails-zones.lex-coarse4.decisions.json",
+      "maxVisibleProjectiles": 2,
+      "maxVisibleZones": 1
+    },
+    {
+      "scenarioId": "mixed",
+      "strategy": "greedy",
+      "seed": 7,
+      "ticks": 241,
+      "hits": 12,
+      "kills": 4,
+      "damageTaken": 0,
+      "survived": true,
+      "avgEnemiesOnRing": 1.066390041493776,
+      "fairyTicks": 240,
+      "plannerDecisionCount": 40,
+      "determinism": {
+        "repeats": 7,
+        "exportRunAlsoCompared": true,
+        "allTickHashesEqual": true,
+        "hashChainTail": "3d793bc121ea72c9",
+        "firstMismatchTick": null
+      },
+      "timing": {
+        "plannerMs": {
+          "count": 280,
+          "p50": 0.0322,
+          "p95": 0.037,
+          "p99": 0.0437
+        },
+        "wholeSimMs": {
+          "count": 7,
+          "p50": 2.5568,
+          "p95": 2.809,
+          "p99": 2.809
+        }
+      },
+      "work": {
+        "movementSteps": 10800,
+        "hazardSteps": 15546,
+        "contactChecks": 34830,
+        "ringVChecks": 4644,
+        "fineCandidates": 0,
+        "coarseCandidates": 0
+      },
+      "traceFile": "mixed.greedy.trace.json",
+      "decisionsFile": "mixed.greedy.decisions.json",
+      "maxVisibleProjectiles": 3,
+      "maxVisibleZones": 1
+    },
+    {
+      "scenarioId": "mixed",
+      "strategy": "lex-full",
+      "seed": 7,
+      "ticks": 241,
+      "hits": 9,
+      "kills": 2,
+      "damageTaken": 15,
+      "survived": true,
+      "avgEnemiesOnRing": 0.8215767634854771,
+      "fairyTicks": 240,
+      "plannerDecisionCount": 40,
+      "determinism": {
+        "repeats": 7,
+        "exportRunAlsoCompared": true,
+        "allTickHashesEqual": true,
+        "hashChainTail": "454a5565f61b5747",
+        "firstMismatchTick": null
+      },
+      "timing": {
+        "plannerMs": {
+          "count": 280,
+          "p50": 0.1233,
+          "p95": 0.1453,
+          "p99": 0.1499
+        },
+        "wholeSimMs": {
+          "count": 7,
+          "p50": 6.3252,
+          "p95": 6.529,
+          "p99": 6.529
+        }
+      },
+      "work": {
+        "movementSteps": 43200,
+        "hazardSteps": 35971,
+        "contactChecks": 140400,
+        "ringVChecks": 280800,
+        "fineCandidates": 1440,
+        "coarseCandidates": 0
+      },
+      "traceFile": "mixed.lex-full.trace.json",
+      "decisionsFile": "mixed.lex-full.decisions.json",
+      "maxVisibleProjectiles": 2,
+      "maxVisibleZones": 1
+    },
+    {
+      "scenarioId": "mixed",
+      "strategy": "lex-coarse4",
+      "seed": 7,
+      "ticks": 241,
+      "hits": 10,
+      "kills": 2,
+      "damageTaken": 0,
+      "survived": true,
+      "avgEnemiesOnRing": 0.8921161825726142,
+      "fairyTicks": 240,
+      "plannerDecisionCount": 40,
+      "determinism": {
+        "repeats": 7,
+        "exportRunAlsoCompared": true,
+        "allTickHashesEqual": true,
+        "hashChainTail": "a83889a41ea52a11",
+        "firstMismatchTick": null
+      },
+      "timing": {
+        "plannerMs": {
+          "count": 280,
+          "p50": 0.1251,
+          "p95": 0.1448,
+          "p99": 0.1758
+        },
+        "wholeSimMs": {
+          "count": 7,
+          "p50": 6.3797,
+          "p95": 6.5066,
+          "p99": 6.5066
+        }
+      },
+      "work": {
+        "movementSteps": 43200,
+        "hazardSteps": 36110,
+        "contactChecks": 140400,
+        "ringVChecks": 78000,
+        "fineCandidates": 160,
+        "coarseCandidates": 1440
+      },
+      "traceFile": "mixed.lex-coarse4.trace.json",
+      "decisionsFile": "mixed.lex-coarse4.decisions.json",
+      "maxVisibleProjectiles": 2,
+      "maxVisibleZones": 1
+    },
+    {
+      "scenarioId": "trap",
+      "strategy": "greedy",
+      "seed": 11,
+      "ticks": 241,
+      "hits": 22,
+      "kills": 6,
+      "damageTaken": 13.866666666666656,
+      "survived": true,
+      "avgEnemiesOnRing": 1.5477178423236515,
+      "fairyTicks": 240,
+      "plannerDecisionCount": 40,
+      "determinism": {
+        "repeats": 7,
+        "exportRunAlsoCompared": true,
+        "allTickHashesEqual": true,
+        "hashChainTail": "475328a4cd39359e",
+        "firstMismatchTick": null
+      },
+      "timing": {
+        "plannerMs": {
+          "count": 280,
+          "p50": 0.036,
+          "p95": 0.0415,
+          "p99": 0.0678
+        },
+        "wholeSimMs": {
+          "count": 7,
+          "p50": 1.8322,
+          "p95": 2.1069,
+          "p99": 2.1069
+        }
+      },
+      "work": {
+        "movementSteps": 10800,
+        "hazardSteps": 54,
+        "contactChecks": 64530,
+        "ringVChecks": 8604,
+        "fineCandidates": 0,
+        "coarseCandidates": 0
+      },
+      "traceFile": "trap.greedy.trace.json",
+      "decisionsFile": "trap.greedy.decisions.json",
+      "maxVisibleProjectiles": 0,
+      "maxVisibleZones": 1
+    },
+    {
+      "scenarioId": "trap",
+      "strategy": "lex-full",
+      "seed": 11,
+      "ticks": 241,
+      "hits": 24,
+      "kills": 8,
+      "damageTaken": 7.066666666666675,
+      "survived": true,
+      "avgEnemiesOnRing": 1.6639004149377594,
+      "fairyTicks": 240,
+      "plannerDecisionCount": 40,
+      "determinism": {
+        "repeats": 7,
+        "exportRunAlsoCompared": true,
+        "allTickHashesEqual": true,
+        "hashChainTail": "4b746f1772d5d6ac",
+        "firstMismatchTick": null
+      },
+      "timing": {
+        "plannerMs": {
+          "count": 280,
+          "p50": 0.1847,
+          "p95": 0.2362,
+          "p99": 0.2662
+        },
+        "wholeSimMs": {
+          "count": 7,
+          "p50": 6.8277,
+          "p95": 7.0333,
+          "p99": 7.0333
+        }
+      },
+      "work": {
+        "movementSteps": 43200,
+        "hazardSteps": 180,
+        "contactChecks": 231120,
+        "ringVChecks": 462240,
+        "fineCandidates": 1440,
+        "coarseCandidates": 0
+      },
+      "traceFile": "trap.lex-full.trace.json",
+      "decisionsFile": "trap.lex-full.decisions.json",
+      "maxVisibleProjectiles": 0,
+      "maxVisibleZones": 1
+    },
+    {
+      "scenarioId": "trap",
+      "strategy": "lex-coarse4",
+      "seed": 11,
+      "ticks": 241,
+      "hits": 22,
+      "kills": 7,
+      "damageTaken": 7.066666666666675,
+      "survived": true,
+      "avgEnemiesOnRing": 1.6141078838174274,
+      "fairyTicks": 240,
+      "plannerDecisionCount": 40,
+      "determinism": {
+        "repeats": 7,
+        "exportRunAlsoCompared": true,
+        "allTickHashesEqual": true,
+        "hashChainTail": "f263d0b1c0d1f57c",
+        "firstMismatchTick": null
+      },
+      "timing": {
+        "plannerMs": {
+          "count": 280,
+          "p50": 0.1697,
+          "p95": 0.1955,
+          "p99": 0.2754
+        },
+        "wholeSimMs": {
+          "count": 7,
+          "p50": 6.0102,
+          "p95": 6.8933,
+          "p99": 6.8933
+        }
+      },
+      "work": {
+        "movementSteps": 43200,
+        "hazardSteps": 180,
+        "contactChecks": 235440,
+        "ringVChecks": 130800,
+        "fineCandidates": 160,
+        "coarseCandidates": 1440
+      },
+      "traceFile": "trap.lex-coarse4.trace.json",
+      "decisionsFile": "trap.lex-coarse4.decisions.json",
+      "maxVisibleProjectiles": 0,
+      "maxVisibleZones": 1
+    }
+  ],
+  "comparisons": [
+    {
+      "scenarioId": "single-tail",
+      "fullVsGreedy": {
+        "hitsDelta": 0,
+        "damageDelta": 0
+      },
+      "coarseVsFull": {
+        "hitsDelta": 0,
+        "damageDelta": 0,
+        "ringDelta": 0,
+        "ringVCheckReduction": 0.7222222222222222,
+        "movementStepRatio": 1
+      }
+    },
+    {
+      "scenarioId": "near-wall",
+      "fullVsGreedy": {
+        "hitsDelta": 0,
+        "damageDelta": 0
+      },
+      "coarseVsFull": {
+        "hitsDelta": 0,
+        "damageDelta": 0,
+        "ringDelta": 0,
+        "ringVCheckReduction": 0.7222222222222222,
+        "movementStepRatio": 1
+      }
+    },
+    {
+      "scenarioId": "nails-zones",
+      "fullVsGreedy": {
+        "hitsDelta": 2,
+        "damageDelta": -12
+      },
+      "coarseVsFull": {
+        "hitsDelta": 0,
+        "damageDelta": 0,
+        "ringDelta": 0,
+        "ringVCheckReduction": 0.7222222222222222,
+        "movementStepRatio": 1
+      }
+    },
+    {
+      "scenarioId": "mixed",
+      "fullVsGreedy": {
+        "hitsDelta": -3,
+        "damageDelta": 15
+      },
+      "coarseVsFull": {
+        "hitsDelta": 1,
+        "damageDelta": -15,
+        "ringDelta": 0.07053941908713701,
+        "ringVCheckReduction": 0.7222222222222222,
+        "movementStepRatio": 1
+      }
+    },
+    {
+      "scenarioId": "trap",
+      "fullVsGreedy": {
+        "hitsDelta": 2,
+        "damageDelta": -6.799999999999981
+      },
+      "coarseVsFull": {
+        "hitsDelta": -2,
+        "damageDelta": 0,
+        "ringDelta": -0.049792531120331995,
+        "ringVCheckReduction": 0.717030114226376,
+        "movementStepRatio": 1
+      }
+    }
+  ],
+  "navigation": {
+    "question": "Existing flow successors versus weighted shortest paths; repeated A* versus one shared tree.",
+    "sourceMap": "prototype/battlesim/scenarios/mix_four.json",
+    "scope": "Static undirected eight-neighbour graph; no dynamic avoidance. Timings are local .NET desktop measurements, not Android results.",
+    "timingCaveat": "Existing A* includes string pulling and sampled clearance checks. The experimental tree includes allocation and backtraces but no smoothing; runtime numbers are not an equal-output speedup claim. Tree path costs are graph costs, not smoothed physical travel times.",
+    "clearanceCaveat": "Radius-0.4 rejection uses the existing conservative sampled LineOfSight; it is a diagnostic count, not proof of physical collision. No original navigation code is changed.",
+    "width": 40,
+    "height": 24,
+    "walls": [
+      [
+        16,
+        2
+      ],
+      [
+        17,
+        2
+      ],
+      [
+        18,
+        2
+      ],
+      [
+        19,
+        2
+      ],
+      [
+        10,
+        5
+      ],
+      [
+        11,
+        5
+      ],
+      [
+        10,
+        6
+      ],
+      [
+        11,
+        6
+      ],
+      [
+        6,
+        10
+      ],
+      [
+        33,
+        10
+      ],
+      [
+        6,
+        11
+      ],
+      [
+        19,
+        11
+      ],
+      [
+        20,
+        11
+      ],
+      [
+        33,
+        11
+      ],
+      [
+        6,
+        12
+      ],
+      [
+        19,
+        12
+      ],
+      [
+        20,
+        12
+      ],
+      [
+        33,
+        12
+      ],
+      [
+        6,
+        13
+      ],
+      [
+        33,
+        13
+      ],
+      [
+        28,
+        17
+      ],
+      [
+        29,
+        17
+      ],
+      [
+        28,
+        18
+      ],
+      [
+        29,
+        18
+      ],
+      [
+        20,
+        21
+      ],
+      [
+        21,
+        21
+      ],
+      [
+        22,
+        21
+      ],
+      [
+        23,
+        21
+      ]
+    ],
+    "origin": [
+      20.5,
+      8.5
+    ],
+    "candidateGoals": [
+      [
+        22.5,
+        14.5
+      ],
+      [
+        22.5,
+        12.5
+      ],
+      [
+        22.5,
+        10.5
+      ],
+      [
+        22.5,
+        8.5
+      ],
+      [
+        22.5,
+        6.5
+      ],
+      [
+        22.5,
+        4.5
+      ],
+      [
+        22.5,
+        2.5
+      ],
+      [
+        15.5,
+        12.5
+      ],
+      [
+        15.5,
+        10.5
+      ],
+      [
+        15.5,
+        8.5
+      ],
+      [
+        26.5,
+        11.5
+      ],
+      [
+        15.5,
+        6.5
+      ],
+      [
+        26.5,
+        9.5
+      ],
+      [
+        15.5,
+        4.5
+      ],
+      [
+        26.5,
+        7.5
+      ],
+      [
+        26.5,
+        5.5
+      ],
+      [
+        19.5,
+        13.5
+      ],
+      [
+        19.5,
+        5.5
+      ],
+      [
+        19.5,
+        3.5
+      ],
+      [
+        19.5,
+        1.5
+      ]
+    ],
+    "flow": {
+      "reachableNonRootCells": 931,
+      "nonShortestSuccessorCells": 0,
+      "worstLocalExcess": 0,
+      "worstRouteExcess": 0,
+      "actualRouteCost": 26.213203435596434,
+      "optimalRouteCost": 26.213203435596434,
+      "start": [
+        0.5,
+        23.5
+      ],
+      "actualRoute": [
+        [
+          0.5,
+          23.5
+        ],
+        [
+          1.5,
+          22.5
+        ],
+        [
+          2.5,
+          21.5
+        ],
+        [
+          3.5,
+          20.5
+        ],
+        [
+          4.5,
+          19.5
+        ],
+        [
+          5.5,
+          18.5
+        ],
+        [
+          6.5,
+          17.5
+        ],
+        [
+          7.5,
+          16.5
+        ],
+        [
+          8.5,
+          15.5
+        ],
+        [
+          9.5,
+          14.5
+        ],
+        [
+          10.5,
+          13.5
+        ],
+        [
+          11.5,
+          12.5
+        ],
+        [
+          12.5,
+          11.5
+        ],
+        [
+          13.5,
+          10.5
+        ],
+        [
+          14.5,
+          9.5
+        ],
+        [
+          15.5,
+          8.5
+        ],
+        [
+          16.5,
+          8.5
+        ],
+        [
+          17.5,
+          8.5
+        ],
+        [
+          18.5,
+          8.5
+        ],
+        [
+          19.5,
+          8.5
+        ],
+        [
+          20.5,
+          8.5
+        ]
+      ],
+      "optimalRoute": [
+        [
+          0.5,
+          23.5
+        ],
+        [
+          1.5,
+          22.5
+        ],
+        [
+          2.5,
+          21.5
+        ],
+        [
+          3.5,
+          20.5
+        ],
+        [
+          4.5,
+          19.5
+        ],
+        [
+          5.5,
+          18.5
+        ],
+        [
+          6.5,
+          17.5
+        ],
+        [
+          7.5,
+          16.5
+        ],
+        [
+          8.5,
+          15.5
+        ],
+        [
+          9.5,
+          14.5
+        ],
+        [
+          10.5,
+          13.5
+        ],
+        [
+          11.5,
+          12.5
+        ],
+        [
+          12.5,
+          11.5
+        ],
+        [
+          13.5,
+          10.5
+        ],
+        [
+          14.5,
+          9.5
+        ],
+        [
+          15.5,
+          8.5
+        ],
+        [
+          16.5,
+          8.5
+        ],
+        [
+          17.5,
+          8.5
+        ],
+        [
+          18.5,
+          8.5
+        ],
+        [
+          19.5,
+          8.5
+        ],
+        [
+          20.5,
+          8.5
+        ]
+      ],
+      "examples": []
+    },
+    "search": [
+      {
+        "candidateCount": 4,
+        "repeatedAStar": {
+          "p50Ms": 0.0139,
+          "p95Ms": 0.0149,
+          "p99Ms": 0.0158,
+          "allocatedBytesPerRun": 4832,
+          "samples": 31
+        },
+        "oneTreeAndBacktrace": {
+          "p50Ms": 0.2825,
+          "p95Ms": 0.2934,
+          "p99Ms": 0.3006,
+          "allocatedBytesPerRun": 20160,
+          "samples": 31
+        },
+        "singleTreeExpandedCells": 932,
+        "singleTreeQueuePushes": 932,
+        "aStarCalls": 4,
+        "aStarUnreachable": 0,
+        "aStarWaypoints": 5,
+        "pathsRejectedByRadius04SampleCheck": 0
+      },
+      {
+        "candidateCount": 12,
+        "repeatedAStar": {
+          "p50Ms": 0.0561,
+          "p95Ms": 0.059,
+          "p99Ms": 0.0591,
+          "allocatedBytesPerRun": 14656,
+          "samples": 31
+        },
+        "oneTreeAndBacktrace": {
+          "p50Ms": 0.2775,
+          "p95Ms": 0.2942,
+          "p99Ms": 0.2967,
+          "allocatedBytesPerRun": 23320,
+          "samples": 31
+        },
+        "singleTreeExpandedCells": 932,
+        "singleTreeQueuePushes": 932,
+        "aStarCalls": 12,
+        "aStarUnreachable": 0,
+        "aStarWaypoints": 13,
+        "pathsRejectedByRadius04SampleCheck": 0
+      },
+      {
+        "candidateCount": 20,
+        "repeatedAStar": {
+          "p50Ms": 0.1042,
+          "p95Ms": 0.1078,
+          "p99Ms": 0.1305,
+          "allocatedBytesPerRun": 24592,
+          "samples": 31
+        },
+        "oneTreeAndBacktrace": {
+          "p50Ms": 0.2751,
+          "p95Ms": 0.292,
+          "p99Ms": 0.2954,
+          "allocatedBytesPerRun": 26912,
+          "samples": 31
+        },
+        "singleTreeExpandedCells": 932,
+        "singleTreeQueuePushes": 932,
+        "aStarCalls": 20,
+        "aStarUnreachable": 0,
+        "aStarWaypoints": 24,
+        "pathsRejectedByRadius04SampleCheck": 0
+      }
+    ]
+  }
+}

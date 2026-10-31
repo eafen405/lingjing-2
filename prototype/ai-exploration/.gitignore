@@ -1,0 +1,8 @@
+bin/
+obj/
+# 运行产物：摘要与观察记录入库，逐 tick 轨迹 / 决策可由 --out 重建
+results/*
+!results/summary.json
+!results/phase-probe.json
+!results/scenario-manifest.json
+!results/browser-inspection.json

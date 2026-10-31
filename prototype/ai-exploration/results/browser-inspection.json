@@ -1,0 +1,113 @@
+{
+  "initial": {
+    "runs": 15,
+    "scenes": 5,
+    "title": "Fairy 代行 · 算法逻辑原型"
+  },
+  "interactions": [
+    {
+      "scenario": "single-tail",
+      "strategy": "greedy",
+      "candidates": 36,
+      "endTick": 240
+    },
+    {
+      "scenario": "single-tail",
+      "strategy": "lex-full",
+      "candidates": 36,
+      "endTick": 240
+    },
+    {
+      "scenario": "single-tail",
+      "strategy": "lex-coarse4",
+      "candidates": 36,
+      "endTick": 240
+    },
+    {
+      "scenario": "near-wall",
+      "strategy": "greedy",
+      "candidates": 36,
+      "endTick": 240
+    },
+    {
+      "scenario": "near-wall",
+      "strategy": "lex-full",
+      "candidates": 36,
+      "endTick": 240
+    },
+    {
+      "scenario": "near-wall",
+      "strategy": "lex-coarse4",
+      "candidates": 36,
+      "endTick": 240
+    },
+    {
+      "scenario": "nails-zones",
+      "strategy": "greedy",
+      "candidates": 36,
+      "endTick": 240
+    },
+    {
+      "scenario": "nails-zones",
+      "strategy": "lex-full",
+      "candidates": 36,
+      "endTick": 240
+    },
+    {
+      "scenario": "nails-zones",
+      "strategy": "lex-coarse4",
+      "candidates": 36,
+      "endTick": 240
+    },
+    {
+      "scenario": "mixed",
+      "strategy": "greedy",
+      "candidates": 36,
+      "endTick": 240
+    },
+    {
+      "scenario": "mixed",
+      "strategy": "lex-full",
+      "candidates": 36,
+      "endTick": 240
+    },
+    {
+      "scenario": "mixed",
+      "strategy": "lex-coarse4",
+      "candidates": 36,
+      "endTick": 240
+    },
+    {
+      "scenario": "trap",
+      "strategy": "greedy",
+      "candidates": 36,
+      "endTick": 240
+    },
+    {
+      "scenario": "trap",
+      "strategy": "lex-full",
+      "candidates": 36,
+      "endTick": 240
+    },
+    {
+      "scenario": "trap",
+      "strategy": "lex-coarse4",
+      "candidates": 36,
+      "endTick": 240
+    }
+  ],
+  "navigation": {
+    "rows": 3,
+    "stats": "931\n可达非根格\n0\n未选最短后继的格数\n0.000\n示例路线额外图代价"
+  },
+  "phase": {
+    "options": 10,
+    "detail": "输入：距离 3.000，敌人切向速度 -2.600，初始相位 0.393。代理选中后的命中 2，候选最佳命中 7，差额 5。"
+  },
+  "runtimeExceptions": [],
+  "screenshots": [
+    "prototype-battle.png",
+    "prototype-navigation.png",
+    "prototype-phase.png"
+  ]
+}
