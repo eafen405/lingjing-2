@@ -70,3 +70,5 @@ desktop.ini
 __pycache__/
 *.pyc
 
+# Unity 批处理日志
+/unity-*.log
