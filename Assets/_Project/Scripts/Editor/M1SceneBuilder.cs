@@ -45,9 +45,6 @@ namespace Lingjing.Editor
             runner.bladeSprite = LoadSprite(Knife);
             runner.viewCamera = cam;
 
-            var input = battleGo.AddComponent<PlayerInputController>();
-            runner.input = input;
-
             var follow = camGo.AddComponent<CameraFollow>();
             follow.runner = runner;
 

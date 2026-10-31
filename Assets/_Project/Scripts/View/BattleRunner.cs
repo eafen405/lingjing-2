@@ -27,8 +27,11 @@ namespace Lingjing.View
         public int initialEnemies = 6;
 
         [Header("引用")]
-        public PlayerInputController input;
+        [Tooltip("留空则运行时自动搭触屏 HUD（摇杆 + 两个按钮）")]
+        public MonoBehaviour input;
         public Camera viewCamera;
+
+        ICommandSource _source;
 
         BattleWorld _world;
         Transform _playerTx;
@@ -48,6 +51,12 @@ namespace Lingjing.View
 
         void Awake()
         {
+            if (input == null)
+            {
+                input = TouchHud.Build();
+            }
+
+            _source = input as ICommandSource;
             Build();
         }
 
@@ -133,7 +142,7 @@ namespace Lingjing.View
             int guard = 0;
             while (_accumulator >= SimConstants.Dt && guard++ < 8)
             {
-                Command command = input != null ? input.CurrentCommand : Command.None;
+                Command command = _source != null ? _source.CurrentCommand : Command.None;
                 _world.Step(command);
                 _accumulator -= SimConstants.Dt;
             }
