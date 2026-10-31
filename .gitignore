@@ -55,3 +55,14 @@ crashlytics-build.properties
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# ── Local-only reference art (third-party copyright) ───────────────────
+# 全部为官方/第三方设定图，只作造型对照，不进公开镜像。
+/source/
+
+# 输入法等工具在仓库根目录写出的日志
+/debug.log
+
+# .NET 原型构建产物
+[Bb]in/
+
