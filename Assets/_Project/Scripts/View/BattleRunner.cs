@@ -281,6 +281,7 @@ namespace Lingjing.View
 
                 if (view.anim != null)
                 {
+                    view.anim.SetState(EnemyAnimMap.StateFor(enemy));
                     view.anim.Face(new Vec2(delta.x, delta.y));
                 }
             }
