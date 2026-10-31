@@ -103,7 +103,7 @@
 
 ### 4. 风格规则
 
-- 色板：全项目共用 32 色（含透明），UI 与地形另有派生色板但色相一致。
+- 色板：角色共用 29 色主色板（伊埃斯 21 + 以骸新增 8）。**「全项目 32 色」的上限已撤销**（2026-10-31）：它是本规格早期自定的预算、不是考核要求，而角色素材已冻结，为凑数字改图不划算。地形/UI 各有派生色板，新增色必须登记在对应模块的色板常量里，不允许散落在绘制代码中。
 - 描边：1px，深色但不纯黑（L 值约 15%），仅角色与可拾取物；地形不描边。
 - 光照：左上主光，右下投影；高光不超过 2 阶。
 - 透明度：只允许 0 或 255；VFX 与地面阴影例外。
@@ -168,6 +168,20 @@ Sprite (2D and UI) · PPU 32 · Filter **Point** · Compression **None** · Mip 
 - 剪影刻意一横一竖：连环是压过来的四足兽（骨角 + 背刺 + 拖在身后的断链），骤雨是立着的三腿祭坛（张开花瓣 + 悬浮核心）。
 - 与小怪同一套导出脚本：`build_malice.py` 一并处理 `Enemies/` 与 `Bosses/`，manifest 里用 `group` 字段区分。
 
+### 7.4 已完成的素材：空洞地形
+
+| 项 | 值 |
+| --- | --- |
+| 生成器 | `tools/art-pipeline/terrain_draw.py`（画法）+ `build_terrain.py`（批量导出） |
+| 规格 | `docs/specs/terrain-tileset.md` |
+| 尺寸 | 边界墙 32×32×8；挡路物 64×64×2；传送门 96×96×4 帧 |
+| 落点 | `Assets/_Project/Art/Terrain/{wall,props,portal}/` + `tileset.json` |
+| 地板 | **无**（`floorTile: null`）：场地内部留空，由相机清屏色决定 |
+
+- 地形只出「边界 / 障碍 / 传送门」三样，不做铺装、贴花、墙脚投影、天穹与城市剪影。
+- 边界墙用 4 位掩码（`n=1,e=2,s=4,w=8`）决定朝向，每块只画朝外的一侧及其对面，避免拼成网格。
+- 重跑：`python tools/art-pipeline/build_terrain.py`（同时输出 `out/terrain_review.png` 与 `out/terrain_room.png`）。
+
 ## Testing Decisions
 
 - **唯一接缝**：`SpriteResolver`——纯 C#，输入 `(entityId, state, directionVector, speed)`，输出帧序列与是否镜像。渲染层只拿结果做 `flipX`。美术换图不改代码。
@@ -186,7 +200,7 @@ Sprite (2D and UI) · PPU 32 · Filter **Point** · Compression **None** · Mip 
 
 - UI 皮肤、图标、Fairy 气泡（非像素，另立规格）。
 - 特效/粒子、地面阴影、屏幕后处理。
-- 地形 tileset 的详细规格（另立，先给 32×32 与色板约束）。
+- 地形 tileset 的详细规格（已在 `docs/specs/terrain-tileset.md` 定稿：只做边界 / 障碍 / 传送门，不做地板）。
 - BGM、音效、Fairy 语音。
 - 多邦布、关卡背景插画、商店页/宣传图。
 - 具体的 AI 生图工具选型与提示词。
