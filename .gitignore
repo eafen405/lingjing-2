@@ -66,3 +66,7 @@ desktop.ini
 # .NET 原型构建产物
 [Bb]in/
 
+# Python 缓存
+__pycache__/
+*.pyc
+
