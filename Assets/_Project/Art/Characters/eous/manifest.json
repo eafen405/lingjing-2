@@ -1,0 +1,80 @@
+{
+  "entity": "eous",
+  "displayName": "伊埃斯",
+  "frameSize": [
+    64,
+    64
+  ],
+  "masterSize": [
+    128,
+    128
+  ],
+  "pivotPx": [
+    32,
+    3
+  ],
+  "pivotNorm": [
+    0.5,
+    0.0469
+  ],
+  "ppu": 32,
+  "directions": {
+    "s": 0,
+    "se": 1,
+    "e": 2,
+    "ne": 3,
+    "n": 4
+  },
+  "mirror": {
+    "sw": "se",
+    "w": "e",
+    "nw": "ne"
+  },
+  "states": {
+    "idle": {
+      "frames": 2,
+      "dirs": 5,
+      "fps": 12,
+      "loop": true,
+      "atlas": "eous_idle.png"
+    },
+    "walk": {
+      "frames": 4,
+      "dirs": 5,
+      "fps": 12,
+      "loop": true,
+      "atlas": "eous_walk.png"
+    },
+    "death": {
+      "frames": 4,
+      "dirs": 1,
+      "fps": 12,
+      "loop": false,
+      "atlas": "eous_death.png"
+    }
+  },
+  "palette": {
+    "outline": "#14161a",
+    "hood_light": "#fbf7ee",
+    "hood": "#ebe4d8",
+    "hood_shade": "#cfc6b8",
+    "hood_deep": "#a89d8e",
+    "visor": "#22282a",
+    "visor_rim": "#3a4440",
+    "eye": "#c9f24d",
+    "eye_hi": "#e8ffa6",
+    "eye_dark": "#8ec32c",
+    "coat_light": "#4b5866",
+    "coat": "#3a4552",
+    "coat_shade": "#2c353f",
+    "coat_deep": "#20272e",
+    "scarf_light": "#e69347",
+    "scarf": "#cf772c",
+    "scarf_shade": "#a95a1e",
+    "scarf_deep": "#7c3d12",
+    "cream": "#f0e6cf",
+    "rivet": "#b7b0a4",
+    "rivet_dark": "#4a463e"
+  },
+  "generator": "tools/art-pipeline/eous_draw.py"
+}

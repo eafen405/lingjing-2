@@ -1,0 +1,78 @@
+{
+  "entity": "nailgun",
+  "group": "Enemies",
+  "frameSize": [
+    64,
+    64
+  ],
+  "pivotPx": [
+    32,
+    5
+  ],
+  "pivotNorm": [
+    0.5,
+    0.0781
+  ],
+  "ppu": 32,
+  "directions": {
+    "s": 0,
+    "e": 1,
+    "n": 2
+  },
+  "mirror": {
+    "w": "e"
+  },
+  "states": {
+    "idle": {
+      "frames": 1,
+      "dirs": 3,
+      "fps": 12,
+      "loop": true,
+      "atlas": "nailgun_idle.png"
+    },
+    "move": {
+      "frames": 2,
+      "dirs": 3,
+      "fps": 12,
+      "loop": true,
+      "atlas": "nailgun_move.png"
+    },
+    "fire": {
+      "frames": 2,
+      "dirs": 3,
+      "fps": 12,
+      "loop": true,
+      "atlas": "nailgun_fire.png"
+    },
+    "death": {
+      "frames": 3,
+      "dirs": 1,
+      "fps": 12,
+      "loop": false,
+      "atlas": "nailgun_death.png"
+    }
+  },
+  "palette": {
+    "outline": "#14161a",
+    "eye": "#c9f24d",
+    "eye_hi": "#e8ffa6",
+    "eye_dark": "#8ec32c",
+    "rivet": "#b7b0a4",
+    "rivet_dark": "#4a463e",
+    "shell_deep": "#10171e",
+    "shell": "#1a232d",
+    "shell_light": "#33455a",
+    "plate": "#4f6b82",
+    "rim": "#a8cbd6",
+    "warn": "#ff415f",
+    "warn_hi": "#ffb0bf",
+    "warn_deep": "#7d1330"
+  },
+  "generator": "tools/art-pipeline/malice_draw.py",
+  "bbox": [
+    12,
+    16,
+    61,
+    63
+  ]
+}
