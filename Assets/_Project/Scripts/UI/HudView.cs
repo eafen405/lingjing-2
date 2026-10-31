@@ -17,28 +17,32 @@ namespace Lingjing.UI
         static readonly Color FairyColor = new Color(0.95f, 0.82f, 0.45f, 1f);
         static readonly Color BarBackground = new Color(0.055f, 0.07f, 0.09f, 0.92f);
 
-        Canvas _canvas;
         Text _hpText;
         Text _energyText;
         Text _fairyText;
         UiBar _hpBar;
         UiBar _energyBar;
 
+        /// <summary>HUD 自己的 Doozy 视图，常驻显示。</summary>
+        public DoozyViewHost View { get; private set; }
+
         public static HudView Build(Action onPause)
         {
             UiKit.EnsureEventSystem();
 
-            Canvas canvas = UiKit.CreateCanvas("HudCanvas", 20);
-            var view = canvas.gameObject.AddComponent<HudView>();
-            view.Init(canvas, onPause);
-            return view;
+            Canvas canvas = DoozyViewHost.EnsureCanvas();
+            DoozyViewHost view = DoozyViewHost.Create(
+                canvas.transform, DoozyViewHost.HudViewName, DoozyViewHost.HudSortingOrder);
+
+            var hud = view.Root.AddComponent<HudView>();
+            hud.View = view;
+            hud.Init(view.Root.transform, onPause);
+            view.Show(true);
+            return hud;
         }
 
-        void Init(Canvas canvas, Action onPause)
+        void Init(Transform root, Action onPause)
         {
-            _canvas = canvas;
-            Transform root = canvas.transform;
-
             RectTransform card = UiKit.CreatePanel(root, "Stats", new Vector2(0f, 1f), new Vector2(0f, 1f),
                 new Vector2(SafeMargin, -SafeMargin), new Vector2(300f, 158f),
                 new Color(0.055f, 0.07f, 0.09f, 0.82f));
@@ -83,14 +87,6 @@ namespace Lingjing.UI
             if (fairyActive)
             {
                 _fairyText.text = $"{UiText.FairyTakeover} {Mathf.Max(0f, fairySeconds):0.0}s";
-            }
-        }
-
-        public void SetVisible(bool visible)
-        {
-            if (_canvas != null)
-            {
-                _canvas.gameObject.SetActive(visible);
             }
         }
     }

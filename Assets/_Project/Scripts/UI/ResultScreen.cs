@@ -10,24 +10,28 @@ namespace Lingjing.UI
     /// </summary>
     public sealed class ResultScreen : MonoBehaviour
     {
-        Canvas _canvas;
         Text _title;
         Text _score;
         Text _highScore;
         Action _restart;
         Action _mainMenu;
 
-        public bool Visible => _canvas != null && _canvas.gameObject.activeSelf;
+        /// <summary>结算界面自己的 Doozy 视图，叠在 HUD 之上，默认隐藏。</summary>
+        public DoozyViewHost View { get; private set; }
+
+        public bool Visible => View != null && View.IsVisible;
 
         public static ResultScreen Build(Action restart, Action mainMenu)
         {
-            Canvas canvas = UiKit.CreateCanvas("ResultCanvas", 110);
-            var screen = canvas.gameObject.AddComponent<ResultScreen>();
-            screen._canvas = canvas;
+            Canvas canvas = DoozyViewHost.EnsureCanvas();
+            DoozyViewHost view = DoozyViewHost.Create(
+                canvas.transform, DoozyViewHost.ResultViewName, DoozyViewHost.ResultSortingOrder);
+
+            var screen = view.Root.AddComponent<ResultScreen>();
+            screen.View = view;
             screen._restart = restart;
             screen._mainMenu = mainMenu;
-            screen.BuildUi(canvas.transform);
-            canvas.gameObject.SetActive(false);
+            screen.BuildUi(view.Root.transform);
             return screen;
         }
 
@@ -62,12 +66,12 @@ namespace Lingjing.UI
                 : new Color(0.95f, 0.45f, 0.45f, 1f);
             _score.text = $"{UiText.Score} {score}";
             _highScore.text = $"{UiText.HighScore} {highScore}";
-            _canvas.gameObject.SetActive(true);
+            View.Show(true);
         }
 
         public void Hide()
         {
-            _canvas.gameObject.SetActive(false);
+            View.Hide(true);
         }
 
         void OnRestart()

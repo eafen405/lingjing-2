@@ -5,7 +5,8 @@
         "Lingjing.Core",
         "Lingjing.Combat",
         "Lingjing.AI",
-        "Lingjing.Data"
+        "Lingjing.Data",
+        "Doozy.Engine"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

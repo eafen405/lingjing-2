@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using Doozy.Engine.UI;
 using Lingjing.UI;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -73,7 +74,8 @@ namespace Lingjing.Editor
                 return false;
             }
 
-            CanvasScaler scaler = canvas.GetComponent<CanvasScaler>();
+            // 每个界面根节点都带 UIView 自带的嵌套 Canvas，缩放只由根画布负责，这里统一从 rootCanvas 取。
+            CanvasScaler scaler = canvas.rootCanvas.GetComponent<CanvasScaler>();
             bool scalerOk = scaler != null
                 && Mathf.Approximately(scaler.referenceResolution.x, UiKit.RefWidth)
                 && Mathf.Approximately(scaler.referenceResolution.y, UiKit.RefHeight);
@@ -88,6 +90,23 @@ namespace Lingjing.Editor
 
             bool fontOk = UiKit.Font != null;
             Expect(fontOk, "UiKit.Font 已加载");
+
+            // Doozy 画布：运行时在 Awake 阶段建出来，界面的 UIView 全挂在它下面。
+            UICanvas doozyCanvas = DoozyViewHost.FindCanvas();
+            bool doozyCanvasOk = doozyCanvas != null
+                && doozyCanvas.Canvas != null
+                && doozyCanvas.Canvas.isRootCanvas
+                && doozyCanvas.CanvasName == DoozyViewHost.CanvasName;
+            Expect(doozyCanvasOk, $"主菜单场景有 Doozy UICanvas（{DoozyViewHost.CanvasName}）");
+
+            UIView[] sceneViews = UnityEngine.Object.FindObjectsOfType<UIView>(true);
+            UIView menuView = sceneViews.FirstOrDefault(v => v.ViewName == DoozyViewHost.MainMenuViewName);
+            bool menuViewOk = menuView != null
+                && boot.Menu != null
+                && boot.Menu.View != null
+                && menuView == boot.Menu.View.DoozyView;
+            Expect(menuViewOk,
+                $"场景里存在 UIView 且 ViewName == {DoozyViewHost.MainMenuViewName}（共 {sceneViews.Length} 个）");
 
             UnityEditor.EditorBuildSettingsScene[] buildScenes = EditorBuildSettings.scenes;
             bool buildSettingsOk = buildScenes.Length >= 2
@@ -118,6 +137,42 @@ namespace Lingjing.Editor
 
             bool lockedText = panel != null && panel.Root != null && HasText(panel.Root, UiText.Locked);
             Expect(lockedText, $"不可进节点显示「{UiText.Locked}」");
+
+            // Doozy：关卡面板自己的 UIView，Show(true)/Hide(true) 直接翻转可见状态。
+            DoozyViewHost levelView = panel != null ? panel.View : null;
+            if (levelView != null)
+            {
+                levelView.Show(true);
+            }
+
+            bool levelShown = levelView != null && levelView.IsVisible && panel.Visible;
+            Expect(levelShown, "LevelSelect：Show(true) 后 UIView 可见");
+
+            if (levelView != null)
+            {
+                levelView.Hide(true);
+            }
+
+            bool levelHidden = levelView != null && !levelView.IsVisible && !panel.Visible;
+            Expect(levelHidden, "LevelSelect：Hide(true) 后 UIView 不可见");
+
+            // Doozy：主菜单自己的 UIView，Hide/Show 各翻转一次 IsVisible，用完恢复显示。
+            DoozyViewHost menuHost = boot.Menu != null ? boot.Menu.View : null;
+            if (menuHost != null)
+            {
+                menuHost.Hide(true);
+            }
+
+            bool menuHidden = menuHost != null && !menuHost.IsVisible;
+            Expect(menuHidden, "MainMenu：Hide(true) 后 IsVisible == false");
+
+            if (menuHost != null)
+            {
+                menuHost.Show(true);
+            }
+
+            bool menuShownAfterHide = menuHost != null && menuHost.IsVisible;
+            Expect(menuShownAfterHide, "MainMenu：Show(true) 后 IsVisible == true");
 
             // 战斗内 HUD/暂停/结算的构造冒烟：不进入播放模式，只验证界面树能搭出来。
             HudView hud = HudView.Build(null);
@@ -151,6 +206,28 @@ namespace Lingjing.Editor
             bool clearShown = HasText(result.transform, UiText.ResultClear);
             result.Hide();
             Expect(failShown && clearShown, "结算：失败/通关标题、得分与最高分");
+
+            // Doozy：HUD/暂停/结算三个视图都存在且 UIView.ViewName 固定。
+            bool viewNamesOk = hud.View != null && hud.View.DoozyView != null
+                && hud.View.DoozyView.ViewName == DoozyViewHost.HudViewName
+                && pause.View != null && pause.View.DoozyView != null
+                && pause.View.DoozyView.ViewName == DoozyViewHost.PauseViewName
+                && result.View != null && result.View.DoozyView != null
+                && result.View.DoozyView.ViewName == DoozyViewHost.ResultViewName;
+            Expect(viewNamesOk, "HUD/暂停/结算三个 UIView 的 ViewName = Hud/Pause/Result");
+
+            // Doozy：三者都在同一个画布下，靠嵌套 Canvas 的 overrideSorting + sortingOrder 叠加。
+            bool layersOk = hud.View != null && pause.View != null && result.View != null
+                && hud.View.DoozyView.Canvas.overrideSorting
+                && pause.View.DoozyView.Canvas.overrideSorting
+                && result.View.DoozyView.Canvas.overrideSorting
+                && hud.View.DoozyView.Canvas.sortingOrder == DoozyViewHost.HudSortingOrder
+                && pause.View.DoozyView.Canvas.sortingOrder == DoozyViewHost.PauseSortingOrder
+                && result.View.DoozyView.Canvas.sortingOrder == DoozyViewHost.ResultSortingOrder
+                && hud.View.DoozyView.Canvas.sortingOrder < pause.View.DoozyView.Canvas.sortingOrder
+                && pause.View.DoozyView.Canvas.sortingOrder < result.View.DoozyView.Canvas.sortingOrder;
+            Expect(layersOk,
+                $"层级：HUD({DoozyViewHost.HudSortingOrder}) < Pause({DoozyViewHost.PauseSortingOrder}) < Result({DoozyViewHost.ResultSortingOrder})");
 
             UnityEngine.Object.DestroyImmediate(hud.gameObject);
             UnityEngine.Object.DestroyImmediate(pause.gameObject);
@@ -203,7 +280,8 @@ namespace Lingjing.Editor
             Debug.Log($"[ui] summary canvas={canvas.name} scaler={scalerText} buttons={activeButtons.Length} "
                 + $"title={titleOk} font={fontText} levelPanelHidden={hiddenBefore} levelPanelShown={shown} "
                 + $"level2Interactable={(level2Button != null && level2Button.interactable)} lockedText={lockedText} "
-                + $"score={scoreOk} restored={restored}");
+                + $"doozyCanvas={(doozyCanvas != null ? doozyCanvas.CanvasName : "null")} views={sceneViews.Length} "
+                + $"viewNames={viewNamesOk} layers={layersOk} score={scoreOk} restored={restored}");
 
             return pass;
         }

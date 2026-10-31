@@ -10,23 +10,27 @@ namespace Lingjing.UI
     /// </summary>
     public sealed class PauseScreen : MonoBehaviour
     {
-        Canvas _canvas;
         Action _resume;
         Action _restart;
         Action _mainMenu;
 
-        public bool Visible => _canvas != null && _canvas.gameObject.activeSelf;
+        /// <summary>暂停界面自己的 Doozy 视图，叠在 HUD 之上，默认隐藏。</summary>
+        public DoozyViewHost View { get; private set; }
+
+        public bool Visible => View != null && View.IsVisible;
 
         public static PauseScreen Build(Action resume, Action restart, Action mainMenu)
         {
-            Canvas canvas = UiKit.CreateCanvas("PauseCanvas", 100);
-            var screen = canvas.gameObject.AddComponent<PauseScreen>();
-            screen._canvas = canvas;
+            Canvas canvas = DoozyViewHost.EnsureCanvas();
+            DoozyViewHost view = DoozyViewHost.Create(
+                canvas.transform, DoozyViewHost.PauseViewName, DoozyViewHost.PauseSortingOrder);
+
+            var screen = view.Root.AddComponent<PauseScreen>();
+            screen.View = view;
             screen._resume = resume;
             screen._restart = restart;
             screen._mainMenu = mainMenu;
-            screen.BuildUi(canvas.transform);
-            canvas.gameObject.SetActive(false);
+            screen.BuildUi(view.Root.transform);
             return screen;
         }
 
@@ -51,12 +55,12 @@ namespace Lingjing.UI
 
         public void Show()
         {
-            _canvas.gameObject.SetActive(true);
+            View.Show(true);
         }
 
         public void Hide()
         {
-            _canvas.gameObject.SetActive(false);
+            View.Hide(true);
         }
 
         void OnResume()

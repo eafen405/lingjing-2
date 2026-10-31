@@ -27,15 +27,21 @@ namespace Lingjing.UI
 
         public RectTransform Root { get; private set; }
 
-        public bool Visible => Root != null && Root.gameObject.activeSelf;
+        /// <summary>关卡面板自己的 Doozy 视图，挂在主菜单视图下面，默认隐藏。</summary>
+        public DoozyViewHost View { get; private set; }
+
+        public bool Visible => View != null && View.IsVisible;
 
         public static LevelSelectPanel Build(Transform parent)
         {
-            RectTransform root = UiKit.CreateFullScreen(parent, "LevelSelectPanel", new Color(0f, 0f, 0f, 0.72f));
-            var panel = root.gameObject.AddComponent<LevelSelectPanel>();
-            panel.Root = root;
-            panel.BuildUi(root);
-            root.gameObject.SetActive(false);
+            DoozyViewHost view = DoozyViewHost.Create(
+                parent, DoozyViewHost.LevelSelectViewName, DoozyViewHost.LevelSelectSortingOrder);
+
+            var panel = view.Root.AddComponent<LevelSelectPanel>();
+            panel.View = view;
+            panel.Root = (RectTransform)view.Root.transform;
+            UiKit.CreateFullScreen(panel.Root, "Dim", new Color(0f, 0f, 0f, 0.72f));
+            panel.BuildUi(panel.Root);
             return panel;
         }
 
@@ -79,13 +85,13 @@ namespace Lingjing.UI
         public void Show()
         {
             Refresh();
-            Root.gameObject.SetActive(true);
+            View.Show(true);
             Root.SetAsLastSibling();
         }
 
         public void Hide()
         {
-            Root.gameObject.SetActive(false);
+            View.Hide(true);
         }
 
         /// <summary>解锁状态以 GameFlow/GameSave 为准，每次打开面板重新算一遍。</summary>

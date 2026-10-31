@@ -28,7 +28,9 @@ namespace Lingjing.UI
 
             _built = true;
             UiKit.EnsureEventSystem();
-            Canvas canvas = UiKit.CreateCanvas("MenuCanvas");
+
+            // Doozy 画布必须在任何 Show() 之前就位：这里在 Awake 阶段先建好，界面再挂上去。
+            Canvas canvas = DoozyViewHost.EnsureCanvas();
             Menu = MainMenuScreen.Build(canvas);
         }
     }

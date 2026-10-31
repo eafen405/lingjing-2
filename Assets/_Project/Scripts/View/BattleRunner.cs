@@ -417,11 +417,7 @@ namespace Lingjing.View
             GameSave.SubmitScore(score);
 
             Time.timeScale = 0f;
-            if (_hud != null)
-            {
-                _hud.SetVisible(false);
-            }
-
+            // HUD 常驻：结算叠在 HUD 之上（Doozy sortingOrder 110 > 20），不隐藏 HUD。
             _pause?.Hide();
             _result.Show(clear, score, GameSave.HighScore);
         }

@@ -19,10 +19,18 @@ namespace Lingjing.UI
 
         public LevelSelectPanel LevelSelect { get; private set; }
 
+        /// <summary>主菜单自己的 Doozy 视图，显隐由它负责。</summary>
+        public DoozyViewHost View { get; private set; }
+
         public static MainMenuScreen Build(Canvas canvas)
         {
-            var screen = canvas.gameObject.AddComponent<MainMenuScreen>();
-            screen.BuildUi(canvas.transform);
+            DoozyViewHost view = DoozyViewHost.Create(
+                canvas.transform, DoozyViewHost.MainMenuViewName, DoozyViewHost.MainMenuSortingOrder);
+
+            var screen = view.Root.AddComponent<MainMenuScreen>();
+            screen.View = view;
+            screen.BuildUi(view.Root.transform);
+            view.Show(true);
             return screen;
         }
 
