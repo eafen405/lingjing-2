@@ -1,0 +1,27 @@
+{
+  "name": "corridor_pressure",
+  "seed": 11,
+  "policy": "scripted",
+  "script": "flee",
+  "durationTicks": 3600,
+  "map": {
+    "width": 40,
+    "height": 24,
+    "wallRects": [
+      [0, 6, 40, 1],
+      [0, 11, 40, 1],
+      [13, 7, 1, 2],
+      [27, 9, 1, 2]
+    ]
+  },
+  "player": {
+    "pos": [3.5, 8.5]
+  },
+  "spawns": [
+    { "tick": 0, "type": "striker", "pos": [14.5, 9.5] },
+    { "tick": 0, "type": "striker", "pos": [22.5, 8.5] },
+    { "tick": 0, "type": "striker", "pos": [30.5, 9.5] },
+    { "tick": 60, "type": "striker", "pos": [36.5, 8.5] },
+    { "tick": 60, "type": "striker", "pos": [18.5, 7.5] }
+  ]
+}

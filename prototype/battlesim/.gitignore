@@ -1,0 +1,4 @@
+bin/
+obj/
+# 运行产物：指标 JSON 入库，逐 tick CSV 可由一条命令重建
+results/*.csv
