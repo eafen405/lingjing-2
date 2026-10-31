@@ -46,8 +46,10 @@ ROOT = os.path.dirname(os.path.dirname(HERE))
 ART = os.path.join(ROOT, "Assets", "_Project", "Art", "Terrain")
 OUT = os.path.join(HERE, "out")
 
-# 一屏 960×540 / 32px = 30×17 瓦片（合成场地用同一尺寸）
-ROOM_W, ROOM_H = 30, 17
+# 合成场地：96×54 瓦片 = 3072×1728，一节 ≈ 3.2×3.2 屏（约 10 屏面积）
+ROOM_W, ROOM_H = 96, 54
+# 手机视口：960×540 基准分辨率 / 32px = 30×17 瓦片，相机跟人走
+VIEW_W, VIEW_H = 30, 17
 KEEP = ("wall", "props", "portal")
 
 
@@ -195,10 +197,11 @@ def review(zoom: int = 5, pzoom: int = 3) -> Image.Image:
 
 
 def compose_room() -> Image.Image:
-    """30×17 的合成场地：边界 + 挡路物 + 传送门 + 主角与四种以骸。
+    """60×34 的合成场地（四屏）：边界 + 挡路物 + 传送门 + 主角与以骸。
 
     底是透明的（游戏里由相机清屏色决定），这张图只回答一个问题：
-    白色伊埃斯和深色以骸站在空场地上，100% 缩放下是否都还一眼认得出。
+    白色伊埃斯和深色以骸站在空场地上，100% 缩放下是否都还一眼认得出，
+    以及边界和障碍物在一节场地里够不够用。
     """
     from eous_draw import render as eous_render
     from eous_model import Pose as EousPose
@@ -225,30 +228,55 @@ def compose_room() -> Image.Image:
                 img.paste(walls[mask], (x * TILE, y * TILE))
 
     portal = draw_portal(0)
-    img.paste(portal, (14 * TILE, 2 * TILE), portal)
+    img.paste(portal, (44 * TILE, 2 * TILE), portal)
 
-    for name, tx, ty in (("prop_block", 8, 7), ("prop_crystal", 20, 6),
-                         ("prop_block", 12, 12), ("prop_crystal", 24, 13)):
+    props = [("prop_block", 10, 8), ("prop_crystal", 20, 6),
+             ("prop_block", 34, 9), ("prop_crystal", 52, 7),
+             ("prop_block", 70, 10), ("prop_crystal", 84, 8),
+             ("prop_crystal", 14, 22), ("prop_block", 30, 26),
+             ("prop_crystal", 46, 20), ("prop_block", 64, 24),
+             ("prop_crystal", 80, 22), ("prop_block", 22, 40),
+             ("prop_crystal", 44, 44), ("prop_block", 68, 42),
+             ("prop_crystal", 86, 38)]
+    for name, tx, ty in props:
         art = PROPS[name]()
         img.paste(art, (tx * TILE + TILE // 2 - PROP // 2,
                         ty * TILE + TILE - PROP), art)
 
-    fx, fy = 15 * TILE + 16, 14 * TILE + 24
+    fx, fy = 48 * TILE, 30 * TILE
     eous = eous_render(EousPose(f=0.0), 64)
     img.paste(eous, (fx - 32, fy - 61), eous)
 
-    mobs = [("striker", 9.5, 9.5, 90.0), ("nailgun", 20.5, 10.0, 90.0),
-            ("taillight", 12.0, 8.5, 0.0), ("dropper", 25.0, 9.0, 0.0)]
+    mobs = [("striker", 16, 14, 90.0), ("nailgun", 28, 16, 90.0),
+            ("taillight", 40, 13, 0.0), ("dropper", 58, 15, 0.0),
+            ("striker", 74, 16, 90.0), ("nailgun", 88, 14, 270.0),
+            ("taillight", 24, 32, 0.0), ("striker", 36, 34, 90.0),
+            ("nailgun", 54, 30, 90.0), ("striker", 66, 36, 180.0),
+            ("dropper", 82, 32, 0.0), ("striker", 40, 48, 90.0),
+            ("taillight", 60, 46, 0.0), ("nailgun", 78, 48, 270.0)]
     for ent, tx, ty, yaw in mobs:
         art = render_entity(MOB_ENTITY[ent], MobPose(yaw=yaw))
-        feet = (int(tx * TILE), int(ty * TILE))
+        feet = (tx * TILE, ty * TILE)
         img.paste(art, (feet[0] - 32, feet[1] - (art.height - 5)), art)
 
     img.save(os.path.join(OUT, "terrain_room.png"))
-    # 2 倍图垫一层深色底，方便直接肉眼验收（素材本身仍是透明底）
-    flat = Image.new("RGBA", (Wp * 2, Hp * 2), C["void"])
-    flat.alpha_composite(img.resize((Wp * 2, Hp * 2), Image.NEAREST))
-    flat.convert("RGB").save(os.path.join(OUT, "terrain_room_2x.png"))
+
+    # 手机只显示一块视口（960×540 = 30×17 瓦片），相机跟人走。
+    # 再出两张：标注视口位置的全图、以及视口里实际看到的那一屏。
+    vx, vy = 33 * TILE, 21 * TILE
+    view = (vx, vy, vx + VIEW_W * TILE, vy + VIEW_H * TILE)
+
+    ann = Image.new("RGBA", (Wp, Hp), C["void"])
+    ann.alpha_composite(img)
+    d = ImageDraw.Draw(ann)
+    d.rectangle(view, outline=(255, 255, 255, 255), width=2)
+    d.text((vx + 6, vy + 6), f"{VIEW_W * TILE}x{VIEW_H * TILE} viewport",
+           fill=(255, 255, 255), font=_font(22))
+    ann.convert("RGB").save(os.path.join(OUT, "terrain_room_view.png"))
+
+    shot = Image.new("RGBA", (VIEW_W * TILE, VIEW_H * TILE), C["void"])
+    shot.alpha_composite(img.crop(view))
+    shot.convert("RGB").save(os.path.join(OUT, "terrain_camera.png"))
     return img
 
 

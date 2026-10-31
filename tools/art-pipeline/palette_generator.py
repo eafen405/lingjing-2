@@ -1,12 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-色板生成器 - 基于参考图和规格要求生成 32 色色板
-规格要求：1px 深色描边（L≈15%）、左上光源、高光不超过 2 阶、禁止半透明
+"""【已废弃】早期的 32 色色板生成器，保留作历史参考。
+
+不要运行它。它内置的色值与 `eous_draw.py` 实际使用的 29 色**不一致**
+（眼睛 #B4F078 vs #c9f24d、围巾 #E68C50 vs #cf772c），而且按当前工作目录
+的相对路径写文件——在 tools/art-pipeline 下跑会生成一层嵌套的
+`tools/art-pipeline/Assets/_Project/Art/`，把错色板铺到仓库里。
+
+「全项目 32 色」这条上限已于 2026-10-31 撤销（见 docs/specs/art-assets.md §4）。
+现在色板的唯一来源是各绘制模块里的色板常量（`EOUS_COLORS` / `MALICE_EXTRA` /
+`TERRAIN_COLORS`），导出结果写进各实体的 manifest 与 `tileset.json`。
+
+确需重跑请显式加 `--force`。
 """
 
 import sys
 import io
+
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 from PIL import Image
@@ -140,6 +150,12 @@ def save_palette_formats(palette):
     print("✓ 已保存 palette.py (代码)")
 
 if __name__ == '__main__':
+    if '--force' not in sys.argv:
+        print("palette_generator 已废弃：色值与现有素材不一致，不要用它覆盖色板。")
+        print("现在色板见 eous_model.EOUS_COLORS / malice_model.MALICE_EXTRA / "
+              "terrain_draw.TERRAIN_COLORS。")
+        print("确需重跑：python palette_generator.py --force")
+        raise SystemExit(1)
     palette = generate_palette()
     save_palette_formats(palette)
     print(f"\n色板生成完成：共 {len(palette)} 色")
