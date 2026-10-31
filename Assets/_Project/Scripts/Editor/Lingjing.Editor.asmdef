@@ -6,7 +6,8 @@
         "Lingjing.Combat",
         "Lingjing.AI",
         "Lingjing.Data",
-        "Lingjing.UI"
+        "Lingjing.UI",
+        "Lingjing.View"
     ],
     "includePlatforms": [
         "Editor"
