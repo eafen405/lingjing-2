@@ -1,0 +1,551 @@
+{
+  "sourceHashes": {
+    "model": "cc42b05b781a9044495348297ed1fed6186ae64e7c5276a73e9ebfc05681fa40",
+    "planner": "f2edf8f761b48e4998b955932986bef9cc903d335e2f426967f66d24a11ff8a1"
+  },
+  "strategy": "phase",
+  "ticks": 215,
+  "startDistance": 6,
+  "startPlayer": {
+    "x": 13,
+    "y": 9
+  },
+  "startEnemy": {
+    "x": 7,
+    "y": 9
+  },
+  "first": {
+    "move": {
+      "x": -0.9238795325112867,
+      "y": 0.3826834323650899
+    },
+    "id": "dir:07",
+    "attack": 0,
+    "damage": 0,
+    "progress": 3.1371367568593964
+  },
+  "safeApproaches": [
+    {
+      "id": "dir:06",
+      "move": {
+        "x": -0.7071067811865475,
+        "y": 0.7071067811865476
+      },
+      "damage": 0,
+      "attack": 0,
+      "progress": 1.7376611455841253
+    },
+    {
+      "id": "dir:07",
+      "move": {
+        "x": -0.9238795325112867,
+        "y": 0.3826834323650899
+      },
+      "damage": 0,
+      "attack": 0,
+      "progress": 3.1371367568593964
+    },
+    {
+      "id": "dir:09",
+      "move": {
+        "x": -0.9238795325112868,
+        "y": -0.38268343236508967
+      },
+      "damage": 0,
+      "attack": 0,
+      "progress": 3.137136756859405
+    },
+    {
+      "id": "dir:10",
+      "move": {
+        "x": -0.7071067811865477,
+        "y": -0.7071067811865475
+      },
+      "damage": 0,
+      "attack": 0,
+      "progress": 1.7376611455841466
+    }
+  ],
+  "actual": {
+    "damage": 0,
+    "damageDealt": 60,
+    "kills": 1,
+    "minDistance": 1.6320585711252822,
+    "player": {
+      "x": 9.968729507539464,
+      "y": 10.199477943199438
+    },
+    "enemies": []
+  },
+  "decisions": [
+    {
+      "tick": 0,
+      "move": {
+        "x": -0.9238795325112867,
+        "y": 0.3826834323650899
+      },
+      "id": "dir:07",
+      "attack": 0,
+      "approach": 3.1371367568593964,
+      "approachActive": true,
+      "predictedDamage": 0,
+      "distance": 6
+    },
+    {
+      "tick": 6,
+      "move": {
+        "x": -0.9238795325112868,
+        "y": -0.38268343236508967
+      },
+      "id": "dir:09",
+      "attack": 0,
+      "approach": 3.2987798660183723,
+      "approachActive": true,
+      "predictedDamage": 0,
+      "distance": 5.7851172635835795
+    },
+    {
+      "tick": 12,
+      "move": {
+        "x": -0.9238795325112819,
+        "y": -0.3826834323651019
+      },
+      "id": "current",
+      "attack": 0.8593288263311448,
+      "approach": 3.084955059910931,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 5.414955059910931
+    },
+    {
+      "tick": 18,
+      "move": {
+        "x": -0.9238795325112819,
+        "y": -0.3826834323651019
+      },
+      "id": "current",
+      "attack": 3.536234980512944,
+      "approach": 2.7168447795668618,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 5.046844779566862
+    },
+    {
+      "tick": 24,
+      "move": {
+        "x": -0.9238795325112819,
+        "y": -0.3826834323651019
+      },
+      "id": "current",
+      "attack": 6.328111142798631,
+      "approach": 2.3539669252918056,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 4.683966925291806
+    },
+    {
+      "tick": 30,
+      "move": {
+        "x": -0.9238795325112819,
+        "y": -0.3826834323651019
+      },
+      "id": "current",
+      "attack": 9.16081179012389,
+      "approach": 1.997637933724799,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 4.327637933724799
+    },
+    {
+      "tick": 36,
+      "move": {
+        "x": -0.9238795325112819,
+        "y": -0.3826834323651019
+      },
+      "id": "current",
+      "attack": 11.889412101610437,
+      "approach": 1.649617319994488,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 3.979617319994488
+    },
+    {
+      "tick": 42,
+      "move": {
+        "x": -0.9238795325112819,
+        "y": -0.3826834323651019
+      },
+      "id": "current",
+      "attack": 12.774345260438965,
+      "approach": 1.074473832283827,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 3.6422874600704387
+    },
+    {
+      "tick": 48,
+      "move": {
+        "x": -0.9238795325112819,
+        "y": -0.3826834323651019
+      },
+      "id": "current",
+      "attack": 12.774345260438965,
+      "approach": 0.338017653841165,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 3.3189097411608874
+    },
+    {
+      "tick": 54,
+      "move": {
+        "x": -0.9238795325112819,
+        "y": -0.3826834323651019
+      },
+      "id": "current",
+      "attack": 12.774345260438965,
+      "approach": -0.4133687840484135,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 3.0139784004134595
+    },
+    {
+      "tick": 60,
+      "move": {
+        "x": -0.9238795325112819,
+        "y": -0.3826834323651019
+      },
+      "id": "current",
+      "attack": 12.774345260438965,
+      "approach": -1.1631693241840537,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 2.733673302782379
+    },
+    {
+      "tick": 66,
+      "move": {
+        "x": -0.9238795325112819,
+        "y": -0.3826834323651019
+      },
+      "id": "current",
+      "attack": 12.774345260438965,
+      "approach": -1.8928836264632651,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 2.486337397565214
+    },
+    {
+      "tick": 72,
+      "move": {
+        "x": -1,
+        "y": 1.2246467991473532e-16
+      },
+      "id": "dir:08",
+      "attack": 12.776614050988698,
+      "approach": -1.5886368515687024,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 2.282712768334552
+    },
+    {
+      "tick": 78,
+      "move": {
+        "x": -0.9238795325112868,
+        "y": -0.38268343236508967
+      },
+      "id": "dir:09",
+      "attack": 10.407124837255648,
+      "approach": -2.682175064300588,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 2.01502184121948
+    },
+    {
+      "tick": 84,
+      "move": {
+        "x": -1,
+        "y": 1.2246467991473532e-16
+      },
+      "id": "dir:08",
+      "attack": 11.481175255025454,
+      "approach": -2.5995010210831895,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 1.9078355349669278
+    },
+    {
+      "tick": 90,
+      "move": {
+        "x": -0.9238795325112867,
+        "y": 0.3826834323650899
+      },
+      "id": "dir:07",
+      "attack": 10.377611094579144,
+      "approach": -2.103765391737765,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 1.7621047973262247
+    },
+    {
+      "tick": 96,
+      "move": {
+        "x": -0.9238795325112884,
+        "y": 0.3826834323650858
+      },
+      "id": "current",
+      "attack": 8.971050104348604,
+      "approach": -2.47848942999347,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 1.6378940911626785
+    },
+    {
+      "tick": 102,
+      "move": {
+        "x": -0.7071067811865475,
+        "y": 0.7071067811865476
+      },
+      "id": "dir:06",
+      "attack": 12.713877455787584,
+      "approach": -2.2633026091110384,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 1.691635632421166
+    },
+    {
+      "tick": 108,
+      "move": {
+        "x": -0.3826834323650897,
+        "y": 0.9238795325112867
+      },
+      "id": "dir:05",
+      "attack": 11.302359983142912,
+      "approach": -1.6653300709486247,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 1.705072216624544
+    },
+    {
+      "tick": 114,
+      "move": {
+        "x": -0.3826834323650905,
+        "y": 0.9238795325112865
+      },
+      "id": "current",
+      "attack": 9.492675376274745,
+      "approach": -2.0800431493537626,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 1.6563122143619402
+    },
+    {
+      "tick": 120,
+      "move": {
+        "x": -0.3826834323650905,
+        "y": 0.9238795325112865
+      },
+      "id": "current",
+      "attack": 9.492675376274745,
+      "approach": -2.473046556489738,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 1.642887461981827
+    },
+    {
+      "tick": 126,
+      "move": {
+        "x": 6.123233995736766e-17,
+        "y": 1
+      },
+      "id": "dir:04",
+      "attack": 13.10494572015763,
+      "approach": -2.20359692821972,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 1.7027558076966707
+    },
+    {
+      "tick": 132,
+      "move": {
+        "x": 0.38268343236508984,
+        "y": 0.9238795325112867
+      },
+      "id": "dir:03",
+      "attack": 10.794890650030874,
+      "approach": -1.5969566052084962,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 1.709982327856611
+    },
+    {
+      "tick": 138,
+      "move": {
+        "x": 0.3826834323650905,
+        "y": 0.9238795325112865
+      },
+      "id": "current",
+      "attack": 8.993943346889635,
+      "approach": -2.008261536503748,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 1.6535883979728905
+    },
+    {
+      "tick": 144,
+      "move": {
+        "x": 0.3826834323650905,
+        "y": 0.9238795325112865
+      },
+      "id": "current",
+      "attack": 8.993943346889635,
+      "approach": -2.420242857186709,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 1.6320680371019467
+    },
+    {
+      "tick": 150,
+      "move": {
+        "x": 0.7071067811865476,
+        "y": 0.7071067811865475
+      },
+      "id": "dir:02",
+      "attack": 13.661674997677494,
+      "approach": -2.123445590741868,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 1.67947595433323
+    },
+    {
+      "tick": 156,
+      "move": {
+        "x": 0.7071067811865409,
+        "y": 0.7071067811865542
+      },
+      "id": "current",
+      "attack": 10.92801674749435,
+      "approach": -2.561740156134735,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 1.677137292450279
+    },
+    {
+      "tick": 162,
+      "move": {
+        "x": 0.9238795325112867,
+        "y": 0.3826834323650898
+      },
+      "id": "dir:01",
+      "attack": 13.516689325208118,
+      "approach": -2.1272750784344003,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 1.7265091886897026
+    },
+    {
+      "tick": 168,
+      "move": {
+        "x": 0.9238795325112836,
+        "y": 0.38268343236509716
+      },
+      "id": "current",
+      "attack": 10.814221721362363,
+      "approach": -2.5388955269355016,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 1.7241212516551563
+    },
+    {
+      "tick": 174,
+      "move": {
+        "x": 1,
+        "y": 0
+      },
+      "id": "dir:00",
+      "attack": 13.38644631425743,
+      "approach": -1.8957116606185016,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 1.7714941894773177
+    },
+    {
+      "tick": 180,
+      "move": {
+        "x": 0.9238795325112865,
+        "y": -0.3826834323650904
+      },
+      "id": "dir:15",
+      "attack": 12.967022910820996,
+      "approach": -1.4096910026688239,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 1.7659337646280515
+    },
+    {
+      "tick": 186,
+      "move": {
+        "x": 0.9238795325112819,
+        "y": -0.3826834323651019
+      },
+      "id": "current",
+      "attack": 10.37314743321126,
+      "approach": -1.8329431528612874,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 1.6910274476929505
+    },
+    {
+      "tick": 192,
+      "move": {
+        "x": 0.9238795325112819,
+        "y": -0.3826834323651019
+      },
+      "id": "current",
+      "attack": 9.483599686137234,
+      "approach": -2.2424856906468045,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 1.6494308692379425
+    },
+    {
+      "tick": 198,
+      "move": {
+        "x": 0.9238795325112819,
+        "y": -0.3826834323651019
+      },
+      "id": "current",
+      "attack": 9.483599686137234,
+      "approach": -2.6099021143328236,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 1.663336788266688
+    },
+    {
+      "tick": 204,
+      "move": {
+        "x": 0.38268343236509,
+        "y": -0.9238795325112866
+      },
+      "id": "dir:13",
+      "attack": 18.020227662349004,
+      "approach": -1.3177051138929556,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 1.7566863242432844
+    },
+    {
+      "tick": 210,
+      "move": {
+        "x": 0.3826834323651019,
+        "y": -0.9238795325112819
+      },
+      "id": "current",
+      "attack": 15.378607043355764,
+      "approach": -1.737482166427891,
+      "approachActive": false,
+      "predictedDamage": 0,
+      "distance": 1.7362844347242123
+    }
+  ],
+  "failures": []
+}

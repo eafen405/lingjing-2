@@ -1,0 +1,264 @@
+{
+  "sourceHashes": {
+    "model": "02f1ad64cad90959d29cb6fb97b560b880d9de795a60ccfae18d6c81d305a9b6",
+    "planner": "f2edf8f761b48e4998b955932986bef9cc903d335e2f426967f66d24a11ff8a1"
+  },
+  "baselineSourceHashes": {
+    "model": "cc42b05b781a9044495348297ed1fed6186ae64e7c5276a73e9ebfc05681fa40",
+    "planner": "f2edf8f761b48e4998b955932986bef9cc903d335e2f426967f66d24a11ff8a1"
+  },
+  "fields": [
+    "ticks",
+    "hp",
+    "damage",
+    "damageDealt",
+    "bladeHits",
+    "kills",
+    "suicides",
+    "pickups",
+    "knifePickups",
+    "healPickups",
+    "energyPickups",
+    "bladesAdded",
+    "healing",
+    "urgentHealing",
+    "bladeCount",
+    "energy",
+    "spawned",
+    "prefixFalseSafe",
+    "prefixUnderprediction"
+  ],
+  "runs": 150,
+  "repetitions": 75,
+  "allRepeated": true,
+  "contracts": {
+    "movementIndependentOfSpin": true,
+    "candidateScoresIndependentOfSpin": true,
+    "spinLeavesMoveAndObservationUnchanged": true,
+    "futureScheduleAbsentFromObservation": true,
+    "entityIdMonotonicAfterRemoval": true
+  },
+  "allSurvived": true,
+  "commonConditions": 120,
+  "unchangedPhysicalConditions": 114,
+  "pickupConditions": 40,
+  "pickupDifferences": [],
+  "probes": {
+    "count": 30,
+    "allOneContact": true
+  },
+  "strategies": [
+    {
+      "strategy": "greedy",
+      "count": 24,
+      "damage": 8,
+      "damageDealt": 1580,
+      "kills": 18,
+      "rangedContacts": 0,
+      "prefixFalseSafe": 0,
+      "prefixUnderprediction": 0
+    },
+    {
+      "strategy": "linear",
+      "count": 24,
+      "damage": 48,
+      "damageDealt": 1380,
+      "kills": 15,
+      "rangedContacts": 0,
+      "prefixFalseSafe": 1,
+      "prefixUnderprediction": 1
+    },
+    {
+      "strategy": "phase",
+      "count": 24,
+      "damage": 0,
+      "damageDealt": 1440,
+      "kills": 14,
+      "rangedContacts": 0,
+      "prefixFalseSafe": 0,
+      "prefixUnderprediction": 0
+    },
+    {
+      "strategy": "phase-short",
+      "count": 24,
+      "damage": 0,
+      "damageDealt": 1670,
+      "kills": 22,
+      "rangedContacts": 0,
+      "prefixFalseSafe": 0,
+      "prefixUnderprediction": 0
+    },
+    {
+      "strategy": "phase-near",
+      "count": 24,
+      "damage": 0,
+      "damageDealt": 1590,
+      "kills": 22,
+      "rangedContacts": 0,
+      "prefixFalseSafe": 0,
+      "prefixUnderprediction": 0
+    }
+  ],
+  "groupChanges": [
+    {
+      "scene": "fairy-dash",
+      "strategy": "linear",
+      "changes": {
+        "damage": {
+          "before": 28,
+          "after": 16
+        },
+        "damageDealt": {
+          "before": 65,
+          "after": 80
+        },
+        "kills": {
+          "before": 0,
+          "after": 0.5
+        }
+      }
+    },
+    {
+      "scene": "fairy-zones",
+      "strategy": "phase",
+      "changes": {
+        "kills": {
+          "before": 0.5,
+          "after": 1
+        }
+      }
+    },
+    {
+      "scene": "fairy-mixed",
+      "strategy": "phase-near",
+      "changes": {
+        "damageDealt": {
+          "before": 80,
+          "after": 85
+        }
+      }
+    },
+    {
+      "scene": "fairy-summon",
+      "strategy": "phase",
+      "changes": {
+        "damageDealt": {
+          "before": 80,
+          "after": 75
+        }
+      }
+    }
+  ],
+  "differences": [
+    {
+      "scene": "fairy-dash",
+      "strategy": "linear",
+      "seed": 1,
+      "changes": {
+        "hp": {
+          "before": 60,
+          "after": 84
+        },
+        "damage": {
+          "before": 40,
+          "after": 16
+        },
+        "damageDealt": {
+          "before": 60,
+          "after": 70
+        },
+        "bladeHits": {
+          "before": 6,
+          "after": 7
+        },
+        "kills": {
+          "before": 0,
+          "after": 1
+        },
+        "suicides": {
+          "before": 3,
+          "after": 2
+        },
+        "prefixFalseSafe": {
+          "before": 1,
+          "after": 0
+        },
+        "prefixUnderprediction": {
+          "before": 1,
+          "after": 0
+        }
+      }
+    },
+    {
+      "scene": "fairy-dash",
+      "strategy": "linear",
+      "seed": 2,
+      "changes": {
+        "damageDealt": {
+          "before": 70,
+          "after": 90
+        },
+        "bladeHits": {
+          "before": 7,
+          "after": 9
+        }
+      }
+    },
+    {
+      "scene": "fairy-zones",
+      "strategy": "phase",
+      "seed": 1,
+      "changes": {
+        "kills": {
+          "before": 0,
+          "after": 1
+        }
+      }
+    },
+    {
+      "scene": "fairy-mixed",
+      "strategy": "phase-near",
+      "seed": 1,
+      "changes": {
+        "damageDealt": {
+          "before": 90,
+          "after": 100
+        },
+        "bladeHits": {
+          "before": 9,
+          "after": 10
+        }
+      }
+    },
+    {
+      "scene": "fairy-summon",
+      "strategy": "phase",
+      "seed": 1,
+      "changes": {
+        "damageDealt": {
+          "before": 80,
+          "after": 90
+        },
+        "bladeHits": {
+          "before": 8,
+          "after": 9
+        }
+      }
+    },
+    {
+      "scene": "fairy-summon",
+      "strategy": "phase",
+      "seed": 2,
+      "changes": {
+        "damageDealt": {
+          "before": 80,
+          "after": 60
+        },
+        "bladeHits": {
+          "before": 8,
+          "after": 6
+        }
+      }
+    }
+  ]
+}

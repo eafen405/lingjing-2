@@ -1,0 +1,283 @@
+{
+  "date": "2026-10-30T11:08:05.718Z",
+  "environment": {
+    "node": "v24.21.0",
+    "platform": "win32",
+    "cpu": "AMD Ryzen 9 8945HX with Radeon Graphics        "
+  },
+  "configuration": {
+    "seeds": [
+      1
+    ],
+    "strategies": [
+      "linear",
+      "phase"
+    ],
+    "scenes": [
+      "fairy-dash",
+      "fairy-zones"
+    ],
+    "ticks": 240,
+    "decisionTicks": 6,
+    "referenceSpin": 1,
+    "predictionKillCredit": false,
+    "damageNumbersAreExperimental": true,
+    "enemyHp": 60,
+    "bladeDamage": 10,
+    "bladeOmega": 2.5,
+    "bladeRadius": 2,
+    "visibleCommandHashScope": "player/enemies/projectiles/zones/items/stats/command; not all hidden navigation state"
+  },
+  "sourceHashes": {
+    "model": "120f80078ee6dec8c7b4e529b1b7cf136d75b54f64eb773026295d720e77c5ef",
+    "planner": "d1bbf4546a1c799a8d5ce5404539cca447360dc7446298b0ac982301784d6571"
+  },
+  "contracts": {
+    "movementIndependentOfSpin": true,
+    "candidateScoresIndependentOfSpin": true,
+    "spinLeavesMoveAndObservationUnchanged": true,
+    "futureScheduleAbsentFromObservation": true,
+    "entityIdMonotonicAfterRemoval": true
+  },
+  "repetition": [],
+  "groups": [
+    {
+      "scene": "fairy-dash",
+      "strategy": "linear",
+      "count": 1,
+      "damage": 40,
+      "damageDealt": 60,
+      "actualDps": 15,
+      "bladeHits": 6,
+      "kills": 0,
+      "suicides": 3,
+      "pickups": 0,
+      "proxyIntegral": 45.707979665235165,
+      "meanOnRing": 0.5041666666666667,
+      "prefixFalseSafe": 1,
+      "prefixUnderprediction": 1,
+      "meanSafeFraction": 0.759232456140351,
+      "wholeRunMs": 1034.1063,
+      "survivalRate": 1,
+      "decisionP95Ms": 33.55139999999983
+    },
+    {
+      "scene": "fairy-dash",
+      "strategy": "phase",
+      "count": 1,
+      "damage": 0,
+      "damageDealt": 90,
+      "actualDps": 22.5,
+      "bladeHits": 9,
+      "kills": 0,
+      "suicides": 0,
+      "pickups": 0,
+      "proxyIntegral": 91.82625205049641,
+      "meanOnRing": 0.7583333333333333,
+      "prefixFalseSafe": 0,
+      "prefixUnderprediction": 0,
+      "meanSafeFraction": 0.5630952380952379,
+      "wholeRunMs": 2567.3988000000004,
+      "survivalRate": 1,
+      "decisionP95Ms": 73.41049999999996
+    },
+    {
+      "scene": "fairy-zones",
+      "strategy": "linear",
+      "count": 1,
+      "damage": 0,
+      "damageDealt": 80,
+      "actualDps": 20,
+      "bladeHits": 8,
+      "kills": 1,
+      "suicides": 0,
+      "pickups": 0,
+      "proxyIntegral": 89.80902526933932,
+      "meanOnRing": 0.7916666666666666,
+      "prefixFalseSafe": 0,
+      "prefixUnderprediction": 0,
+      "meanSafeFraction": 0.7011309523809526,
+      "wholeRunMs": 1299.0452999999998,
+      "survivalRate": 1,
+      "decisionP95Ms": 34.809299999999894
+    },
+    {
+      "scene": "fairy-zones",
+      "strategy": "phase",
+      "count": 1,
+      "damage": 0,
+      "damageDealt": 80,
+      "actualDps": 20,
+      "bladeHits": 8,
+      "kills": 0,
+      "suicides": 0,
+      "pickups": 0,
+      "proxyIntegral": 84.34684131013213,
+      "meanOnRing": 0.7541666666666667,
+      "prefixFalseSafe": 0,
+      "prefixUnderprediction": 0,
+      "meanSafeFraction": 0.6190476190476194,
+      "wholeRunMs": 2684.0229,
+      "survivalRate": 1,
+      "decisionP95Ms": 94.25929999999971
+    }
+  ],
+  "runs": [
+    {
+      "scene": "fairy-dash",
+      "seed": 1,
+      "strategy": "linear",
+      "ticks": 240,
+      "survived": true,
+      "hp": 60,
+      "damage": 40,
+      "damageDealt": 60,
+      "actualDps": 15,
+      "bladeHits": 6,
+      "kills": 0,
+      "suicides": 3,
+      "pickups": 0,
+      "healing": 0,
+      "spawned": 0,
+      "proxyIntegral": 45.707979665235165,
+      "meanOnRing": 0.5041666666666667,
+      "decisions": 40,
+      "prefixCount": 40,
+      "prefixFalseSafe": 1,
+      "prefixUnderprediction": 1,
+      "zeroPrefixPredictions": 38,
+      "meanSafeFraction": 0.759232456140351,
+      "decisionMs": {
+        "mean": 25.631324999999983,
+        "p50": 24.29860000000008,
+        "p95": 33.55139999999983,
+        "max": 36.71900000000005
+      },
+      "wholeRunMs": 1034.1063,
+      "visibleCommandHash": "866145fecdf9c1d2647457c0b7e3fc92530c91efae81bfb100a3b8b7cef991e3",
+      "mismatches": [
+        {
+          "tick": 114,
+          "actual": 8,
+          "predicted": 0,
+          "chosenId": "dir:15",
+          "newEntities": false,
+          "events": [
+            {
+              "tick": 119,
+              "text": "尾灯 3 接触 命中，生命 -8",
+              "kind": "hit"
+            },
+            {
+              "tick": 119,
+              "text": "尾灯 3 接触后自毁",
+              "kind": "note"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scene": "fairy-dash",
+      "seed": 1,
+      "strategy": "phase",
+      "ticks": 240,
+      "survived": true,
+      "hp": 100,
+      "damage": 0,
+      "damageDealt": 90,
+      "actualDps": 22.5,
+      "bladeHits": 9,
+      "kills": 0,
+      "suicides": 0,
+      "pickups": 0,
+      "healing": 0,
+      "spawned": 0,
+      "proxyIntegral": 91.82625205049641,
+      "meanOnRing": 0.7583333333333333,
+      "decisions": 40,
+      "prefixCount": 40,
+      "prefixFalseSafe": 0,
+      "prefixUnderprediction": 0,
+      "zeroPrefixPredictions": 40,
+      "meanSafeFraction": 0.5630952380952379,
+      "decisionMs": {
+        "mean": 63.733837499999844,
+        "p50": 64.71029999999973,
+        "p95": 73.41049999999996,
+        "max": 80.8141999999998
+      },
+      "wholeRunMs": 2567.3988000000004,
+      "visibleCommandHash": "739fbe81b616e5f56b1bb7f8778d28324b56900847ae48620f74e63016e8c9e4",
+      "mismatches": []
+    },
+    {
+      "scene": "fairy-zones",
+      "seed": 1,
+      "strategy": "linear",
+      "ticks": 240,
+      "survived": true,
+      "hp": 100,
+      "damage": 0,
+      "damageDealt": 80,
+      "actualDps": 20,
+      "bladeHits": 8,
+      "kills": 1,
+      "suicides": 0,
+      "pickups": 0,
+      "healing": 0,
+      "spawned": 0,
+      "proxyIntegral": 89.80902526933932,
+      "meanOnRing": 0.7916666666666666,
+      "decisions": 40,
+      "prefixCount": 40,
+      "prefixFalseSafe": 0,
+      "prefixUnderprediction": 0,
+      "zeroPrefixPredictions": 40,
+      "meanSafeFraction": 0.7011309523809526,
+      "decisionMs": {
+        "mean": 32.039134999999966,
+        "p50": 31.900800000000345,
+        "p95": 34.809299999999894,
+        "max": 35.99439999999959
+      },
+      "wholeRunMs": 1299.0452999999998,
+      "visibleCommandHash": "2bca71514d45ab1911ff69c6aa76a55c96c965518ec1e09f661e3d328098f72d",
+      "mismatches": []
+    },
+    {
+      "scene": "fairy-zones",
+      "seed": 1,
+      "strategy": "phase",
+      "ticks": 240,
+      "survived": true,
+      "hp": 100,
+      "damage": 0,
+      "damageDealt": 80,
+      "actualDps": 20,
+      "bladeHits": 8,
+      "kills": 0,
+      "suicides": 0,
+      "pickups": 0,
+      "healing": 0,
+      "spawned": 0,
+      "proxyIntegral": 84.34684131013213,
+      "meanOnRing": 0.7541666666666667,
+      "decisions": 40,
+      "prefixCount": 40,
+      "prefixFalseSafe": 0,
+      "prefixUnderprediction": 0,
+      "zeroPrefixPredictions": 40,
+      "meanSafeFraction": 0.6190476190476194,
+      "decisionMs": {
+        "mean": 66.65449000000008,
+        "p50": 60.8066000000008,
+        "p95": 94.25929999999971,
+        "max": 96.54470000000038
+      },
+      "wholeRunMs": 2684.0229,
+      "visibleCommandHash": "5dc671d76123833544b18401ee66011480aa425aa118130ea9add9e2e68dec14",
+      "mismatches": []
+    }
+  ]
+}

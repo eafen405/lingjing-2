@@ -1,0 +1,1402 @@
+{
+  "sourceHashes": {
+    "model": "3c18d84655842c0b3952bd1433d0b7da1f4cd43829f78946b5d62ef4f20d7290",
+    "planner": "f2edf8f761b48e4998b955932986bef9cc903d335e2f426967f66d24a11ff8a1"
+  },
+  "configuration": {
+    "damage": 4,
+    "invulnerabilityTicks": 45,
+    "knockback": 0.8
+  },
+  "probes": [
+    {
+      "kind": "shooter",
+      "start": {
+        "x": 13,
+        "y": 9
+      },
+      "predictedIdleDamage": 4,
+      "first": {
+        "tick": 1,
+        "hp": 96,
+        "damage": 4,
+        "hits": 1,
+        "rangedContacts": 1,
+        "position": {
+          "x": 13.8,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "shooter",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 46
+      }
+    },
+    {
+      "kind": "dropper",
+      "start": {
+        "x": 13,
+        "y": 9
+      },
+      "predictedIdleDamage": 4,
+      "first": {
+        "tick": 1,
+        "hp": 96,
+        "damage": 4,
+        "hits": 1,
+        "rangedContacts": 1,
+        "position": {
+          "x": 13.8,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "dropper",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 46
+      }
+    },
+    {
+      "kind": "wall",
+      "first": {
+        "tick": 1,
+        "hp": 96,
+        "damage": 4,
+        "hits": 1,
+        "rangedContacts": 1,
+        "position": {
+          "x": 13.639992000000001,
+          "y": 9.5
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "shooter",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 46
+      },
+      "atExpiry": {
+        "tick": 46,
+        "hp": 92,
+        "damage": 8,
+        "hits": 2,
+        "rangedContacts": 2,
+        "position": {
+          "x": 13.639992000000001,
+          "y": 9.5
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "shooter",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 91
+      }
+    }
+  ],
+  "checks": [
+    {
+      "name": "shooter first contact damages exactly once",
+      "ok": true,
+      "detail": {
+        "tick": 1,
+        "hp": 96,
+        "damage": 4,
+        "hits": 1,
+        "rangedContacts": 1,
+        "position": {
+          "x": 13.8,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "shooter",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 46
+      }
+    },
+    {
+      "name": "shooter contact moves Eous outward by configured distance",
+      "ok": true,
+      "detail": {
+        "x": 13.8,
+        "y": 9
+      }
+    },
+    {
+      "name": "shooter body survives with unchanged HP",
+      "ok": true,
+      "detail": [
+        {
+          "id": 1,
+          "kind": "shooter",
+          "hp": 60
+        }
+      ]
+    },
+    {
+      "name": "shooter forecast includes contact",
+      "ok": true,
+      "detail": {
+        "predicted": 4
+      }
+    },
+    {
+      "name": "shooter protection lasts within user range",
+      "ok": true,
+      "detail": {
+        "tick": 1,
+        "hp": 96,
+        "damage": 4,
+        "hits": 1,
+        "rangedContacts": 1,
+        "position": {
+          "x": 13.8,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "shooter",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 46
+      }
+    },
+    {
+      "name": "shooter phase first-step world matches execution",
+      "ok": true,
+      "detail": {
+        "tick": 1,
+        "hp": 96,
+        "damage": 4,
+        "hits": 1,
+        "rangedContacts": 1,
+        "position": {
+          "x": 13.8,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "shooter",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 46
+      }
+    },
+    {
+      "name": "shooter linear first-step world matches execution",
+      "ok": true,
+      "detail": {
+        "tick": 1,
+        "hp": 96,
+        "damage": 4,
+        "hits": 1,
+        "rangedContacts": 1,
+        "position": {
+          "x": 13.8,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "shooter",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 46
+      }
+    },
+    {
+      "name": "shooter forecasts leave public observation unchanged",
+      "ok": true
+    },
+    {
+      "name": "shooter one-shot displacement has no residual velocity",
+      "ok": true,
+      "detail": {
+        "tick": 2,
+        "hp": 96,
+        "damage": 4,
+        "hits": 1,
+        "rangedContacts": 1,
+        "position": {
+          "x": 13.8,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "shooter",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 46
+      }
+    },
+    {
+      "name": "shooter re-entry during protection cannot retrigger hit or kick",
+      "ok": true,
+      "detail": {
+        "tick": 3,
+        "hp": 96,
+        "damage": 4,
+        "hits": 1,
+        "rangedContacts": 1,
+        "position": {
+          "x": 13,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "shooter",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 46
+      }
+    },
+    {
+      "name": "shooter expiry alone does not cause damage after separation",
+      "ok": true,
+      "detail": {
+        "tick": 46,
+        "hp": 96,
+        "damage": 4,
+        "hits": 1,
+        "rangedContacts": 1,
+        "position": {
+          "x": 16,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "shooter",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 46
+      }
+    },
+    {
+      "name": "shooter re-entry after expiry hits again",
+      "ok": true,
+      "detail": {
+        "tick": 47,
+        "hp": 92,
+        "damage": 8,
+        "hits": 2,
+        "rangedContacts": 2,
+        "position": {
+          "x": 13.8,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "shooter",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 92
+      }
+    },
+    {
+      "name": "dropper first contact damages exactly once",
+      "ok": true,
+      "detail": {
+        "tick": 1,
+        "hp": 96,
+        "damage": 4,
+        "hits": 1,
+        "rangedContacts": 1,
+        "position": {
+          "x": 13.8,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "dropper",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 46
+      }
+    },
+    {
+      "name": "dropper contact moves Eous outward by configured distance",
+      "ok": true,
+      "detail": {
+        "x": 13.8,
+        "y": 9
+      }
+    },
+    {
+      "name": "dropper body survives with unchanged HP",
+      "ok": true,
+      "detail": [
+        {
+          "id": 1,
+          "kind": "dropper",
+          "hp": 60
+        }
+      ]
+    },
+    {
+      "name": "dropper forecast includes contact",
+      "ok": true,
+      "detail": {
+        "predicted": 4
+      }
+    },
+    {
+      "name": "dropper protection lasts within user range",
+      "ok": true,
+      "detail": {
+        "tick": 1,
+        "hp": 96,
+        "damage": 4,
+        "hits": 1,
+        "rangedContacts": 1,
+        "position": {
+          "x": 13.8,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "dropper",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 46
+      }
+    },
+    {
+      "name": "dropper phase first-step world matches execution",
+      "ok": true,
+      "detail": {
+        "tick": 1,
+        "hp": 96,
+        "damage": 4,
+        "hits": 1,
+        "rangedContacts": 1,
+        "position": {
+          "x": 13.8,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "dropper",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 46
+      }
+    },
+    {
+      "name": "dropper linear first-step world matches execution",
+      "ok": true,
+      "detail": {
+        "tick": 1,
+        "hp": 96,
+        "damage": 4,
+        "hits": 1,
+        "rangedContacts": 1,
+        "position": {
+          "x": 13.8,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "dropper",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 46
+      }
+    },
+    {
+      "name": "dropper forecasts leave public observation unchanged",
+      "ok": true
+    },
+    {
+      "name": "dropper one-shot displacement has no residual velocity",
+      "ok": true,
+      "detail": {
+        "tick": 2,
+        "hp": 96,
+        "damage": 4,
+        "hits": 1,
+        "rangedContacts": 1,
+        "position": {
+          "x": 13.8,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "dropper",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 46
+      }
+    },
+    {
+      "name": "dropper re-entry during protection cannot retrigger hit or kick",
+      "ok": true,
+      "detail": {
+        "tick": 3,
+        "hp": 96,
+        "damage": 4,
+        "hits": 1,
+        "rangedContacts": 1,
+        "position": {
+          "x": 13,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "dropper",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 46
+      }
+    },
+    {
+      "name": "dropper expiry alone does not cause damage after separation",
+      "ok": true,
+      "detail": {
+        "tick": 46,
+        "hp": 96,
+        "damage": 4,
+        "hits": 1,
+        "rangedContacts": 1,
+        "position": {
+          "x": 16,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "dropper",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 46
+      }
+    },
+    {
+      "name": "dropper re-entry after expiry hits again",
+      "ok": true,
+      "detail": {
+        "tick": 47,
+        "hp": 92,
+        "damage": 8,
+        "hits": 2,
+        "rangedContacts": 2,
+        "position": {
+          "x": 13.8,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "dropper",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 92
+      }
+    },
+    {
+      "name": "wall clips kick to the player footprint",
+      "ok": true,
+      "detail": {
+        "tick": 1,
+        "hp": 96,
+        "damage": 4,
+        "hits": 1,
+        "rangedContacts": 1,
+        "position": {
+          "x": 13.639992000000001,
+          "y": 9.5
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "shooter",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 46
+      }
+    },
+    {
+      "name": "persistent overlap stays one hit through protected final tick",
+      "ok": true,
+      "detail": {
+        "tick": 45,
+        "hp": 96,
+        "damage": 4,
+        "hits": 1,
+        "rangedContacts": 1,
+        "position": {
+          "x": 13.639992000000001,
+          "y": 9.5
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "shooter",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 46
+      }
+    },
+    {
+      "name": "protected reconstruction 0 retains absolute deadline",
+      "ok": true,
+      "detail": {
+        "tick": 45,
+        "hp": 96,
+        "damage": 0,
+        "hits": 0,
+        "rangedContacts": 0,
+        "position": {
+          "x": 13.639992000000001,
+          "y": 9.5
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "shooter",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 46
+      }
+    },
+    {
+      "name": "protected reconstruction 1 retains absolute deadline",
+      "ok": true,
+      "detail": {
+        "tick": 45,
+        "hp": 96,
+        "damage": 0,
+        "hits": 0,
+        "rangedContacts": 0,
+        "position": {
+          "x": 13.639992000000001,
+          "y": 9.5
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "shooter",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 46
+      }
+    },
+    {
+      "name": "persistent overlap hits exactly at expiry",
+      "ok": true,
+      "detail": {
+        "tick": 46,
+        "hp": 92,
+        "damage": 8,
+        "hits": 2,
+        "rangedContacts": 2,
+        "position": {
+          "x": 13.639992000000001,
+          "y": 9.5
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "shooter",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 91
+      }
+    },
+    {
+      "name": "protected reconstruction 0 repeats at same expiry",
+      "ok": true,
+      "detail": {
+        "tick": 46,
+        "hp": 92,
+        "damage": 4,
+        "hits": 1,
+        "rangedContacts": 1,
+        "position": {
+          "x": 13.639992000000001,
+          "y": 9.5
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "shooter",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 91
+      }
+    },
+    {
+      "name": "protected reconstruction 1 repeats at same expiry",
+      "ok": true,
+      "detail": {
+        "tick": 46,
+        "hp": 92,
+        "damage": 4,
+        "hits": 1,
+        "rangedContacts": 1,
+        "position": {
+          "x": 13.639992000000001,
+          "y": 9.5
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "shooter",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 91
+      }
+    },
+    {
+      "name": "simultaneous bodies cause one hit and stable outward kick",
+      "ok": true,
+      "detail": {
+        "tick": 1,
+        "hp": 96,
+        "damage": 4,
+        "hits": 1,
+        "rangedContacts": 1,
+        "position": {
+          "x": 13.8,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "shooter",
+            "hp": 60
+          },
+          {
+            "id": 2,
+            "kind": "dropper",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 46
+      }
+    },
+    {
+      "name": "contact protection covers same-tick projectile and zone",
+      "ok": true,
+      "detail": {
+        "tick": 1,
+        "hp": 96,
+        "damage": 4,
+        "hits": 1,
+        "rangedContacts": 1,
+        "position": {
+          "x": 13.8,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "shooter",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 46
+      }
+    },
+    {
+      "name": "protection covers later projectile and zone",
+      "ok": true,
+      "detail": {
+        "tick": 2,
+        "hp": 96,
+        "damage": 4,
+        "hits": 1,
+        "rangedContacts": 1,
+        "position": {
+          "x": 13.8,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "shooter",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 46
+      }
+    },
+    {
+      "name": "other attacks resume at protection expiry",
+      "ok": true,
+      "detail": {
+        "tick": 46,
+        "hp": 73,
+        "damage": 27,
+        "hits": 3,
+        "rangedContacts": 1,
+        "position": {
+          "x": 13.8,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [],
+        "suicides": 0,
+        "invulnerableUntil": 46
+      }
+    },
+    {
+      "name": "dead remote body cannot damage",
+      "ok": true,
+      "detail": {
+        "tick": 1,
+        "hp": 100,
+        "damage": 0,
+        "hits": 0,
+        "rangedContacts": 0,
+        "position": {
+          "x": 13,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [],
+        "suicides": 0,
+        "invulnerableUntil": 0
+      }
+    },
+    {
+      "name": "dead player cannot trigger combat or advance",
+      "ok": true,
+      "detail": {
+        "tick": 0,
+        "hp": 0,
+        "damage": 0,
+        "hits": 0,
+        "rangedContacts": 0,
+        "position": {
+          "x": 13,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "dropper",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 0
+      }
+    },
+    {
+      "name": "fatal contact cannot be cancelled by same-tick healing",
+      "ok": true,
+      "detail": {
+        "tick": 1,
+        "hp": 0,
+        "damage": 4,
+        "hits": 1,
+        "rangedContacts": 1,
+        "position": {
+          "x": 13,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "shooter",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 46
+      }
+    },
+    {
+      "name": "coincident centres have a finite deterministic fallback kick",
+      "ok": true,
+      "detail": {
+        "tick": 1,
+        "hp": 96,
+        "damage": 4,
+        "hits": 1,
+        "rangedContacts": 1,
+        "position": {
+          "x": 13.8,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "shooter",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 46
+      }
+    },
+    {
+      "name": "sweep fixture endpoints are both separated",
+      "ok": true,
+      "detail": {
+        "before": {
+          "x": 12.966666666666667,
+          "y": 9.6899
+        },
+        "naturalEnd": {
+          "x": 13.033333333333333,
+          "y": 9.6899
+        }
+      }
+    },
+    {
+      "name": "relative sweep catches contact between endpoints",
+      "ok": true,
+      "detail": {
+        "tick": 1,
+        "hp": 96,
+        "damage": 4,
+        "hits": 1,
+        "rangedContacts": 1,
+        "position": {
+          "x": 13.019713722332169,
+          "y": 10.489784057971015
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "shooter",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 46
+      }
+    },
+    {
+      "name": "earlier blade kill suppresses later body event",
+      "ok": true,
+      "detail": {
+        "tick": 1,
+        "hp": 100,
+        "damage": 0,
+        "hits": 0,
+        "rangedContacts": 0,
+        "position": {
+          "x": 12.988888888888889,
+          "y": 9
+        },
+        "velocity": {
+          "x": 179.33333333333334,
+          "y": 0
+        },
+        "enemies": [],
+        "suicides": 0,
+        "invulnerableUntil": 0,
+        "kills": 1
+      }
+    },
+    {
+      "name": "earlier body event is not erased by later blade kill",
+      "ok": true,
+      "detail": {
+        "tick": 1,
+        "hp": 96,
+        "damage": 4,
+        "hits": 1,
+        "rangedContacts": 1,
+        "position": {
+          "x": 17.788888888888888,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [],
+        "suicides": 0,
+        "invulnerableUntil": 46,
+        "kills": 1
+      }
+    },
+    {
+      "name": "tail existing contact semantics remain",
+      "ok": true,
+      "detail": {
+        "tick": 1,
+        "hp": 92,
+        "damage": 8,
+        "hits": 1,
+        "rangedContacts": 0,
+        "position": {
+          "x": 13,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [],
+        "suicides": 1,
+        "invulnerableUntil": 0
+      }
+    },
+    {
+      "name": "striker existing contact semantics remain",
+      "ok": true,
+      "detail": {
+        "tick": 1,
+        "hp": 84,
+        "damage": 16,
+        "hits": 1,
+        "rangedContacts": 0,
+        "position": {
+          "x": 13,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [],
+        "suicides": 1,
+        "invulnerableUntil": 0
+      }
+    },
+    {
+      "name": "tail uses common hurt protection",
+      "ok": false,
+      "detail": {
+        "tick": 1,
+        "hp": 92,
+        "damage": 8,
+        "hits": 1,
+        "rangedContacts": 0,
+        "position": {
+          "x": 13,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [],
+        "suicides": 1,
+        "invulnerableUntil": 0
+      }
+    },
+    {
+      "name": "tail uses common outward displacement",
+      "ok": false,
+      "detail": {
+        "tick": 1,
+        "hp": 92,
+        "damage": 8,
+        "hits": 1,
+        "rangedContacts": 0,
+        "position": {
+          "x": 13,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [],
+        "suicides": 1,
+        "invulnerableUntil": 0
+      }
+    },
+    {
+      "name": "striker uses common hurt protection",
+      "ok": false,
+      "detail": {
+        "tick": 1,
+        "hp": 84,
+        "damage": 16,
+        "hits": 1,
+        "rangedContacts": 0,
+        "position": {
+          "x": 13,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [],
+        "suicides": 1,
+        "invulnerableUntil": 0
+      }
+    },
+    {
+      "name": "striker uses common outward displacement",
+      "ok": false,
+      "detail": {
+        "tick": 1,
+        "hp": 84,
+        "damage": 16,
+        "hits": 1,
+        "rangedContacts": 0,
+        "position": {
+          "x": 13,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [],
+        "suicides": 1,
+        "invulnerableUntil": 0
+      }
+    },
+    {
+      "name": "bullet uses common hurt protection",
+      "ok": false,
+      "detail": {
+        "tick": 1,
+        "hp": 91,
+        "damage": 9,
+        "hits": 1,
+        "rangedContacts": 0,
+        "position": {
+          "x": 13,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [],
+        "suicides": 0,
+        "invulnerableUntil": 0
+      }
+    },
+    {
+      "name": "bullet uses common outward displacement",
+      "ok": false,
+      "detail": {
+        "tick": 1,
+        "hp": 91,
+        "damage": 9,
+        "hits": 1,
+        "rangedContacts": 0,
+        "position": {
+          "x": 13,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [],
+        "suicides": 0,
+        "invulnerableUntil": 0
+      }
+    },
+    {
+      "name": "zone uses common hurt protection",
+      "ok": false,
+      "detail": {
+        "tick": 1,
+        "hp": 86,
+        "damage": 14,
+        "hits": 1,
+        "rangedContacts": 0,
+        "position": {
+          "x": 13,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [],
+        "suicides": 0,
+        "invulnerableUntil": 0
+      }
+    },
+    {
+      "name": "zone uses common outward displacement",
+      "ok": false,
+      "detail": {
+        "tick": 1,
+        "hp": 86,
+        "damage": 14,
+        "hits": 1,
+        "rangedContacts": 0,
+        "position": {
+          "x": 13,
+          "y": 9
+        },
+        "velocity": {
+          "x": 0,
+          "y": 0
+        },
+        "enemies": [],
+        "suicides": 0,
+        "invulnerableUntil": 0
+      }
+    },
+    {
+      "name": "wall fixture starts outside wall for seed 1",
+      "ok": true,
+      "detail": {
+        "seed": 1,
+        "position": {
+          "x": 13.63,
+          "y": 9.5
+        }
+      }
+    },
+    {
+      "name": "wall fixture starts outside wall for seed 2",
+      "ok": true,
+      "detail": {
+        "seed": 2,
+        "position": {
+          "x": 13.52473723107949,
+          "y": 9.483989775553345
+        }
+      }
+    },
+    {
+      "name": "wall fixture starts outside wall for seed 1000",
+      "ok": true,
+      "detail": {
+        "seed": 1000,
+        "position": {
+          "x": 13.63,
+          "y": 9.5
+        }
+      }
+    }
+  ],
+  "failures": [
+    "tail uses common hurt protection",
+    "tail uses common outward displacement",
+    "striker uses common hurt protection",
+    "striker uses common outward displacement",
+    "bullet uses common hurt protection",
+    "bullet uses common outward displacement",
+    "zone uses common hurt protection",
+    "zone uses common outward displacement"
+  ]
+}

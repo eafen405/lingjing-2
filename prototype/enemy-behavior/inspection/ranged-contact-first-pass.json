@@ -1,0 +1,159 @@
+{
+  "sourceHashes": {
+    "model": "abb3cb70f5d9b4d13380d4451f61b7098454e862cfd2456326545324ff9893dc",
+    "planner": "f2edf8f761b48e4998b955932986bef9cc903d335e2f426967f66d24a11ff8a1"
+  },
+  "probes": [
+    {
+      "kind": "shooter",
+      "start": {
+        "x": 13,
+        "y": 9
+      },
+      "predictedIdleDamage": 4,
+      "actual": {
+        "hp": 96,
+        "damage": 4,
+        "hits": 1,
+        "position": {
+          "x": 13.8,
+          "y": 9
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "shooter",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 46
+      }
+    },
+    {
+      "kind": "dropper",
+      "start": {
+        "x": 13,
+        "y": 9
+      },
+      "predictedIdleDamage": 4,
+      "actual": {
+        "hp": 96,
+        "damage": 4,
+        "hits": 1,
+        "position": {
+          "x": 13.8,
+          "y": 9
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "dropper",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 46
+      }
+    }
+  ],
+  "checks": [
+    {
+      "name": "shooter first body contact must damage",
+      "ok": true,
+      "detail": {
+        "hp": 96,
+        "damage": 4,
+        "hits": 1,
+        "position": {
+          "x": 13.8,
+          "y": 9
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "shooter",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 46
+      }
+    },
+    {
+      "name": "shooter contact must move Eous away",
+      "ok": true,
+      "detail": {
+        "x": 13.8,
+        "y": 9
+      }
+    },
+    {
+      "name": "shooter body must survive",
+      "ok": true,
+      "detail": [
+        {
+          "id": 1,
+          "kind": "shooter",
+          "hp": 60
+        }
+      ]
+    },
+    {
+      "name": "shooter public forecast must include body damage",
+      "ok": true,
+      "detail": {
+        "predicted": 4
+      }
+    },
+    {
+      "name": "dropper first body contact must damage",
+      "ok": true,
+      "detail": {
+        "hp": 96,
+        "damage": 4,
+        "hits": 1,
+        "position": {
+          "x": 13.8,
+          "y": 9
+        },
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "dropper",
+            "hp": 60
+          }
+        ],
+        "suicides": 0,
+        "invulnerableUntil": 46
+      }
+    },
+    {
+      "name": "dropper contact must move Eous away",
+      "ok": true,
+      "detail": {
+        "x": 13.8,
+        "y": 9
+      }
+    },
+    {
+      "name": "dropper body must survive",
+      "ok": true,
+      "detail": [
+        {
+          "id": 1,
+          "kind": "dropper",
+          "hp": 60
+        }
+      ]
+    },
+    {
+      "name": "dropper public forecast must include body damage",
+      "ok": true,
+      "detail": {
+        "predicted": 4
+      }
+    }
+  ],
+  "failures": []
+}

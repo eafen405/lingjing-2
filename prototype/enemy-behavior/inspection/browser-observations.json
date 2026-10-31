@@ -1,0 +1,928 @@
+{
+  "page": "file:///C:/Users/user/Desktop/lingjing_2/prototype/enemy-behavior/enemy-behavior.prototype.html",
+  "sourceSha256": "4206dca21dce758fb027ba9d8c7ccd1d1ea861c12c2a51fe4ecc5d979f335cdd",
+  "interactions": [
+    {
+      "scene": "melee",
+      "guide": 0,
+      "tick": 0,
+      "hp": 100
+    },
+    {
+      "scene": "melee",
+      "guide": 1,
+      "tick": 2,
+      "hp": 100
+    },
+    {
+      "scene": "melee",
+      "guide": 2,
+      "tick": 32,
+      "hp": 100
+    },
+    {
+      "scene": "melee",
+      "guide": 3,
+      "tick": 67,
+      "hp": 100
+    },
+    {
+      "scene": "navigation",
+      "guide": 0,
+      "tick": 0,
+      "hp": 100
+    },
+    {
+      "scene": "navigation",
+      "guide": 1,
+      "tick": 120,
+      "hp": 100
+    },
+    {
+      "scene": "navigation",
+      "guide": 2,
+      "tick": 150,
+      "hp": 100
+    },
+    {
+      "scene": "navigation",
+      "guide": 3,
+      "tick": 330,
+      "hp": 100
+    },
+    {
+      "scene": "commitment",
+      "guide": 0,
+      "tick": 0,
+      "hp": 100
+    },
+    {
+      "scene": "commitment",
+      "guide": 1,
+      "tick": 26,
+      "hp": 100
+    },
+    {
+      "scene": "commitment",
+      "guide": 2,
+      "tick": 56,
+      "hp": 100
+    },
+    {
+      "scene": "commitment",
+      "guide": 3,
+      "tick": 96,
+      "hp": 100
+    },
+    {
+      "scene": "dash-wall",
+      "guide": 0,
+      "tick": 0,
+      "hp": 100
+    },
+    {
+      "scene": "dash-wall",
+      "guide": 1,
+      "tick": 26,
+      "hp": 100
+    },
+    {
+      "scene": "dash-wall",
+      "guide": 2,
+      "tick": 56,
+      "hp": 100
+    },
+    {
+      "scene": "dash-wall",
+      "guide": 3,
+      "tick": 96,
+      "hp": 100
+    },
+    {
+      "scene": "cover",
+      "guide": 0,
+      "tick": 0,
+      "hp": 100
+    },
+    {
+      "scene": "cover",
+      "guide": 1,
+      "tick": 10,
+      "hp": 100
+    },
+    {
+      "scene": "cover",
+      "guide": 2,
+      "tick": 40,
+      "hp": 100
+    },
+    {
+      "scene": "cover",
+      "guide": 3,
+      "tick": 85,
+      "hp": 100
+    },
+    {
+      "scene": "zone",
+      "guide": 0,
+      "tick": 0,
+      "hp": 100
+    },
+    {
+      "scene": "zone",
+      "guide": 1,
+      "tick": 15,
+      "hp": 100
+    },
+    {
+      "scene": "zone",
+      "guide": 2,
+      "tick": 45,
+      "hp": 100
+    },
+    {
+      "scene": "zone",
+      "guide": 3,
+      "tick": 90,
+      "hp": 100
+    },
+    {
+      "scene": "mixed",
+      "guide": 0,
+      "tick": 0,
+      "hp": 100
+    },
+    {
+      "scene": "mixed",
+      "guide": 1,
+      "tick": 60,
+      "hp": 100
+    },
+    {
+      "scene": "mixed",
+      "guide": 2,
+      "tick": 90,
+      "hp": 100
+    },
+    {
+      "scene": "mixed",
+      "guide": 3,
+      "tick": 210,
+      "hp": 75
+    },
+    {
+      "scene": "unreachable",
+      "guide": 0,
+      "tick": 0,
+      "hp": 100
+    },
+    {
+      "scene": "unreachable",
+      "guide": 1,
+      "tick": 60,
+      "hp": 100
+    },
+    {
+      "scene": "unreachable",
+      "guide": 2,
+      "tick": 90,
+      "hp": 100
+    },
+    {
+      "scene": "unreachable",
+      "guide": 3,
+      "tick": 210,
+      "hp": 100
+    }
+  ],
+  "observations": {
+    "stationaryMelee": {
+      "sceneId": "melee",
+      "tick": 60,
+      "hp": 92,
+      "stats": {
+        "flowBuilds": 1,
+        "astarCalls": 0,
+        "attacks": 1,
+        "shots": 0,
+        "hits": 1,
+        "damage": 8,
+        "cancelled": 0,
+        "wallStops": 0
+      },
+      "busy": 0,
+      "queued": 0,
+      "bullets": 0,
+      "zones": 0,
+      "enemies": [
+        {
+          "id": 1,
+          "kind": "tail",
+          "state": "recover",
+          "age": 31,
+          "pos": {
+            "x": 11.9,
+            "y": 9
+          },
+          "target": {
+            "x": 13,
+            "y": 9
+          },
+          "dir": {
+            "x": 1,
+            "y": 0
+          },
+          "reason": "出手后恢复"
+        }
+      ]
+    },
+    "sidestepMelee": {
+      "sceneId": "melee",
+      "tick": 67,
+      "hp": 100,
+      "stats": {
+        "flowBuilds": 2,
+        "astarCalls": 0,
+        "attacks": 1,
+        "shots": 0,
+        "hits": 0,
+        "damage": 0,
+        "cancelled": 0,
+        "wallStops": 0
+      },
+      "busy": 0,
+      "queued": 0,
+      "bullets": 0,
+      "zones": 0,
+      "enemies": [
+        {
+          "id": 1,
+          "kind": "tail",
+          "state": "approach",
+          "age": 2,
+          "pos": {
+            "x": 11.90510244576487,
+            "y": 9.012318393766817
+          },
+          "target": {
+            "x": 13,
+            "y": 9
+          },
+          "dir": {
+            "x": 1,
+            "y": 0
+          },
+          "reason": "沿全局路径接近"
+        }
+      ]
+    },
+    "navigation": {
+      "sceneId": "navigation",
+      "tick": 330,
+      "hp": 100,
+      "stats": {
+        "flowBuilds": 2,
+        "astarCalls": 0,
+        "attacks": 1,
+        "shots": 0,
+        "hits": 0,
+        "damage": 0,
+        "cancelled": 0,
+        "wallStops": 0
+      },
+      "busy": 1,
+      "queued": 0,
+      "bullets": 0,
+      "zones": 0,
+      "enemies": [
+        {
+          "id": 1,
+          "kind": "tail",
+          "state": "approach",
+          "age": 330,
+          "pos": {
+            "x": 16.89740264293632,
+            "y": 7.000718677631758
+          },
+          "target": null,
+          "dir": {
+            "x": 1,
+            "y": 0
+          },
+          "reason": "沿全局路径接近"
+        },
+        {
+          "id": 2,
+          "kind": "tail",
+          "state": "approach",
+          "age": 330,
+          "pos": {
+            "x": 17.54597905004895,
+            "y": 12.800773491621907
+          },
+          "target": null,
+          "dir": {
+            "x": 1,
+            "y": 0
+          },
+          "reason": "沿全局路径接近"
+        },
+        {
+          "id": 3,
+          "kind": "striker",
+          "state": "dash",
+          "age": 10,
+          "pos": {
+            "x": 17.930194711524784,
+            "y": 12.031873465158945
+          },
+          "target": {
+            "x": 19.5,
+            "y": 10.999999999999993
+          },
+          "dir": {
+            "x": 0.8356353241237474,
+            "y": -0.5492846302934388
+          },
+          "reason": "沿锁定方向直线突刺"
+        }
+      ]
+    },
+    "dashWall": {
+      "sceneId": "dash-wall",
+      "tick": 96,
+      "hp": 100,
+      "stats": {
+        "flowBuilds": 2,
+        "astarCalls": 0,
+        "attacks": 1,
+        "shots": 0,
+        "hits": 0,
+        "damage": 0,
+        "cancelled": 0,
+        "wallStops": 1
+      },
+      "busy": 0,
+      "queued": 0,
+      "bullets": 0,
+      "zones": 0,
+      "enemies": [
+        {
+          "id": 1,
+          "kind": "striker",
+          "state": "recover",
+          "age": 35,
+          "pos": {
+            "x": 12.6699985,
+            "y": 9
+          },
+          "target": {
+            "x": 12,
+            "y": 9
+          },
+          "dir": {
+            "x": 1,
+            "y": 0
+          },
+          "reason": "出手后恢复"
+        }
+      ]
+    },
+    "stationaryStriker": {
+      "sceneId": "commitment",
+      "tick": 110,
+      "hp": 84,
+      "stats": {
+        "flowBuilds": 1,
+        "astarCalls": 0,
+        "attacks": 1,
+        "shots": 0,
+        "hits": 1,
+        "damage": 16,
+        "cancelled": 0,
+        "wallStops": 0
+      },
+      "busy": 0,
+      "queued": 0,
+      "bullets": 0,
+      "zones": 0,
+      "enemies": [
+        {
+          "id": 1,
+          "kind": "striker",
+          "state": "recover",
+          "age": 43,
+          "pos": {
+            "x": 13.600000000000009,
+            "y": 9
+          },
+          "target": {
+            "x": 13,
+            "y": 9
+          },
+          "dir": {
+            "x": 1,
+            "y": 0
+          },
+          "reason": "出手后恢复"
+        }
+      ]
+    },
+    "sidestepStriker": {
+      "sceneId": "commitment",
+      "tick": 96,
+      "hp": 100,
+      "stats": {
+        "flowBuilds": 2,
+        "astarCalls": 0,
+        "attacks": 1,
+        "shots": 0,
+        "hits": 0,
+        "damage": 0,
+        "cancelled": 0,
+        "wallStops": 0
+      },
+      "busy": 0,
+      "queued": 0,
+      "bullets": 0,
+      "zones": 0,
+      "enemies": [
+        {
+          "id": 1,
+          "kind": "striker",
+          "state": "recover",
+          "age": 29,
+          "pos": {
+            "x": 13.600000000000009,
+            "y": 9
+          },
+          "target": {
+            "x": 13,
+            "y": 9
+          },
+          "dir": {
+            "x": 1,
+            "y": 0
+          },
+          "reason": "出手后恢复"
+        }
+      ]
+    },
+    "cover": {
+      "sceneId": "cover",
+      "tick": 85,
+      "hp": 100,
+      "stats": {
+        "flowBuilds": 3,
+        "astarCalls": 10,
+        "attacks": 1,
+        "shots": 0,
+        "hits": 0,
+        "damage": 0,
+        "cancelled": 1,
+        "wallStops": 0
+      },
+      "busy": 0,
+      "queued": 0,
+      "bullets": 0,
+      "zones": 0,
+      "enemies": [
+        {
+          "id": 1,
+          "kind": "shooter",
+          "state": "reposition",
+          "age": 41,
+          "pos": {
+            "x": 9.276306440470666,
+            "y": 8.443027380275035
+          },
+          "target": {
+            "x": 14,
+            "y": 10.033333333333331
+          },
+          "dir": {
+            "x": 0.9854917092779036,
+            "y": 0.16972357215341644
+          },
+          "reason": "沿可达路径寻找有视线的射击站位"
+        }
+      ]
+    },
+    "zone": {
+      "sceneId": "zone",
+      "tick": 90,
+      "hp": 100,
+      "stats": {
+        "flowBuilds": 3,
+        "astarCalls": 0,
+        "attacks": 1,
+        "shots": 0,
+        "hits": 0,
+        "damage": 0,
+        "cancelled": 0,
+        "wallStops": 0
+      },
+      "busy": 0,
+      "queued": 0,
+      "bullets": 0,
+      "zones": 0,
+      "enemies": [
+        {
+          "id": 1,
+          "kind": "dropper",
+          "state": "recover",
+          "age": 11,
+          "pos": {
+            "x": 15,
+            "y": 12
+          },
+          "target": {
+            "x": 13.5,
+            "y": 9
+          },
+          "dir": {
+            "x": 1,
+            "y": 0
+          },
+          "reason": "出手后恢复"
+        }
+      ]
+    },
+    "unreachable": {
+      "sceneId": "unreachable",
+      "tick": 240,
+      "hp": 100,
+      "stats": {
+        "flowBuilds": 1,
+        "astarCalls": 49,
+        "attacks": 0,
+        "shots": 0,
+        "hits": 0,
+        "damage": 0,
+        "cancelled": 0,
+        "wallStops": 0
+      },
+      "busy": 0,
+      "queued": 0,
+      "bullets": 0,
+      "zones": 0,
+      "enemies": [
+        {
+          "id": 1,
+          "kind": "tail",
+          "state": "approach",
+          "age": 240,
+          "pos": {
+            "x": 9,
+            "y": 8
+          },
+          "target": null,
+          "dir": {
+            "x": 1,
+            "y": 0
+          },
+          "reason": "目标不可达，停止并等待路径变化"
+        },
+        {
+          "id": 2,
+          "kind": "striker",
+          "state": "approach",
+          "age": 240,
+          "pos": {
+            "x": 11,
+            "y": 10
+          },
+          "target": null,
+          "dir": {
+            "x": 1,
+            "y": 0
+          },
+          "reason": "目标不可达，停止并等待路径变化"
+        },
+        {
+          "id": 3,
+          "kind": "shooter",
+          "state": "reposition",
+          "age": 240,
+          "pos": {
+            "x": 8,
+            "y": 11
+          },
+          "target": null,
+          "dir": {
+            "x": 1,
+            "y": 0
+          },
+          "reason": "没有可达且有视线的射击站位"
+        }
+      ]
+    },
+    "crowd": [
+      {
+        "slots": "limited",
+        "maxBusy": 2,
+        "sceneId": "mixed",
+        "tick": 180,
+        "hp": 92,
+        "stats": {
+          "flowBuilds": 3,
+          "astarCalls": 49,
+          "attacks": 7,
+          "shots": 2,
+          "hits": 1,
+          "damage": 8,
+          "cancelled": 0,
+          "wallStops": 0
+        },
+        "busy": 2,
+        "queued": 1,
+        "bullets": 2,
+        "zones": 0,
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "tail",
+            "state": "approach",
+            "age": 30,
+            "pos": {
+              "x": 11.07083333333341,
+              "y": 9
+            },
+            "target": {
+              "x": 11.433333333333339,
+              "y": 9
+            },
+            "dir": {
+              "x": 1,
+              "y": 0
+            },
+            "reason": "攻击条件成立，等待进攻许可"
+          },
+          {
+            "id": 2,
+            "kind": "tail",
+            "state": "locked",
+            "age": 14,
+            "pos": {
+              "x": 12.167232240041773,
+              "y": 8.76951260191413
+            },
+            "target": {
+              "x": 11.000000000000007,
+              "y": 9
+            },
+            "dir": {
+              "x": -0.9810560432204505,
+              "y": 0.19372413391375265
+            },
+            "reason": "方向已锁定，短打准备"
+          },
+          {
+            "id": 3,
+            "kind": "striker",
+            "state": "aim",
+            "age": 11,
+            "pos": {
+              "x": 13,
+              "y": 9.24
+            },
+            "target": {
+              "x": 11.000000000000007,
+              "y": 9
+            },
+            "dir": {
+              "x": -0.992876838486922,
+              "y": -0.11914522061843118
+            },
+            "reason": "瞄准线仍会跟踪玩家"
+          },
+          {
+            "id": 4,
+            "kind": "shooter",
+            "state": "recover",
+            "age": 14,
+            "pos": {
+              "x": 6.2318379891355935,
+              "y": 8.446162732788824
+            },
+            "target": {
+              "x": 11.000000000000007,
+              "y": 9
+            },
+            "dir": {
+              "x": 0.9933217171720656,
+              "y": 0.11537749431470244
+            },
+            "reason": "出手后恢复"
+          },
+          {
+            "id": 5,
+            "kind": "shooter",
+            "state": "recover",
+            "age": 11,
+            "pos": {
+              "x": 18.146990556321928,
+              "y": 9.66243452878281
+            },
+            "target": {
+              "x": 11.000000000000007,
+              "y": 9
+            },
+            "dir": {
+              "x": -0.9957320214467701,
+              "y": -0.09229161102466918
+            },
+            "reason": "出手后恢复"
+          },
+          {
+            "id": 6,
+            "kind": "dropper",
+            "state": "approach",
+            "age": 27,
+            "pos": {
+              "x": 16.821510119473906,
+              "y": 5.672471526889372
+            },
+            "target": {
+              "x": 13.5,
+              "y": 9
+            },
+            "dir": {
+              "x": 1,
+              "y": 0
+            },
+            "reason": "空中接近至有效标记距离"
+          }
+        ]
+      },
+      {
+        "slots": "independent",
+        "maxBusy": 5,
+        "sceneId": "mixed",
+        "tick": 180,
+        "hp": 58,
+        "stats": {
+          "flowBuilds": 3,
+          "astarCalls": 42,
+          "attacks": 8,
+          "shots": 2,
+          "hits": 5,
+          "damage": 42,
+          "cancelled": 0,
+          "wallStops": 0
+        },
+        "busy": 1,
+        "queued": 0,
+        "bullets": 0,
+        "zones": 0,
+        "enemies": [
+          {
+            "id": 1,
+            "kind": "tail",
+            "state": "recover",
+            "age": 13,
+            "pos": {
+              "x": 11.07083333333341,
+              "y": 9
+            },
+            "target": {
+              "x": 11.000000000000007,
+              "y": 9
+            },
+            "dir": {
+              "x": -1,
+              "y": 0
+            },
+            "reason": "出手后恢复"
+          },
+          {
+            "id": 2,
+            "kind": "tail",
+            "state": "recover",
+            "age": 12,
+            "pos": {
+              "x": 12.167232240041773,
+              "y": 8.76951260191413
+            },
+            "target": {
+              "x": 11.000000000000007,
+              "y": 9
+            },
+            "dir": {
+              "x": -0.9810560432204505,
+              "y": 0.19372413391375265
+            },
+            "reason": "出手后恢复"
+          },
+          {
+            "id": 3,
+            "kind": "striker",
+            "state": "locked",
+            "age": 15,
+            "pos": {
+              "x": 13,
+              "y": 9.24
+            },
+            "target": {
+              "x": 11.000000000000007,
+              "y": 9
+            },
+            "dir": {
+              "x": -0.992876838486922,
+              "y": -0.11914522061843118
+            },
+            "reason": "方向已锁定，等待出手"
+          },
+          {
+            "id": 4,
+            "kind": "shooter",
+            "state": "reposition",
+            "age": 27,
+            "pos": {
+              "x": 6.510111550877871,
+              "y": 7.924350925980762
+            },
+            "target": {
+              "x": 11.300000000000006,
+              "y": 9
+            },
+            "dir": {
+              "x": 0.9241542339669309,
+              "y": 0.382019569971219
+            },
+            "reason": "沿可达路径寻找有视线的射击站位"
+          },
+          {
+            "id": 5,
+            "kind": "shooter",
+            "state": "reposition",
+            "age": 40,
+            "pos": {
+              "x": 18.81512144685376,
+              "y": 10.361107028749634
+            },
+            "target": {
+              "x": 12.16666666666667,
+              "y": 9
+            },
+            "dir": {
+              "x": -0.9588787821182109,
+              "y": -0.28381592838228237
+            },
+            "reason": "沿可达路径寻找有视线的射击站位"
+          },
+          {
+            "id": 6,
+            "kind": "dropper",
+            "state": "approach",
+            "age": 27,
+            "pos": {
+              "x": 16.821510119473906,
+              "y": 5.672471526889372
+            },
+            "target": {
+              "x": 13.5,
+              "y": 9
+            },
+            "dir": {
+              "x": 1,
+              "y": 0
+            },
+            "reason": "空中接近至有效标记距离"
+          }
+        ]
+      }
+    ],
+    "sameActionSequenceEqual": true
+  },
+  "controls": {
+    "oneTick": 61,
+    "quarter": 76,
+    "walk": 106,
+    "added": 4,
+    "selected": 10,
+    "lock": {
+      "tick": 0,
+      "value": "early"
+    },
+    "slots": {
+      "tick": 0,
+      "value": "independent"
+    }
+  },
+  "keyboard": {
+    "tick": 17,
+    "y": 9.966666666666663,
+    "running": false
+  },
+  "narrow": {
+    "width": 760,
+    "scrollWidth": 745
+  },
+  "runtimeExceptions": [],
+  "screenshots": [
+    "striker-locked.png",
+    "navigation.png",
+    "mixed.png"
+  ]
+}
