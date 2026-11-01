@@ -15,7 +15,7 @@ public sealed class Projectile
     public Vec2 Pos;
     public Vec2 Vel;
     public double Radius = DefaultRadius;
-    public double Damage = DamageRules.NailDamage;
+    public double Damage = EnemyTuning.NailDamage;
     public int TtlTicks = DefaultTtlTicks;
     public bool Alive = true;
 
@@ -47,7 +47,7 @@ public sealed class HazardZone
     public double Width = 2.0;
     public double Height = 2.0;
     public int WarnTicksLeft;
-    public double Damage = DamageRules.FallingZoneDamage;
+    public double Damage = EnemyTuning.FallingZoneDamage;
     public bool Resolved;
 
     public bool ContainsCircle(Vec2 center, double radius)

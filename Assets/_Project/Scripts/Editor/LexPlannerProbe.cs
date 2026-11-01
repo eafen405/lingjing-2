@@ -90,7 +90,7 @@ namespace Lingjing.Editor
             world.SetFairyPlanner(timing);
 
             Player player = world.World.Player;
-            player.Energy = DamageRules.EnergyMax;
+            player.Energy = Tuning.EnergyMax;
             bool activated = world.TryActivateFairy();
             Vec2 start = player.Pos;
 

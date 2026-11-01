@@ -13,8 +13,9 @@ using Grid = Lingjing.Nav.Grid;
 namespace Lingjing.View
 {
     /// <summary>
-    /// M1 竖切的表现层入口：持有 BattleWorld，按固定 1/60 推进，把世界状态同步到精灵。
+    /// 表现层入口：持有 BattleWorld，按固定 1/60 推进，把世界状态同步到精灵。
     /// 世界是唯一权威，这里只读不改；所有位置都直接取自模拟，不做插值（像素对齐优先）。
+    /// 打击感（火花 / 闪白 / 顿帧 / 震屏 / 抖动）全部只发生在这里，模拟层一无所知。
     /// </summary>
     public sealed class BattleRunner : MonoBehaviour
     {
@@ -25,6 +26,13 @@ namespace Lingjing.View
         public Sprite bladeSprite;
         public Sprite healthSprite;
         public Sprite energySprite;
+
+        [Header("表现")]
+        [Tooltip("以骸血条轨道 32×5（Art/Fx/bar/bar_track.png），由场景生成器烘进来")]
+        public Sprite healthBarTrack;
+
+        [Tooltip("以骸血条填充 1×3（Art/Fx/bar/bar_fill.png）")]
+        public Sprite healthBarFill;
 
         [Header("关卡")]
         [Tooltip("levels.json（Assets/_Project/Data），由场景生成器烘进来")]
@@ -52,19 +60,36 @@ namespace Lingjing.View
         public MonoBehaviour input;
         public Camera viewCamera;
 
+        /// <summary>命中闪白的持续时长（秒）。够短才不会糊成一片白。</summary>
+        public const float HitFlashSeconds = 0.06f;
+
+        /// <summary>受击抖动的持续时长（秒）。</summary>
+        public const float HitShakeSeconds = 0.1f;
+
+        /// <summary>击杀顿帧时长（秒）：3–4 帧，只在击杀触发。</summary>
+        public const float KillFreezeSeconds = 0.06f;
+
         ICommandSource _source;
 
         BattleWorld _world;
         LevelRun _run;
         AudioDirector _audio;
+        EffectPool _fx;
+        Material _flashMaterial;
+        CameraFollow _camera;
+        float _freezeUntil;
+        float _playerFlashUntil;
+        bool _playerFlashApplied;
         int _lastSectionIndex = -1;
         bool _bossAnnounced;
         Transform _playerTx;
         SpriteRenderer _playerSr;
         Transform _bladeRoot;
+        Transform _barRoot;
         readonly List<Transform> _blades = new List<Transform>();
         readonly Dictionary<int, EnemyView> _enemyViews = new Dictionary<int, EnemyView>();
         readonly List<int> _staleIds = new List<int>();
+        readonly HashSet<int> _aliveIds = new HashSet<int>();
         readonly Dictionary<int, SpriteRenderer> _pickupViews = new Dictionary<int, SpriteRenderer>();
         readonly List<int> _stalePickupIds = new List<int>();
         ActorAnimator _playerAnim;
@@ -73,7 +98,12 @@ namespace Lingjing.View
         {
             public Transform tx;
             public ActorAnimator anim;
+            public SpriteRenderer sr;
+            public EnemyHealthBar bar;
             public Vector3 last;
+            public float shakeUntil;
+            public float flashUntil;
+            public bool flashApplied;
         }
 
         double _accumulator;
@@ -106,9 +136,12 @@ namespace Lingjing.View
             }
 
             _source = input as ICommandSource;
+            _flashMaterial = HitFlash.Material;
+            _camera = viewCamera != null ? viewCamera.GetComponent<CameraFollow>() : null;
             _audio = AudioDirector.Attach(gameObject, VoiceLineTable.Parse(voiceJson != null ? voiceJson.text : null));
             Build();
             BuildUi();
+            DebugOverlay.Build(this);
         }
 
         /// <summary>建世界。测试与探针可直接调用，不必进播放模式。</summary>
@@ -131,6 +164,7 @@ namespace Lingjing.View
             _world.BladeHit += OnBladeHit;
             _world.EnemyKilled += OnEnemyKilled;
             _world.PickupTaken += OnPickupTaken;
+            _world.PlayerHurt += OnPlayerHurt;
             _world.FairyStarted += OnFairyStarted;
             _world.FairyEnded += OnFairyEnded;
             _world.PlayerDied += OnPlayerDied;
@@ -138,6 +172,10 @@ namespace Lingjing.View
             // 一局的推进规则独立于世界：世界只管 1/60 步进，节与波次归 LevelRun。
             _run = new LevelRun(level, _world, seed);
 
+            _fx = new EffectPool(transform, art);
+            var barRootGo = new GameObject("HpBars");
+            _barRoot = barRootGo.transform;
+            _barRoot.SetParent(transform, false);
             CreatePlayer();
             CreateBlades();
             BuildTerrain(level, grid);
@@ -156,7 +194,7 @@ namespace Lingjing.View
         void BuildTerrain(LevelDef level, Grid grid)
         {
             var root = new GameObject("Terrain");
-            var terrainRoot = root.transform;
+            Transform terrainRoot = root.transform;
 
             int width = grid.Width;
             int height = grid.Height;
@@ -221,11 +259,37 @@ namespace Lingjing.View
         {
             _hits++;
             _audio?.PlaySfxThrottled("sfx_hit", 0.045f, 0.7f);
+
+            // 火花放在刀刃压上去的那一侧，不是敌人中心：刀从哪个方向切进来，火花就从哪儿炸。
+            if (_fx != null && _world != null)
+            {
+                Vec2 player = _world.World.Player.Pos;
+                Vec2 toEnemy = enemy.Pos - player;
+                Vec2 sparkAt = toEnemy == Vec2.Zero
+                    ? enemy.Pos
+                    : enemy.Pos - toEnemy.Normalized() * (enemy.Radius * 0.6);
+                _fx.Play("hit", new Vector3((float)sparkAt.X, (float)sparkAt.Y, 0f));
+            }
+
+            if (_enemyViews.TryGetValue(enemy.Id, out EnemyView view))
+            {
+                view.flashUntil = Time.time + HitFlashSeconds;
+                view.shakeUntil = Time.time + HitShakeSeconds;
+                view.bar?.MarkDamaged();
+            }
         }
 
         void OnPickupTaken(Pickup pickup)
         {
             _audio?.PlaySfx(pickup.Kind == PickupKind.Health ? "sfx_pickup_health" : "sfx_pickup_energy", 0.8f);
+            _fx?.Play("pickup", new Vector3((float)pickup.Pos.X, (float)pickup.Pos.Y, 0f));
+        }
+
+        void OnPlayerHurt(double amount)
+        {
+            _playerFlashUntil = Time.time + HitFlashSeconds * 1.6f;
+            _hud?.PulseHurt();
+            _camera?.Shake(2, 0.16f);
         }
 
         void OnFairyStarted()
@@ -271,6 +335,10 @@ namespace Lingjing.View
             _playerSr = go.AddComponent<SpriteRenderer>();
             _playerSr.sprite = playerSprite;
             _playerSr.sortingOrder = 10;
+            if (_flashMaterial != null)
+            {
+                _playerSr.sharedMaterial = _flashMaterial;
+            }
 
             _playerAnim = go.AddComponent<ActorAnimator>();
             _playerAnim.target = _playerSr;
@@ -283,8 +351,11 @@ namespace Lingjing.View
             _kills++;
             _audio?.PlaySfx("sfx_kill", 0.8f);
 
+            var position = new Vector3((float)enemy.Pos.X, (float)enemy.Pos.Y, 0f);
+            _fx?.Play("break", position);
+
             var go = new GameObject("Corpse" + enemy.Id);
-            go.transform.position = new Vector3((float)enemy.Pos.X, (float)enemy.Pos.Y, 0f);
+            go.transform.position = position;
             var sr = go.AddComponent<SpriteRenderer>();
             sr.sortingOrder = 7;
 
@@ -295,6 +366,10 @@ namespace Lingjing.View
             anim.Face(new Vec2(enemy.Pos.X < World.World.Player.Pos.X ? -1 : 1, 0));
 
             Destroy(go, Mathf.Max(0.2f, anim.Duration("death")));
+
+            // 顿帧 + 微震：只给击杀，命中不给——命中频率太高，每击都停会毁掉节奏。
+            Freeze(KillFreezeSeconds);
+            _camera?.Shake(1, 0.12f);
         }
 
         static string EntityOf(EnemyKind kind)
@@ -331,6 +406,16 @@ namespace Lingjing.View
             }
         }
 
+        /// <summary>画面冻结一小段（只在击杀）。和暂停共用 timeScale，所以这里只负责"解冻到 1"。</summary>
+        void Freeze(float seconds)
+        {
+            float until = Time.unscaledTime + Mathf.Max(0f, seconds);
+            if (until > _freezeUntil)
+            {
+                _freezeUntil = until;
+            }
+        }
+
         void Update()
         {
             if (_world == null || _resultShown)
@@ -349,6 +434,22 @@ namespace Lingjing.View
             if (_paused)
             {
                 return;
+            }
+
+            // 顿帧：世界与动画一起定住 3–4 帧，只留相机在震。
+            if (Time.unscaledTime < _freezeUntil)
+            {
+                if (Time.timeScale != 0f)
+                {
+                    Time.timeScale = 0f;
+                }
+
+                return;
+            }
+
+            if (Time.timeScale != 1f)
+            {
+                Time.timeScale = 1f;
             }
 
             _accumulator += Time.deltaTime;
@@ -373,6 +474,7 @@ namespace Lingjing.View
             }
 
             Sync();
+            _fx?.Step(Time.deltaTime);
             UpdateHud();
             CheckOutcome();
         }
@@ -441,6 +543,8 @@ namespace Lingjing.View
                 }
             }
 
+            SyncPlayerFlash();
+
             EnsureBladeViews(p.Ring.BladeCount);
             for (int i = 0; i < p.Ring.BladeCount; i++)
             {
@@ -452,52 +556,83 @@ namespace Lingjing.View
                 blade.rotation = Quaternion.Euler(0f, 0f, (float)(System.Math.Atan2(dy, dx) * Mathf.Rad2Deg));
             }
 
-            // 以骸：按 Id 绑定，死亡被移除的下帧销毁。
+            SyncEnemies();
+            SyncPickups();
+        }
+
+        void SyncPlayerFlash()
+        {
+            if (_playerSr == null || _flashMaterial == null)
+            {
+                return;
+            }
+
+            float amount = 0f;
+            if (Time.time < _playerFlashUntil)
+            {
+                amount = Mathf.Clamp01((_playerFlashUntil - Time.time) / (HitFlashSeconds * 1.6f));
+            }
+
+            // 只在真的闪的时候写：每帧都 SetPropertyBlock 是一笔白给的 native 调用。
+            if (amount > 0f || _playerFlashApplied)
+            {
+                HitFlash.Apply(_playerSr, amount, new Color(1f, 0.35f, 0.35f, 1f));
+                _playerFlashApplied = amount > 0f;
+            }
+        }
+
+        void SyncEnemies()
+        {
             List<Enemy> enemies = _world.World.Enemies;
+            _aliveIds.Clear();
+            for (int i = 0; i < enemies.Count; i++)
+            {
+                _aliveIds.Add(enemies[i].Id);
+            }
+
             for (int i = 0; i < enemies.Count; i++)
             {
                 Enemy enemy = enemies[i];
                 if (!_enemyViews.TryGetValue(enemy.Id, out EnemyView view))
                 {
-                    var go = new GameObject("Enemy" + enemy.Id);
-                    var sr = go.AddComponent<SpriteRenderer>();
-                    sr.sprite = enemySprite;
-                    sr.sortingOrder = 8;
-
-                    var anim = go.AddComponent<ActorAnimator>();
-                    anim.target = sr;
-                    anim.Init(art, EntityOf(enemy.Kind), "idle");
-
-                    view = new EnemyView { tx = go.transform, anim = anim, last = go.transform.position };
-                    _enemyViews.Add(enemy.Id, view);
+                    view = CreateEnemyView(enemy);
                 }
 
                 var now = new Vector3((float)enemy.Pos.X, (float)enemy.Pos.Y, 0f);
                 Vector3 delta = now - view.last;
                 view.last = now;
-                view.tx.position = now;
+
+                // 受击抖动只动渲染位置，不动模拟坐标：确定性一点不受影响。
+                Vector3 shake = Vector3.zero;
+                if (Time.time < view.shakeUntil)
+                {
+                    const float pixel = 1f / 32f;
+                    shake = new Vector3(
+                        Random.Range(-1, 2) * pixel,
+                        Random.Range(-1, 2) * pixel,
+                        0f);
+                }
+
+                view.tx.position = now + shake;
 
                 if (view.anim != null)
                 {
                     view.anim.SetState(EnemyAnimMap.StateFor(enemy));
                     view.anim.Face(new Vec2(delta.x, delta.y));
                 }
+
+                SyncEnemyFlash(view);
+
+                if (view.bar != null)
+                {
+                    view.bar.Sync(enemy.Hp, enemy.MaxHp, now, Time.deltaTime);
+                }
             }
 
             _staleIds.Clear();
             foreach (KeyValuePair<int, EnemyView> pair in _enemyViews)
             {
-                bool alive = false;
-                for (int i = 0; i < enemies.Count; i++)
-                {
-                    if (enemies[i].Id == pair.Key)
-                    {
-                        alive = true;
-                        break;
-                    }
-                }
-
-                if (!alive)
+                if (!_aliveIds.Contains(pair.Key))
                 {
                     _staleIds.Add(pair.Key);
                 }
@@ -511,10 +646,70 @@ namespace Lingjing.View
                     Destroy(view.tx.gameObject);
                 }
 
+                view.bar?.Destroy();
                 _enemyViews.Remove(_staleIds[i]);
             }
+        }
 
-            SyncPickups();
+        EnemyView CreateEnemyView(Enemy enemy)
+        {
+            var go = new GameObject("Enemy" + enemy.Id);
+            var sr = go.AddComponent<SpriteRenderer>();
+            sr.sprite = enemySprite;
+            sr.sortingOrder = 8;
+            if (_flashMaterial != null)
+            {
+                sr.sharedMaterial = _flashMaterial;
+            }
+
+            var anim = go.AddComponent<ActorAnimator>();
+            anim.target = sr;
+            anim.Init(art, EntityOf(enemy.Kind), "idle");
+
+            EnemyHealthBar bar = null;
+            if (healthBarTrack != null && healthBarFill != null)
+            {
+                float top = SpriteTopHeight(sr.sprite);
+                bar = new EnemyHealthBar(_barRoot, healthBarTrack, healthBarFill, top + 5f / 32f);
+            }
+
+            var view = new EnemyView
+            {
+                tx = go.transform,
+                anim = anim,
+                sr = sr,
+                bar = bar,
+                last = go.transform.position
+            };
+
+            _enemyViews.Add(enemy.Id, view);
+            return view;
+        }
+
+        /// <summary>精灵顶点到枢轴的高度（单位）。血条贴在它上面一点点。</summary>
+        static float SpriteTopHeight(Sprite sprite)
+        {
+            if (sprite == null)
+            {
+                return 1.5f;
+            }
+
+            return (sprite.rect.height - sprite.pivot.y) / sprite.pixelsPerUnit;
+        }
+
+        static void SyncEnemyFlash(EnemyView view)
+        {
+            float amount = 0f;
+            if (Time.time < view.flashUntil)
+            {
+                amount = Mathf.Clamp01((view.flashUntil - Time.time) / HitFlashSeconds);
+            }
+
+            if (amount > 0f || view.flashApplied)
+            {
+                HitFlash.Apply(view.sr, amount, Color.white);
+                view.flashApplied = amount > 0f;
+            }
         }
 
         /// <summary>掉落物：按 Id 绑定，被拾取后下一帧销毁。位置在生成时就定死，不会移动。</summary>
@@ -614,7 +809,7 @@ namespace Lingjing.View
             Player p = _world.World.Player;
             float fairySeconds = (float)(_world.FairyTicksLeft * SimConstants.Dt);
             _hud.SetStats((float)p.Hp, (float)p.MaxHp, (float)p.Energy,
-                (float)DamageRules.EnergyMax, _world.FairyActive, fairySeconds);
+                (float)Tuning.EnergyMax, _world.FairyActive, fairySeconds);
             _hud.SetSubtitle(_audio != null ? _audio.Subtitle : null);
 
             if (_run != null && _run.SectionCount > 0)
@@ -633,7 +828,32 @@ namespace Lingjing.View
                 }
             }
 
+            UpdateBossBar();
             AnnounceBossIfAny();
+        }
+
+        /// <summary>恶名以骸的血条：场上有一只就显示，没有就收起。</summary>
+        void UpdateBossBar()
+        {
+            if (_hud == null)
+            {
+                return;
+            }
+
+            List<Enemy> enemies = _world.World.Enemies;
+            for (int i = 0; i < enemies.Count; i++)
+            {
+                Enemy enemy = enemies[i];
+                if (enemy.Kind != EnemyKind.ChainBoss)
+                {
+                    continue;
+                }
+
+                _hud.SetBoss(UiText.EnemyName(enemy.Kind), (float)enemy.Hp, (float)enemy.MaxHp);
+                return;
+            }
+
+            _hud.SetBoss(null, 0f, 0f);
         }
 
         /// <summary>恶名以骸第一次出现在场上时喊一次。</summary>

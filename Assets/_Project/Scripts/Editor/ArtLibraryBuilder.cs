@@ -16,6 +16,9 @@ namespace Lingjing.Editor
     public static class ArtLibraryBuilder
     {
         public const string AssetPath = "Assets/_Project/Art/ArtLibrary.asset";
+
+        /// <summary>一次性特效的清单（T23 像素部分）。</summary>
+        public const string EffectsPath = "Assets/_Project/Art/Fx/effects.json";
         static readonly string[] Groups = { "Characters", "Enemies", "Bosses" };
 
         public static void Run()
@@ -49,6 +52,7 @@ namespace Lingjing.Editor
             }
 
             library.entities = entities.ToArray();
+            library.effects = BuildEffects();
             EditorUtility.SetDirty(library);
             AssetDatabase.SaveAssets();
 
@@ -67,6 +71,68 @@ namespace Lingjing.Editor
             }
 
             Debug.Log($"[art] library built: entities={library.entities.Length} states={states} frames={frames} -> {AssetPath}");
+        }
+
+        /// <summary>
+        /// 从 effects.json 收一次性特效（命中 / 碎裂 / 拾取 / 代行 / 警示）。
+        /// 血条不走这里：它是两张固定用途的图，由场景生成器按路径烘进 BattleRunner。
+        /// </summary>
+        static ArtLibrary.EffectClips[] BuildEffects()
+        {
+            if (!File.Exists(EffectsPath))
+            {
+                Debug.LogWarning($"[art] 找不到 {EffectsPath}，一次性特效将不可用");
+                return System.Array.Empty<ArtLibrary.EffectClips>();
+            }
+
+            string json = File.ReadAllText(EffectsPath);
+            var list = new List<ArtLibrary.EffectClips>();
+            int missing = 0;
+
+            // 注意：pattern 的值里带 {frame} 字面量，所以不能用「对象体内没有大括号」来切组，
+            // 改成锚定 pattern 与 names 两个键的惰性匹配。
+            foreach (Match group in Regex.Matches(json,
+                "\"(\\w+)\"\\s*:\\s*\\{[^{}]*?\"pattern\"\\s*:\\s*\"([^\"]+)\"[^{}]*?\"names\"\\s*:\\s*\\[([^\\]]*)\\]"))
+            {
+                string groupName = group.Groups[1].Value;
+                string pattern = group.Groups[2].Value;
+                string namesBody = group.Groups[3].Value;
+                string head = group.Value;
+
+                var frames = new List<Sprite>();
+                foreach (Match entry in Regex.Matches(namesBody, "\"([^\"]+)\""))
+                {
+                    string file = "Assets/_Project/Art/Fx/" + pattern.Replace("{frame}", entry.Groups[1].Value);
+                    var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(file);
+                    if (sprite != null)
+                    {
+                        frames.Add(sprite);
+                    }
+                    else
+                    {
+                        missing++;
+                        Debug.LogWarning($"[art] 特效图缺失：{file}");
+                    }
+                }
+
+                if (frames.Count == 0)
+                {
+                    continue;
+                }
+
+                Match fps = Regex.Match(head, "\"fps\"\\s*:\\s*(\\d+)");
+                Match loop = Regex.Match(head, "\"loop\"\\s*:\\s*(true|false)");
+                list.Add(new ArtLibrary.EffectClips
+                {
+                    name = groupName,
+                    fps = fps.Success ? float.Parse(fps.Groups[1].Value) : 20f,
+                    loop = loop.Success && loop.Groups[1].Value == "true",
+                    frames = frames.ToArray()
+                });
+            }
+
+            Debug.Log($"[art] effects: {list.Count} 组，缺图 {missing} 张");
+            return list.ToArray();
         }
 
         static ArtLibrary.EntityClips BuildEntity(string dir, string entityName, bool isBoss)

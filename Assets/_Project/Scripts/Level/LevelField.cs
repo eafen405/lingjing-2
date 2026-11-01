@@ -12,8 +12,6 @@ namespace Lingjing.Level
         public const int DefaultHeight = 54;
         public const int DefaultWallThickness = 1;
 
-        public const double PlayerRadius = 0.4;
-
         public static int Width(LevelDef level) => level != null && level.mapWidth > 0 ? level.mapWidth : DefaultWidth;
 
         public static int Height(LevelDef level) => level != null && level.mapHeight > 0 ? level.mapHeight : DefaultHeight;
@@ -73,10 +71,10 @@ namespace Lingjing.Level
             int cy = grid.Height / 2;
             if (grid.TryFindNearestWalkable(cx, cy, 32, out int x, out int y))
             {
-                return grid.ResolveCircle(Grid.CellCenter(x, y), PlayerRadius);
+                return grid.ResolveCircle(Grid.CellCenter(x, y), Tuning.PlayerRadius);
             }
 
-            return grid.ResolveCircle(new Vec2(grid.Width * 0.5, grid.Height * 0.5), PlayerRadius);
+            return grid.ResolveCircle(new Vec2(grid.Width * 0.5, grid.Height * 0.5), Tuning.PlayerRadius);
         }
     }
 }

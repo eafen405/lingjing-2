@@ -14,21 +14,14 @@ namespace Lingjing.AI
 /// </summary>
 public sealed class ChainBoss : Enemy
 {
-    public const double SpeedConst = 2.0;
-
     public enum BossState
     {
         Approach = 0,
         Death = 1
     }
 
-    public ChainBoss()
+    public ChainBoss() : base(EnemyKind.ChainBoss)
     {
-        Kind = EnemyKind.ChainBoss;
-        MoveSpeed = SpeedConst;
-        MaxHp = 600.0;
-        Hp = 600.0;
-        Radius = 0.6;
     }
 
     public override string StateName => ((BossState)State).ToString();

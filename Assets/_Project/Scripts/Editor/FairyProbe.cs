@@ -25,7 +25,7 @@ namespace Lingjing.Editor
             Player player = world.World.Player;
             bool rejectedWhenEmpty = !world.TryActivateFairy();
 
-            player.Energy = DamageRules.EnergyMax;
+            player.Energy = Tuning.EnergyMax;
             bool activated = world.TryActivateFairy();
             Vec2 start = player.Pos;
 
@@ -40,7 +40,8 @@ namespace Lingjing.Editor
             bool ended = !world.FairyActive;
             bool noEnergy = player.Energy < 1e-9;
 
-            Debug.Log($"[fairy] rejectedWhenEmpty={rejectedWhenEmpty} activated={activated} moved={moved:0.00} endedAfter4s={ended} energyStayedZero={noEnergy} sawActive={sawActive}");
+            Debug.Log($"[fairy] rejectedWhenEmpty={rejectedWhenEmpty} activated={activated} moved={moved:0.00} " +
+                      $"endedAfter{Tuning.FairySeconds:0}s={ended} energyStayedZero={noEnergy} sawActive={sawActive}");
 
             bool pass = rejectedWhenEmpty && activated && moved > 0.2 && ended && noEnergy && sawActive;
             Debug.Log(pass ? "[fairy] PROBE PASS" : "[fairy] PROBE FAIL");

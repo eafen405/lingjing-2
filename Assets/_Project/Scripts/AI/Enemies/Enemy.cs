@@ -17,7 +17,7 @@ public enum EnemyKind
 
 /// <summary>
 /// 以骸基类。每种以骸一个显式状态机；状态编号写进每 tick 哈希。
-/// 死亡后不再造成任何伤害（碰撞伤害由模拟层检查 Alive）。
+/// 生命、移速、半径一律从 <see cref="EnemyTuning"/> 取，行为类里不再写死；死亡后不再造成任何伤害。
 /// </summary>
 public abstract class Enemy
 {
@@ -25,15 +25,24 @@ public abstract class Enemy
     public EnemyKind Kind;
     public Vec2 Pos;
     public Vec2 Vel;
-    public double Radius = DamageRules.EnemyRadius;
-    public double MaxHp = DamageRules.EnemyMaxHp;
-    public double Hp = DamageRules.EnemyMaxHp;
+    public double Radius;
+    public double MaxHp;
+    public double Hp;
     public double MoveSpeed;
     public int State;
     public int StateTick;
     public int SpawnTick;
 
-    int[] _bladeCooldown = new int[BladeRing.DefaultBladeCount];
+    int[] _bladeCooldown = new int[Tuning.BladeCount];
+
+    protected Enemy(EnemyKind kind)
+    {
+        Kind = kind;
+        MaxHp = EnemyTuning.MaxHp(kind);
+        Hp = MaxHp;
+        MoveSpeed = EnemyTuning.MoveSpeed(kind);
+        Radius = EnemyTuning.Radius(kind);
+    }
 
     /// <summary>每把刀一个独立冷却（tick）。间隔由 DamageRules.BladeHitIntervalTicks 按 ω_rel 给出。</summary>
     public int[] BladeCooldown => _bladeCooldown;

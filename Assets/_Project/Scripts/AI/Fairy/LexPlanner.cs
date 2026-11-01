@@ -502,7 +502,7 @@ namespace Lingjing.Fairy
                 _shot.Pos = shot.Pos;
                 _shot.Vel = shot.Vel;
                 _shot.Radius = Projectile.DefaultRadius;
-                _shot.Damage = DamageRules.NailDamage;
+                _shot.Damage = EnemyTuning.NailDamage;
                 _shot.TtlTicks = Projectile.DefaultTtlTicks;
                 _shot.Alive = true;
 
@@ -531,7 +531,7 @@ namespace Lingjing.Fairy
                 _zone.Y = zone.Y;
                 _zone.Width = zone.Width;
                 _zone.Height = zone.Height;
-                _zone.Damage = DamageRules.FallingZoneDamage;
+                _zone.Damage = EnemyTuning.FallingZoneDamage;
                 if (_zone.ContainsCircle(_pathPositions[offset + k], s.PlayerRadius))
                 {
                     damage += _zone.Damage;
@@ -558,12 +558,12 @@ namespace Lingjing.Fairy
 
                     if (tailLight)
                     {
-                        damage += DamageRules.TailLightContactDps * SimConstants.Dt;
+                        damage += EnemyTuning.TailLightContactDps * SimConstants.Dt;
                     }
 
                     if (strikerDashing && !dashHit)
                     {
-                        damage += DamageRules.StrikerDashImpact;
+                        damage += EnemyTuning.StrikerDashImpact;
                         dashHit = true;
                     }
                 }

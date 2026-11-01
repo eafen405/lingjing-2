@@ -5,12 +5,11 @@ namespace Lingjing.Combat
 {
 
 /// <summary>
-/// 伤害与充能数值的唯一权威。所有常量来自 game-design.md §4.2 / §4.4 / §5。
+/// 伤害模型的规则（不再是数值表）。数值在 <see cref="Tuning"/> 与 <c>Lingjing.AI.EnemyTuning</c>。
+/// 公式来源：game-design.md §4.2。
 /// </summary>
 public static class DamageRules
 {
-    public const double BladeHitDamage = 10.0;
-
     /// <summary>ω_rel 的下限（弧度/秒）。低于它视为刀刃相对该以骸停滞，这把刀在它身上不再命中。</summary>
     public const double MinOmegaRel = 1e-3;
 
@@ -28,38 +27,6 @@ public static class DamageRules
 
         return (int)Math.Ceiling(Math.PI * 2.0 / (w * SimConstants.Dt));
     }
-
-    public const double EnemyMaxHp = 30.0;
-    public const double EnemyRadius = 0.35;
-
-    public const double EnergyPerHit = 2.0;
-    public const double EnergyPerKill = 15.0;
-    public const double EnergyMax = 100.0;
-
-    /// <summary>尾灯贴身持续伤害：每秒 8（按 dt 摊到每 tick）。</summary>
-    public const double TailLightContactDps = 8.0;
-
-    /// <summary>拾取半径（中心距）：走进 0.6 单位自动拾取，不占按键（§7.3）。</summary>
-    public const double PickupRadius = 0.6;
-
-    /// <summary>血包回复量（满血 100 的 30%）。</summary>
-    public const double HealthPickupAmount = 30.0;
-
-    /// <summary>能量球回复量（满槽 100 的 30%）。</summary>
-    public const double EnergyPickupAmount = 30.0;
-
-    /// <summary>击杀掉落概率：血包 12%、能量球 18%；恶名以骸必掉血包。</summary>
-    public const double HealthDropChance = 0.12;
-    public const double EnergyDropChance = 0.18;
-
-    /// <summary>撞针冲刺撞击：一次性 15。</summary>
-    public const double StrikerDashImpact = 15.0;
-
-    /// <summary>钉枪弹丸：8。</summary>
-    public const double NailDamage = 8.0;
-
-    /// <summary>坠物落区：12。</summary>
-    public const double FallingZoneDamage = 12.0;
 
     /// <summary>
     /// 以"玩家移动方向 + 敌人方位"计算相对角速度：m 在敌人切向 t̂ 上的投影。

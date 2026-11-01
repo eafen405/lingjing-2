@@ -199,9 +199,12 @@ Sprite (2D and UI) · PPU 32 · Filter **Point** · Compression **None** · Mip 
 | 碎裂 | 16×16 | 4 | 中心 | 18fps |
 | 拾取 | 24×24 | 3 | 中心 | 20fps |
 | 代行进入 / 结束 | 128×128 | 各 4 | 中心 | 14fps；双环 + 八刻度，不做半透明 |
+| 以骸血条·轨道 | 32×5 | 1 | 中心 | 1px 描边 + 深色内槽；贴以骸头顶 |
+| 以骸血条·填充 | 1×3 | 1 | 中心 | 可平铺：上下深红、中间亮红，引擎按整数像素裁宽 |
 
 - 这批**不属于 §3 的角色帧预算**：都是单帧小图，不参与朝向表，单独记在 `items.json` / `effects.json`。
-- 尺寸依据：飞刀按 §2 的 16×16；掉落与警示区要能和 56px 高的伊埃斯同屏读清，所以给到 32×32；代行光环要套住 2 单位高的角色，给到 128×128。
+- 尺寸依据：飞刀按 §2 的 16×16；掉落与警示区要能和 56px 高的伊埃斯同屏读清，所以给到 32×32；代行光环要套住 2 单位高的角色，给到 128×128；血条 32px 宽 ≈ 1 世界单位，正好压在 64px 高的以骸头顶。
+- 血条单独一个生成器（不是逐帧特效，schema 不同）：`python tools/art-pipeline/build_bar.py`（输出 `out/bar_review.png`）。
 - 重跑：`python tools/art-pipeline/build_misc.py`（输出 `out/misc_items.png`、`out/misc_fx.png`、`out/misc_scene.png` 与 `misc_scene_2x.png`）。
 
 UI 皮肤（主菜单、HUD、三选一卡面、天赋图标）**未做**：按本文 Out of Scope，它属于非像素资产，另立规格。

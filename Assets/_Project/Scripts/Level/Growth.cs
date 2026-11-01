@@ -26,9 +26,6 @@ namespace Lingjing.Level
         /// <summary>类别总数，数组一律按它开。</summary>
         public const int KindCount = 5;
 
-        /// <summary>每点一次代行时长加多少秒。</summary>
-        public const double FairyDurationPerLevelSeconds = 2.0;
-
         /// <summary>击杀经验按以骸强度加权，不数人头（§7.1）。</summary>
         public static double ExperienceOf(EnemyKind kind)
         {
@@ -55,7 +52,7 @@ namespace Lingjing.Level
                 case GrowthKind.BladeCount: return 6;
                 case GrowthKind.Omega: return 6;
                 case GrowthKind.Speed: return 5;
-                case GrowthKind.FairyDuration: return 4;
+                case GrowthKind.FairyDuration: return Tuning.FairyMaxLevels;
                 default: return 0;
             }
         }
@@ -80,7 +77,7 @@ namespace Lingjing.Level
                     player.BladeDamage *= MultiplierOf(kind);
                     break;
                 case GrowthKind.BladeCount:
-                    player.Ring.BladeCount = Math.Min(BladeRing.MaxBladeCount, player.Ring.BladeCount + 1);
+                    player.Ring.BladeCount = Math.Min(Tuning.MaxBladeCount, player.Ring.BladeCount + 1);
                     break;
                 case GrowthKind.Omega:
                     player.Ring.Omega *= MultiplierOf(kind);
@@ -89,7 +86,7 @@ namespace Lingjing.Level
                     player.Speed *= MultiplierOf(kind);
                     break;
                 case GrowthKind.FairyDuration:
-                    player.FairyDurationTicks += SimConstants.FromSeconds(FairyDurationPerLevelSeconds);
+                    player.FairyDurationTicks += SimConstants.FromSeconds(Tuning.FairySecondsPerLevel);
                     break;
             }
         }

@@ -14,7 +14,6 @@ namespace Lingjing.AI
 /// </summary>
 public sealed class NailGun : Enemy
 {
-    public const double SpeedConst = 2.0;
     public const double StandoffMin = 5.0;
     public const double StandoffMax = 7.0;
     public const double RetreatDistance = 3.0;
@@ -40,10 +39,8 @@ public sealed class NailGun : Enemy
     private Vec2 _standPoint;
     private bool _hasStandPoint;
 
-    public NailGun()
+    public NailGun() : base(EnemyKind.NailGun)
     {
-        Kind = EnemyKind.NailGun;
-        MoveSpeed = SpeedConst;
     }
 
     public override string StateName => ((NailState)State).ToString();

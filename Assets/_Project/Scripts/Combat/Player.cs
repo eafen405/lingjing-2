@@ -4,33 +4,32 @@ using System;
 namespace Lingjing.Combat
 {
 
-/// <summary>玩家：半径 0.4、移速 4、HP 100。圆 vs 网格碰撞由 Grid.ResolveCircle 负责。</summary>
+/// <summary>
+/// 玩家。基础数值全部来自 <see cref="Tuning"/>；关内成长改的是这里的实例字段，不改变量表。
+/// 圆 vs 网格碰撞由 Grid.ResolveCircle 负责。
+/// </summary>
 public sealed class Player
 {
-    public const double RadiusConst = 0.4;
-    public const double SpeedConst = 4.0;
-    public const double MaxHpConst = 100.0;
-
     public Vec2 Pos;
     public Vec2 Vel;
-    public double Radius = RadiusConst;
-    public double Speed = SpeedConst;
-    public double MaxHp = MaxHpConst;
-    public double Hp = MaxHpConst;
+    public double Radius = Tuning.PlayerRadius;
+    public double Speed = Tuning.PlayerSpeed;
+    public double MaxHp = Tuning.PlayerMaxHp;
+    public double Hp = Tuning.PlayerMaxHp;
 
     /// <summary>当前移动方向（单位向量或零）。</summary>
     public Vec2 MoveDir;
 
     /// <summary>加速度（单位/秒²）：速度朝目标速度平滑逼近，方向变化走弧线。</summary>
-    public double Acceleration = 60.0;
+    public double Acceleration = Tuning.PlayerAcceleration;
 
-    /// <summary>充能 0..100。命中 +2、击杀 +15，代行期间不回能。</summary>
+    /// <summary>充能 0..100。命中 +1、击杀 +8，代行期间不回能。</summary>
     public double Energy;
 
-    /// <summary>每把刀的伤害。基础值来自 DamageRules，关内成长（game-design §7.1）会改它。</summary>
-    public double BladeDamage = DamageRules.BladeHitDamage;
+    /// <summary>每把刀的伤害。基础值来自 Tuning，关内成长（game-design §7.1）会改它。</summary>
+    public double BladeDamage = Tuning.BladeDamage;
 
-    /// <summary>一次代行能接管多久（tick）。基础值来自 SimConstants，关内成长会把它拉长。</summary>
+    /// <summary>一次代行能接管多久（tick）。基础值来自 Tuning，关内成长会把它拉长。</summary>
     public int FairyDurationTicks = SimConstants.FairyDurationTicks;
 
     /// <summary>旋转方向：+1 / −1。</summary>
@@ -44,7 +43,7 @@ public sealed class Player
 
     public bool Dead => Hp <= 0.0;
 
-    public double EnergyRatio => Energy / DamageRules.EnergyMax;
+    public double EnergyRatio => Energy / Tuning.EnergyMax;
 
     public void TakeDamage(double amount)
     {

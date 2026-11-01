@@ -36,6 +36,8 @@ namespace Lingjing.Editor
         const string WallSE = "Assets/_Project/Art/Terrain/wall/wall_se.png";
         const string WallSW = "Assets/_Project/Art/Terrain/wall/wall_sw.png";
         const string PropBlock = "Assets/_Project/Art/Terrain/props/prop_block.png";
+        const string BarTrack = "Assets/_Project/Art/Fx/bar/bar_track.png";
+        const string BarFill = "Assets/_Project/Art/Fx/bar/bar_fill.png";
 
         /// <summary>两关一起生成；场景清单统一走 SceneCatalog，避免谁后跑谁覆盖。</summary>
         public static void Run()
@@ -94,6 +96,8 @@ namespace Lingjing.Editor
             runner.wallSouthEast = LoadSprite(WallSE);
             runner.wallSouthWest = LoadSprite(WallSW);
             runner.propBlock = LoadSprite(PropBlock);
+            runner.healthBarTrack = LoadSprite(BarTrack);
+            runner.healthBarFill = LoadSprite(BarFill);
             runner.viewCamera = cam;
             runner.levelJson = levelData;
             runner.levelId = levelId;

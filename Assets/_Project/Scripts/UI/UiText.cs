@@ -1,3 +1,5 @@
+using Lingjing.AI;
+using Lingjing.Core;
 using Lingjing.Level;
 using UnityEngine;
 
@@ -33,7 +35,7 @@ namespace Lingjing.UI
         public const string Score = "得分";
         public const string HighScore = "最高分";
 
-        public const string MoveHint = "左侧摇杆移动";
+        public const string MoveHint = "按住屏幕拖动移动";
         public const string SkillHint = "右下技能键：代行";
         public const string ReverseHint = "右下上键：正反切";
 
@@ -43,6 +45,17 @@ namespace Lingjing.UI
 
         /// <summary>HUD 上的节进度，如「第 2/4 节」。</summary>
         public static string SectionProgress(int current, int total) => $"第 {current}/{total} 节";
+
+        /// <summary>以骸的名字。恶名以骸在血条上要能被认出来。</summary>
+        public static string EnemyName(EnemyKind kind) => kind switch
+        {
+            EnemyKind.TailLight => "尾灯",
+            EnemyKind.Striker => "撞针",
+            EnemyKind.NailGun => "钉枪",
+            EnemyKind.Dropper => "坠物",
+            EnemyKind.ChainBoss => "恶名以骸·连环",
+            _ => "以骸"
+        };
 
         /// <summary>换节时中间那个大提示。</summary>
         public static string SectionBanner(int current) => $"第 {current} 节";
@@ -62,7 +75,7 @@ namespace Lingjing.UI
         public static string GrowthEffect(GrowthKind kind) => kind switch
         {
             GrowthKind.BladeCount => "+1",
-            GrowthKind.FairyDuration => $"+{GrowthRules.FairyDurationPerLevelSeconds:0}秒",
+            GrowthKind.FairyDuration => $"+{Tuning.FairySecondsPerLevel:0}秒",
             _ => $"+{(GrowthRules.MultiplierOf(kind) - 1.0) * 100.0:0}%"
         };
     }

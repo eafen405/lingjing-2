@@ -10,11 +10,10 @@ namespace Lingjing.AI
 
 /// <summary>
 /// 撞针：Approach(A* 接近到 4 单位) → Windup 0.6s 静止 → Dash 0.25s 直线（预警结束瞬间锁定方向，
-/// 不转向，撞墙停）→ Recover 0.8s → Approach。移速 2.2，冲刺 8。冲刺撞击 15 一次。
+/// 不转向，撞墙停）→ Recover 0.8s → Approach。冲刺 8。冲刺撞击 15 一次（见 <see cref="EnemyTuning"/>）。
 /// </summary>
 public sealed class Striker : Enemy
 {
-    public const double SpeedConst = 2.2;
     public const double DashSpeedConst = 8.0;
     public const double TriggerRange = 4.0;
     public const int WindupTicks = 36;   // 0.6s
@@ -35,10 +34,8 @@ public sealed class Striker : Enemy
     private Vec2 _dashDir = Vec2.UnitX;
     private bool _dashHitDone;
 
-    public Striker()
+    public Striker() : base(EnemyKind.Striker)
     {
-        Kind = EnemyKind.Striker;
-        MoveSpeed = SpeedConst;
     }
 
     public override string StateName => ((StrikerState)State).ToString();

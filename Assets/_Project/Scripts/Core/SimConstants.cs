@@ -21,8 +21,8 @@ public static class SimConstants
     /// <summary>1 单位 = 32px。</summary>
     public const double UnitPixels = 32.0;
 
-    /// <summary>Fairy 代行 4s。</summary>
-    public const int FairyDurationTicks = 240;
+    /// <summary>Fairy 代行初始时长。数值本体在 <see cref="Tuning.FairySeconds"/>（10s），这里只做秒→tick 的落点。</summary>
+    public const int FairyDurationTicks = Tuning.FairyTicks;
 
     /// <summary>每 tick 最多发起 4 条 A*，超出排队（本原型里丢弃，下个决策周期再试）。</summary>
     public const int AstarBudgetPerTick = 4;

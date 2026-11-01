@@ -80,7 +80,7 @@ namespace Lingjing.Sim
                 return false;
             }
 
-            if (World.Player.Energy < DamageRules.EnergyMax - 1e-9)
+            if (World.Player.Energy < Tuning.EnergyMax - 1e-9)
             {
                 return false;
             }
@@ -101,7 +101,7 @@ namespace Lingjing.Sim
             World.Player = new Player
             {
                 Pos = playerStart,
-                Energy = SimMath.Clamp(initialCharge, 0.0, DamageRules.EnergyMax)
+                Energy = SimMath.Clamp(initialCharge, 0.0, Tuning.EnergyMax)
             };
             World.Flow.Recompute(World.Player.Pos);
         }
@@ -282,7 +282,7 @@ namespace Lingjing.Sim
 
             if (!FairyActive)
             {
-                p.Energy = Math.Min(DamageRules.EnergyMax, p.Energy + DamageRules.EnergyPerHit);
+                p.Energy = Math.Min(Tuning.EnergyMax, p.Energy + Tuning.EnergyPerHit);
             }
 
             BladeHit?.Invoke(enemy, p.BladeDamage);
@@ -291,7 +291,7 @@ namespace Lingjing.Sim
             {
                 if (!FairyActive)
                 {
-                    p.Energy = Math.Min(DamageRules.EnergyMax, p.Energy + DamageRules.EnergyPerKill);
+                    p.Energy = Math.Min(Tuning.EnergyMax, p.Energy + Tuning.EnergyPerKill);
                 }
 
                 RollDrop(enemy);
@@ -425,11 +425,11 @@ namespace Lingjing.Sim
             }
 
             double roll = World.Rng.NextDouble();
-            if (roll < DamageRules.HealthDropChance)
+            if (roll < Tuning.HealthDropChance)
             {
                 World.SpawnPickup(PickupKind.Health, enemy.Pos);
             }
-            else if (roll < DamageRules.HealthDropChance + DamageRules.EnergyDropChance)
+            else if (roll < Tuning.HealthDropChance + Tuning.EnergyDropChance)
             {
                 World.SpawnPickup(PickupKind.Energy, enemy.Pos);
             }
@@ -440,7 +440,7 @@ namespace Lingjing.Sim
         {
             Player p = World.Player;
             List<Pickup> pickups = World.Pickups;
-            const double reach = DamageRules.PickupRadius;
+            const double reach = Tuning.PickupRadius;
 
             for (int i = 0; i < pickups.Count; i++)
             {
@@ -461,10 +461,10 @@ namespace Lingjing.Sim
                 switch (pickup.Kind)
                 {
                     case PickupKind.Health:
-                        p.Heal(DamageRules.HealthPickupAmount);
+                        p.Heal(Tuning.HealthPickupAmount);
                         break;
                     case PickupKind.Energy:
-                        p.Energy = Math.Min(DamageRules.EnergyMax, p.Energy + DamageRules.EnergyPickupAmount);
+                        p.Energy = Math.Min(Tuning.EnergyMax, p.Energy + Tuning.EnergyPickupAmount);
                         break;
                 }
 
@@ -498,10 +498,10 @@ namespace Lingjing.Sim
                 switch (enemy)
                 {
                     case TailLight:
-                        Hurt(DamageRules.TailLightContactDps * SimConstants.Dt);
+                        Hurt(EnemyTuning.TailLightContactDps * SimConstants.Dt);
                         break;
                     case Striker striker when striker.CanHitDuringDash:
-                        Hurt(DamageRules.StrikerDashImpact);
+                        Hurt(EnemyTuning.StrikerDashImpact);
                         striker.ConsumeDashHit();
                         break;
                 }

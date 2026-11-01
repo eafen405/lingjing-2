@@ -76,6 +76,9 @@ namespace Lingjing.View
 
         public EntityClips[] entities = Array.Empty<EntityClips>();
 
+        /// <summary>一次性特效（命中 / 碎裂 / 拾取 / 代行 / 警示），按 effects.json 的组名索引。</summary>
+        public EffectClips[] effects = Array.Empty<EffectClips>();
+
         public EntityClips EntityOf(string entity)
         {
             for (int i = 0; i < entities.Length; i++)
@@ -87,6 +90,29 @@ namespace Lingjing.View
             }
 
             return null;
+        }
+
+        public EffectClips EffectOf(string name)
+        {
+            for (int i = 0; i < effects.Length; i++)
+            {
+                if (effects[i].name == name)
+                {
+                    return effects[i];
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>一组一次性特效：帧序列 + 播放速率，没有朝向。</summary>
+        [Serializable]
+        public sealed class EffectClips
+        {
+            public string name = "";
+            public float fps = 20f;
+            public bool loop;
+            public Sprite[] frames = Array.Empty<Sprite>();
         }
     }
 }

@@ -7,23 +7,19 @@ namespace Lingjing.AI
 {
 
 /// <summary>
-/// 尾灯：流场追玩家，移速 2.6。状态机只有 Approach 与 Death（死亡由 Hp 表达，保留枚举位以对齐规格）。
-/// 贴身伤害由模拟层的接触判定施加（每秒 8）。
+/// 尾灯：流场追玩家。状态机只有 Approach 与 Death（死亡由 Hp 表达，保留枚举位以对齐规格）。
+/// 贴身伤害由模拟层的接触判定施加。速度与生命见 <see cref="EnemyTuning"/>。
 /// </summary>
 public sealed class TailLight : Enemy
 {
-    public const double SpeedConst = 2.6;
-
     public enum TailLightState
     {
         Approach = 0,
         Death = 1
     }
 
-    public TailLight()
+    public TailLight() : base(EnemyKind.TailLight)
     {
-        Kind = EnemyKind.TailLight;
-        MoveSpeed = SpeedConst;
     }
 
     public override string StateName => ((TailLightState)State).ToString();

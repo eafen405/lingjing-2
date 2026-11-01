@@ -119,6 +119,7 @@
 验收：三道具 + 飞刀 + 两种矩形警示区；命中/碎裂/拾取/代行特效；主菜单、HUD、三选一卡面、天赋图标。
 > 2026-10-31 拆两半：**像素部分已完成**（飞刀 8 帧、三道具、两档警示区、四种特效，见 `docs/specs/art-assets.md` §7.5）；
 > UI 皮肤按规格 Out of Scope 属非像素资产，**另立规格**，不在像素管线里做。
+> 2026-11-01 特效已接线：`effects.json` 由 `ArtLibraryBuilder` 收进 `ArtLibrary.effects`，命中/碎裂/拾取在 `BattleRunner` 里按事件播放（打击感见 ADR-0003）；另加了以骸血条两张图（`build_bar.py`）。
 
 ## 音频
 

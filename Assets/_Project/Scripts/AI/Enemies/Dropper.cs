@@ -14,7 +14,6 @@ namespace Lingjing.AI
 /// </summary>
 public sealed class Dropper : Enemy
 {
-    public const double SpeedConst = 2.4;
     public const double MarkRange = 4.0;
     public const int MarkDelayTicks = 72;   // 1.2s 预警
     public const int HoverCooldownTicks = 90;
@@ -29,10 +28,8 @@ public sealed class Dropper : Enemy
 
     private int _cooldown;
 
-    public Dropper()
+    public Dropper() : base(EnemyKind.Dropper)
     {
-        Kind = EnemyKind.Dropper;
-        MoveSpeed = SpeedConst;
     }
 
     public override string StateName => ((DropperState)State).ToString();

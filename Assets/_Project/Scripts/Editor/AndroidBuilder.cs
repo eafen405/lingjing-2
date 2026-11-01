@@ -38,7 +38,10 @@ namespace Lingjing.Editor
                 scenes = EnabledScenes(),
                 locationPathName = OutputPath,
                 target = BuildTarget.Android,
-                options = BuildOptions.Development
+
+                // 真机试玩必须出 Release：Development 构建带 Profiler 钩子与调试符号，
+                // 同一份内容在低端机上会少掉十几帧，那正是「帧数太低」最容易被误判的来源。
+                options = BuildOptions.None
             };
 
             BuildReport report = BuildPipeline.BuildPlayer(options);

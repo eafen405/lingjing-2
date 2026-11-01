@@ -414,3 +414,44 @@ MonoBehaviour:
         - {fileID: 21300000, guid: 31f8233c8a64a2e49aa4120a002e39e3, type: 3}
     mirrorFrom: []
     mirrorTo: []
+  effects:
+  - name: warn
+    fps: 0
+    loop: 0
+    frames:
+    - {fileID: 21300000, guid: 1f691d3c9a90d4041be6c6c63ebd96c6, type: 3}
+    - {fileID: 21300000, guid: 93377ac4dee475f4eb09265e70d57739, type: 3}
+  - name: hit
+    fps: 20
+    loop: 0
+    frames:
+    - {fileID: 21300000, guid: 7def907ab180c764a8e4543424464573, type: 3}
+    - {fileID: 21300000, guid: b0326028739bbca48874a9dc254afbe3, type: 3}
+    - {fileID: 21300000, guid: beecc3c74a8d9a84faa96750677091aa, type: 3}
+  - name: break
+    fps: 18
+    loop: 0
+    frames:
+    - {fileID: 21300000, guid: 40388fa278334d044955a1c657e12740, type: 3}
+    - {fileID: 21300000, guid: 89051e421f7c0eb4e8ff3e9d72102a58, type: 3}
+    - {fileID: 21300000, guid: d272f115c59cb24458c9fb3aa3cce72a, type: 3}
+    - {fileID: 21300000, guid: 2abb0a76025741d45b78f29b0105322e, type: 3}
+  - name: pickup
+    fps: 20
+    loop: 0
+    frames:
+    - {fileID: 21300000, guid: 2126ba7e5e179704dae86cbcbfafda2c, type: 3}
+    - {fileID: 21300000, guid: 298e33796e4688b418f4d7d18eb0bb18, type: 3}
+    - {fileID: 21300000, guid: 6b13f243fa4fc1e4f8893f341561c307, type: 3}
+  - name: proxy
+    fps: 14
+    loop: 0
+    frames:
+    - {fileID: 21300000, guid: a5fca8685d9b6b04a84d3446deec763b, type: 3}
+    - {fileID: 21300000, guid: c2d3b634d6143784fbdf16aa2d8a943c, type: 3}
+    - {fileID: 21300000, guid: 031d97f8845679e49bea4ca288822c75, type: 3}
+    - {fileID: 21300000, guid: 957a59ce0124d674e95f1774e86c649e, type: 3}
+    - {fileID: 21300000, guid: 022911f8bb913164e889d9f6642d1554, type: 3}
+    - {fileID: 21300000, guid: 4dcc273398992ad47b638c54b9d7de13, type: 3}
+    - {fileID: 21300000, guid: 0525c94eae2a38c4da6393e75b8a968a, type: 3}
+    - {fileID: 21300000, guid: 1a10b703274d44b4287561217c57205d, type: 3}
