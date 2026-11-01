@@ -30,6 +30,9 @@ public sealed class Player
     /// <summary>每把刀的伤害。基础值来自 DamageRules，关内成长（game-design §7.1）会改它。</summary>
     public double BladeDamage = DamageRules.BladeHitDamage;
 
+    /// <summary>一次代行能接管多久（tick）。基础值来自 SimConstants，关内成长会把它拉长。</summary>
+    public int FairyDurationTicks = SimConstants.FairyDurationTicks;
+
     /// <summary>旋转方向：+1 / −1。</summary>
     public int SpinSign = 1;
 

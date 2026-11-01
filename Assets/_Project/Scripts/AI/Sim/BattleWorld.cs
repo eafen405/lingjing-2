@@ -40,8 +40,10 @@ namespace Lingjing.Sim
         bool _deathAnnounced;
 
         IPlanner _planner;
+        IPlanner _autopilot;
         int _fairyTicksLeft;
         Command _fairyCommand = Command.None;
+        Command _autopilotCommand = Command.None;
 
         /// <summary>代行进行中：玩家输入被屏蔽，指令来自规划器，且不获得充能。</summary>
         public bool FairyActive => _fairyTicksLeft > 0;
@@ -55,6 +57,16 @@ namespace Lingjing.Sim
         public void SetFairyPlanner(IPlanner planner)
         {
             _planner = planner;
+        }
+
+        /// <summary>
+        /// 自动驾驶：不靠充能、没有 4 秒限时，全程由同一个规划器给出玩家指令。
+        /// 给整局模拟与录屏用——探针要验「这套规则下能不能打通」，就该让会打的那一方去打。
+        /// </summary>
+        public void SetAutopilot(IPlanner planner)
+        {
+            _autopilot = planner;
+            _autopilotCommand = Command.None;
         }
 
         /// <summary>满槽且不在代行中时接管 4 秒。返回是否真的接管。</summary>
@@ -71,7 +83,7 @@ namespace Lingjing.Sim
             }
 
             World.Player.Energy = 0.0;
-            _fairyTicksLeft = SimConstants.FairyDurationTicks;
+            _fairyTicksLeft = World.Player.FairyDurationTicks;
             _fairyCommand = new Command(World.Player.MoveDir, World.Player.SpinSign, false);
             FairyStarted?.Invoke();
             return true;
@@ -120,6 +132,15 @@ namespace Lingjing.Sim
                     }
 
                     applied = _fairyCommand;
+                }
+                else if (_autopilot != null)
+                {
+                    if (Tick % SimConstants.DecisionTicks == 0)
+                    {
+                        _autopilotCommand = _autopilot.Decide(SnapshotFactory.Create(w, false));
+                    }
+
+                    applied = _autopilotCommand;
                 }
 
                 ApplyPlayerCommand(applied);

@@ -1,6 +1,5 @@
 using Lingjing.AI;
 using Lingjing.Core;
-using Lingjing.Data;
 using Lingjing.Fairy;
 using Lingjing.Level;
 using Lingjing.Sim;
@@ -50,7 +49,7 @@ namespace Lingjing.Editor
 
             Result a = Simulate(level1, true);
             Result b = Simulate(level1, true);
-            Result c = Simulate(level2, true);
+            Result c = Simulate(level2, true, trace: true);
 
             // 不参与判定，只作平衡参考：真实血量下这一关能撑多久。
             Result m1 = Simulate(level1, false);
@@ -122,12 +121,15 @@ namespace Lingjing.Editor
             return total;
         }
 
-        static Result Simulate(LevelDef level, bool immortal)
+        static Result Simulate(LevelDef level, bool immortal, bool trace = false)
         {
             Grid grid = LevelField.Build(level);
             var world = new BattleWorld(grid, LevelField.PlayerStart(grid), Seed);
             var run = new LevelRun(level, world, Seed);
-            var policy = new ScriptedPlayerPolicy();
+
+            // 玩家就是 Fairy：同一个 LexPlanner，不另养一个更笨的策略。
+            var planner = new LexPlanner();
+            world.SetAutopilot(planner);
 
             int kills = 0;
             world.EnemyKilled += _ => kills++;
@@ -140,8 +142,8 @@ namespace Lingjing.Editor
             var trail = new System.Text.StringBuilder();
             while (ticks < MaxTicks && run.Outcome == RunOutcome.Running)
             {
-                Command command = policy.Decide(world.World, PlayerScriptKind.Kite);
-                world.Step(command);
+                // 指令由自动驾驶（LexPlanner）给，这里只推世界。
+                world.Step(Command.None);
 
                 // 探针专用：只验流程，所以不让死亡打断。必须在 run.Tick 之前回血，否则 Tick 会判失败。
                 if (immortal)
@@ -162,6 +164,18 @@ namespace Lingjing.Editor
                 {
                     Vec2 p = world.World.Player.Pos;
                     trail.Append($"({p.X:0.#},{p.Y:0.#})s{run.SectionIndex} ");
+                }
+
+                if (trace && ticks % 6000 == 0)
+                {
+                    Vec2 p = world.World.Player.Pos;
+                    Debug.Log($"[level] trace t={ticks} s{run.SectionIndex} pos=({p.X:0.#},{p.Y:0.#}) " +
+                              $"spd={world.World.Player.Vel.Length:0.00} " +
+                              $"enemies={world.World.Enemies.Count} " +
+                              $"ring={planner.DebugChosenRing:0.00}/{planner.DebugBestRing:0.00} " +
+                              $"v={planner.DebugChosenV:0.00}/{planner.DebugBestV:0.00} " +
+                              $"dmg={planner.DebugChosenDamage:0.000}/{planner.DebugBestDamage:0.000} " +
+                              $"hold={planner.DebugHoldRing:0.00}/d{planner.DebugHoldDamage:0.000}");
                 }
 
                 if (run.SectionIndex > lastSection)

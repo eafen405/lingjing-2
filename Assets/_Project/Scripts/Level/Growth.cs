@@ -5,13 +5,16 @@ using Lingjing.Core;
 
 namespace Lingjing.Level
 {
-    /// <summary>关内成长的四类选项（game-design §7.1）。</summary>
+    /// <summary>关内成长的选项（game-design §7.1 / §4.5）。</summary>
     public enum GrowthKind
     {
         Damage,
         BladeCount,
         Omega,
-        Speed
+        Speed,
+
+        /// <summary>代行时长。她是加分项也是有故事的机制，时间越长越接近"整局交给她"。</summary>
+        FairyDuration
     }
 
     /// <summary>成长数值的唯一权威：经验权重、升级阈值、每类上限、效果强度都在这里。</summary>
@@ -19,6 +22,12 @@ namespace Lingjing.Level
     {
         /// <summary>一次给几张牌。</summary>
         public const int OptionCount = 3;
+
+        /// <summary>类别总数，数组一律按它开。</summary>
+        public const int KindCount = 5;
+
+        /// <summary>每点一次代行时长加多少秒。</summary>
+        public const double FairyDurationPerLevelSeconds = 2.0;
 
         /// <summary>击杀经验按以骸强度加权，不数人头（§7.1）。</summary>
         public static double ExperienceOf(EnemyKind kind)
@@ -46,6 +55,7 @@ namespace Lingjing.Level
                 case GrowthKind.BladeCount: return 6;
                 case GrowthKind.Omega: return 6;
                 case GrowthKind.Speed: return 5;
+                case GrowthKind.FairyDuration: return 4;
                 default: return 0;
             }
         }
@@ -78,6 +88,9 @@ namespace Lingjing.Level
                 case GrowthKind.Speed:
                     player.Speed *= MultiplierOf(kind);
                     break;
+                case GrowthKind.FairyDuration:
+                    player.FairyDurationTicks += SimConstants.FromSeconds(FairyDurationPerLevelSeconds);
+                    break;
             }
         }
     }
@@ -88,7 +101,7 @@ namespace Lingjing.Level
     /// </summary>
     public sealed class GrowthState
     {
-        readonly int[] _taken = new int[4];
+        readonly int[] _taken = new int[GrowthRules.KindCount];
         readonly GrowthKind[] _options = new GrowthKind[GrowthRules.OptionCount];
         readonly Prng _rng;
 
@@ -173,7 +186,7 @@ namespace Lingjing.Level
         /// <summary>从没满级的类别里随机取三张（不足三张就全给）。</summary>
         void RollOptions()
         {
-            var pool = new GrowthKind[4];
+            var pool = new GrowthKind[GrowthRules.KindCount];
             int count = 0;
             for (int k = 0; k < pool.Length; k++)
             {

@@ -48,12 +48,16 @@ namespace Lingjing.UI
             GrowthKind.BladeCount => "刀数",
             GrowthKind.Omega => "角速度",
             GrowthKind.Speed => "移速",
+            GrowthKind.FairyDuration => "代行时长",
             _ => "?"
         };
 
         /// <summary>增量的显示文本。数值本身从 GrowthRules 取，改平衡不会让卡面说谎。</summary>
-        public static string GrowthEffect(GrowthKind kind) => kind == GrowthKind.BladeCount
-            ? "+1"
-            : $"+{(GrowthRules.MultiplierOf(kind) - 1.0) * 100.0:0}%";
+        public static string GrowthEffect(GrowthKind kind) => kind switch
+        {
+            GrowthKind.BladeCount => "+1",
+            GrowthKind.FairyDuration => $"+{GrowthRules.FairyDurationPerLevelSeconds:0}秒",
+            _ => $"+{(GrowthRules.MultiplierOf(kind) - 1.0) * 100.0:0}%"
+        };
     }
 }

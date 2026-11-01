@@ -16,10 +16,7 @@ public enum PolicyKind
 public enum PlayerScriptKind
 {
     Flee,
-    Orbit,
-
-    /// <summary>保距风筝：贴到环内就先拉开，出环再绕切——探针里充当"合格玩家"。</summary>
-    Kite
+    Orbit
 }
 
 public sealed class ScenarioSpawn

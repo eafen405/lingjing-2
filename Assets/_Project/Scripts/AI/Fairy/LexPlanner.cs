@@ -9,14 +9,19 @@ namespace Lingjing.Fairy
     /// <summary>
     /// lex-full 规划器：把 prototype/ai-exploration/ExplorationPlanner.cs 的完整分层策略搬进正式模拟。
     ///
-    /// 动作集合：16 个等角方向 + 零向量 + 当前 PlayerMoveDir，共 18 个移动候选；每个候选两个旋向，
-    /// 共 36 个动作。每个候选按固定 1 tick 步长前瞻 60 tick（1 秒），运动学与网格碰撞都复用正式规则。
+    /// 动作集合：16 个等角方向 + 零向量 + 当前 PlayerMoveDir + 最近 4 只以骸的站位两档
+    /// + 最近 1 只以骸的闭环站位两档，共 28 个移动候选；每个候选两个旋向，共 56 个动作。
+    /// 每个候选按固定 1 tick 步长前瞻 60 tick（1 秒），运动学与网格碰撞都复用正式规则。
     ///
-    /// 决策链（与原型逐条一致）：
+    /// 决策链：
     ///   P0：保留预测伤害最小的候选（容差 1e-9）；
     ///   P1：在 P0 里保留环上覆盖不低于最优值 85% 的候选；
-    ///   P2：在 P1 里取相对角速度积分最大者（容差 1e-9）；
+    ///   P1.5：在 P1 里保留「前瞻结束时落在环上」的候选（结束误差容差 0.05）；
+    ///   P2：在 P1.5 里取相对角速度积分最大者（容差 1e-9）；
     ///   平局：连续性降序（dir·previousMove，同旋向 +0.05），再按候选 Id 升序。
+    ///
+    /// P0/P1/P2 与原型逐条一致；站位候选与 P1.5 是整局自走时补的——原型只跑 4 秒代行，
+    /// 开环动作集在那段时间里够用，拉到整局就会绕着以骸满速转圈、永远不把对方压到环上。
     ///
     /// 只读 BattleSnapshot：不读墙钟、随机数或未来刷新。所有轨迹与评分缓冲都是成员字段，
     /// Decide 内不分配内存（敌人预测对象首次出现时分配，之后复用）。
@@ -24,8 +29,21 @@ namespace Lingjing.Fairy
     public sealed class LexPlanner : IPlanner
     {
         const int DirectionCount = 16;
-        const int MoveCount = DirectionCount + 2;
+        const int HoldEnemies = 4;
+        const int HoldVariants = 2;
+        const int HoldCount = HoldEnemies * HoldVariants;
+        const int StationVariants = 2;
+        const int MoveCount = DirectionCount + 2 + HoldCount + StationVariants;
         const int CandidateCount = MoveCount * 2;
+
+        /// <summary>站位候选的慢速档：全速会冲过环，慢档才是"停在环上"。</summary>
+        const double HoldSlowScale = 0.25;
+
+        /// <summary>闭环站位的径向增益：半径误差 → 径向速度（每秒按误差的几倍修正）。</summary>
+        const double StationGain = 3.0;
+
+        /// <summary>环路切向速度占玩家速度的比例：越大 ω_rel 越高，但越容易甩出环带。</summary>
+        const double StationTangentScale = 0.8;
 
         /// <summary>前瞻 60 tick = 1 秒。</summary>
         const int HorizonTicks = 60;
@@ -39,6 +57,12 @@ namespace Lingjing.Fairy
         const double VTolerance = 1e-9;
         const double SameSpinBonus = 0.05;
         const double RingKernelWidth = 0.65;
+
+        /// <summary>结束误差只在「还算够得着」的以骸上算：超过刀刃半径这么多就不算接触目标。</summary>
+        const double EndReachMargin = 3.0;
+
+        /// <summary>结束误差的容差：差这么多以内视为同样"停在环上"。</summary>
+        const double EndErrorTolerance = 0.05;
 
         /// <summary>每个前瞻步的权重：stride × dt。</summary>
         const double StepWeight = StrideTicks * SimConstants.Dt;
@@ -61,8 +85,11 @@ namespace Lingjing.Fairy
 
         static readonly Vec2[] DirectionTable = BuildDirections();
 
-        /// <summary>本帧的 18 个移动候选（16 方向 + 零 + 当前 MoveDir）。</summary>
+        /// <summary>本帧的移动候选：16 方向 + 零 + 当前 MoveDir + 最近的几只以骸的站位候选。</summary>
         readonly Vec2[] _moveDirs = new Vec2[MoveCount];
+
+        /// <summary>站位候选对应的以骸下标（-1 表示空位）。</summary>
+        readonly int[] _holdTargets = new int[HoldEnemies];
 
         // 候选轨迹缓冲，索引 m*(HorizonTicks+1)+k。
         readonly Vec2[] _pathPositions = new Vec2[MoveCount * (HorizonTicks + 1)];
@@ -72,6 +99,7 @@ namespace Lingjing.Fairy
         // 36 个动作的评分。Damage 是每个移动候选共享的，按候选 Id 摊平以便与原型一致地逐 Id 比较。
         readonly double[] _candidateDamage = new double[CandidateCount];
         readonly double[] _candidateRing = new double[CandidateCount];
+        readonly double[] _candidateEndError = new double[CandidateCount];
         readonly double[] _candidateV = new double[CandidateCount];
         readonly double[] _candidateContinuity = new double[CandidateCount];
 
@@ -93,6 +121,8 @@ namespace Lingjing.Fairy
             Array.Copy(DirectionTable, _moveDirs, DirectionCount);
             _moveDirs[DirectionCount] = Vec2.Zero;
             _moveDirs[DirectionCount + 1] = s.PlayerMoveDir;
+            FillHoldMoves(s);
+            FillStationMoves(s);
 
             for (int m = 0; m < MoveCount; m++)
             {
@@ -136,12 +166,27 @@ namespace Lingjing.Fairy
                 }
             }
 
+            // P1.5：在 P1 里保留「前瞻结束时落在环上」的候选。
+            // 只用 ring 的平均覆盖会奖励「站得够近」而不是「踩在环上」——实测绕圈覆盖 0.34 就饱和，
+            // 结果她绕着以骸满速转圈，一只钉枪能空耗两千秒。
+            double bestEndError = double.PositiveInfinity;
+            for (int id = 0; id < CandidateCount; id++)
+            {
+                if (_candidateDamage[id] <= bestDamage + DamageTolerance &&
+                    _candidateRing[id] + RingTolerance >= bestRing * RingRetention &&
+                    _candidateEndError[id] < bestEndError)
+                {
+                    bestEndError = _candidateEndError[id];
+                }
+            }
+
             // P2：相对角速度积分最大。
             double bestV = double.NegativeInfinity;
             for (int id = 0; id < CandidateCount; id++)
             {
                 if (_candidateDamage[id] <= bestDamage + DamageTolerance &&
                     _candidateRing[id] + RingTolerance >= bestRing * RingRetention &&
+                    _candidateEndError[id] <= bestEndError + EndErrorTolerance &&
                     _candidateV[id] > bestV)
                 {
                     bestV = _candidateV[id];
@@ -159,6 +204,11 @@ namespace Lingjing.Fairy
                 }
 
                 if (!(_candidateRing[id] + RingTolerance >= bestRing * RingRetention))
+                {
+                    continue;
+                }
+
+                if (!(_candidateEndError[id] <= bestEndError + EndErrorTolerance))
                 {
                     continue;
                 }
@@ -181,10 +231,56 @@ namespace Lingjing.Fairy
                 return Command.None;
             }
 
+            // 调试量：只读，供探针观察"她以为哪个候选更好"。不参与决策。
+            DebugBestDamage = bestDamage;
+            DebugBestRing = bestRing;
+            DebugBestV = bestV;
+            DebugChosenDamage = _candidateDamage[chosenId];
+            DebugChosenRing = _candidateRing[chosenId];
+            DebugChosenV = _candidateV[chosenId];
+
+            // 站位候选自己的分：用来分清"环覆盖上不去"还是"被 P0 门槛挡掉"。
+            DebugHoldRing = 0.0;
+            DebugHoldDamage = double.PositiveInfinity;
+            for (int m = DirectionCount + 2; m < MoveCount; m++)
+            {
+                for (int spin = 0; spin < 2; spin++)
+                {
+                    int id = m * 2 + spin;
+                    if (_candidateRing[id] > DebugHoldRing)
+                    {
+                        DebugHoldRing = _candidateRing[id];
+                    }
+
+                    if (_candidateDamage[id] < DebugHoldDamage)
+                    {
+                        DebugHoldDamage = _candidateDamage[id];
+                    }
+                }
+            }
+
             int moveIndex = chosenId / 2;
             _previousMove = _moveDirs[moveIndex];
             return new Command(_previousMove, chosenId % 2 == 0 ? 1 : -1, false);
         }
+
+        /// <summary>上一次决策的三级评分（最优值 / 实际选中值）。探针用，不参与决策。</summary>
+        public double DebugBestDamage { get; private set; }
+
+        public double DebugBestRing { get; private set; }
+
+        public double DebugBestV { get; private set; }
+
+        public double DebugChosenDamage { get; private set; }
+
+        public double DebugChosenRing { get; private set; }
+
+        public double DebugChosenV { get; private set; }
+
+        /// <summary>站位候选里最好的环覆盖与最小预测伤害。</summary>
+        public double DebugHoldRing { get; private set; }
+
+        public double DebugHoldDamage { get; private set; }
 
         /// <summary>
         /// 敌人预测：相邻快照位置差分成速度；预警/硬直阶段按静止外推；撞针冲刺速度用常量截断；
@@ -261,6 +357,125 @@ namespace Lingjing.Fairy
         }
 
         /// <summary>一个移动候选的 60 tick 轨迹与预测伤害（弹丸、落区、敌人接触）。</summary>
+        /// <summary>
+        /// 站位候选：朝「该以骸周围、刀刃半径上的那个点」走，全速一档、慢速一档。
+        /// 没有这两档时，动作集只有「朝某方向走满一秒」——永远停不在环上。
+        /// 实测（整局自走）表现为绕着以骸满速转圈、环上覆盖 0.34 一直上不去，一只钉枪能耗掉两千秒。
+        /// </summary>
+        void FillHoldMoves(BattleSnapshot s)
+        {
+            for (int k = 0; k < HoldEnemies; k++)
+            {
+                _holdTargets[k] = -1;
+            }
+
+            // 就近插入：站位只需要覆盖当前最相关的几只，不必全排序。
+            for (int i = 0; i < s.Enemies.Length; i++)
+            {
+                if (!s.Enemies[i].Alive)
+                {
+                    continue;
+                }
+
+                double distance = (s.Enemies[i].Pos - s.PlayerPos).LengthSquared;
+                for (int k = 0; k < HoldEnemies; k++)
+                {
+                    if (_holdTargets[k] < 0)
+                    {
+                        _holdTargets[k] = i;
+                        break;
+                    }
+
+                    double current = (s.Enemies[_holdTargets[k]].Pos - s.PlayerPos).LengthSquared;
+                    if (distance >= current)
+                    {
+                        continue;
+                    }
+
+                    for (int j = HoldEnemies - 1; j > k; j--)
+                    {
+                        _holdTargets[j] = _holdTargets[j - 1];
+                    }
+
+                    _holdTargets[k] = i;
+                    break;
+                }
+            }
+
+            for (int k = 0; k < HoldEnemies; k++)
+            {
+                int slot = DirectionCount + 2 + k * HoldVariants;
+                int index = _holdTargets[k];
+                if (index < 0)
+                {
+                    _moveDirs[slot] = Vec2.Zero;
+                    _moveDirs[slot + 1] = Vec2.Zero;
+                    continue;
+                }
+
+                Vec2 enemyPos = s.Enemies[index].Pos;
+                Vec2 away = s.PlayerPos - enemyPos;
+                double length = away.Length;
+                Vec2 bearing = length > 1e-9 ? away / length : Vec2.UnitX;
+
+                // 环上那个点：从以骸出发、沿当前方位走一个刀刃半径。
+                Vec2 toRing = (enemyPos + bearing * s.BladeRadius) - s.PlayerPos;
+                Vec2 dir = toRing.Normalized();
+
+                _moveDirs[slot] = dir;
+                _moveDirs[slot + 1] = dir * HoldSlowScale;
+            }
+        }
+
+        /// <summary>
+        /// 闭环站位候选：按半径误差实时给径向速度，再叠一个切向分量榨 ω_rel。
+        /// 开环动作集解决不了"追着跑的以骸"——它每秒都在变距离，任何固定方向走一秒都会过冲或者够不着。
+        /// 两条候选对应两个切向（正/反），正好与两个旋向配对。
+        /// </summary>
+        void FillStationMoves(BattleSnapshot s)
+        {
+            int slot = DirectionCount + 2 + HoldCount;
+            int nearest = -1;
+            double best = double.PositiveInfinity;
+            for (int i = 0; i < s.Enemies.Length; i++)
+            {
+                if (!s.Enemies[i].Alive)
+                {
+                    continue;
+                }
+
+                double distance = (s.Enemies[i].Pos - s.PlayerPos).LengthSquared;
+                if (distance < best)
+                {
+                    best = distance;
+                    nearest = i;
+                }
+            }
+
+            if (nearest < 0)
+            {
+                _moveDirs[slot] = Vec2.Zero;
+                _moveDirs[slot + 1] = Vec2.Zero;
+                return;
+            }
+
+            Vec2 away = s.PlayerPos - s.Enemies[nearest].Pos;
+            double length = away.Length;
+            Vec2 bearing = length > 1e-9 ? away / length : Vec2.UnitX;
+            Vec2 tangent = bearing.Perpendicular();
+
+            // 半径误差换成速度（世界单位/秒），再折算成「玩家速度的比例」。
+            double speed = s.PlayerSpeed > 1e-9 ? s.PlayerSpeed : 1.0;
+            double radial = (length - s.BladeRadius) * StationGain;
+            Vec2 radialPart = bearing * (radial / speed);
+            Vec2 tangentPart = tangent * StationTangentScale;
+
+            Vec2 plus = radialPart + tangentPart;
+            Vec2 minus = radialPart - tangentPart;
+            _moveDirs[slot] = plus.Length > 1.0 ? plus.Normalized() : plus;
+            _moveDirs[slot + 1] = minus.Length > 1.0 ? minus.Normalized() : minus;
+        }
+
         void BuildPath(BattleSnapshot s, Vec2 move, int moveIndex, int enemyCount)
         {
             int offset = moveIndex * (HorizonTicks + 1);
@@ -370,6 +585,7 @@ namespace Lingjing.Fairy
 
             double ring = 0.0;
             double v = 0.0;
+            double endError = double.PositiveInfinity;
 
             for (int k = StrideTicks; k <= HorizonTicks; k += StrideTicks)
             {
@@ -393,11 +609,27 @@ namespace Lingjing.Fairy
                     Vec2 tangent = delta.Perpendicular() / distance;
                     double relative = spinSign * omega + (playerVelocity - prediction.Velocity).Dot(tangent) / bladeRadius;
                     v += DamageRules.HitsPerSecond(bladeCount, relative) * StepWeight;
+
+                    // 前瞻结束那一刻离环有多远：只算最近的一次接触，让她真的"停在环上"。
+                    if (k == HorizonTicks)
+                    {
+                        Vec2 endDelta = prediction.Positions[HorizonTicks] - _pathPositions[offset + HorizonTicks];
+                        double endDistance = endDelta.Length;
+                        if (endDistance < bladeRadius + EndReachMargin)
+                        {
+                            double error = Math.Abs(endDistance - bladeRadius);
+                            if (error < endError)
+                            {
+                                endError = error;
+                            }
+                        }
+                    }
                 }
             }
 
             _candidateRing[candidateId] = ring;
             _candidateV[candidateId] = v;
+            _candidateEndError[candidateId] = double.IsPositiveInfinity(endError) ? RingKernelWidth : endError;
         }
 
         EnemyPrediction AcquirePrediction(int index)
