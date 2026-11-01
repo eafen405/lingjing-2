@@ -182,7 +182,8 @@ namespace Lingjing.Sim
             if (wantsFlip && p.ReverseCooldown == 0)
             {
                 p.SpinSign = -p.SpinSign;
-                p.ReverseCooldown = SimConstants.ReverseCooldownTicks;
+                // 冷却 = 一把刀走过一格扇区的时间（game-design §4.3），随刀数与角速度成长而缩短。
+                p.ReverseCooldown = p.Ring.ReverseCooldownTicks;
             }
 
             Vec2 move = command.Move;
@@ -206,20 +207,23 @@ namespace Lingjing.Sim
         void UpdateBlades()
         {
             Player p = World.Player;
-            p.Ring.Advance(p.SpinSign, SimConstants.Dt);
+            BladeRing ring = p.Ring;
+            ring.Advance(p.SpinSign, SimConstants.Dt);
 
             List<Enemy> enemies = World.Enemies;
+            int bladeCount = ring.BladeCount;
             for (int i = 0; i < enemies.Count; i++)
             {
                 if (enemies[i].Alive)
                 {
+                    enemies[i].EnsureBladeSlots(bladeCount);
                     enemies[i].TickBladeCooldowns();
                 }
             }
 
-            for (int blade = 0; blade < BladeRing.BladeCount; blade++)
+            for (int blade = 0; blade < bladeCount; blade++)
             {
-                Vec2 tip = p.Ring.TipAt(p.Pos, blade);
+                Vec2 tip = ring.TipAt(p.Pos, blade);
                 for (int e = 0; e < enemies.Count; e++)
                 {
                     Enemy enemy = enemies[e];
@@ -234,17 +238,20 @@ namespace Lingjing.Sim
                         continue;
                     }
 
-                    ApplyBladeHit(enemy, blade);
+                    ApplyBladeHit(enemy, blade, p, ring);
                 }
             }
         }
 
-        void ApplyBladeHit(Enemy enemy, int blade)
+        void ApplyBladeHit(Enemy enemy, int blade, Player p, BladeRing ring)
         {
             enemy.TakeDamage(DamageRules.BladeHitDamage);
-            enemy.BladeCooldown[blade] = DamageRules.BladePerTargetCooldownTicks;
 
-            Player p = World.Player;
+            // 再次命中间隔 = 2π/|ω_rel|：静止时正好一圈，顺扫更短、逆扫更长（game-design §4.2）。
+            double omegaRel = DamageRules.OmegaRel(
+                ring.Omega, p.SpinSign, p.Vel.Normalized(), p.Vel.Length, enemy.Pos - p.Pos, ring.OuterRadius);
+            enemy.BladeCooldown[blade] = DamageRules.BladeHitIntervalTicks(omegaRel);
+
             if (!FairyActive)
             {
                 p.Energy = Math.Min(DamageRules.EnergyMax, p.Energy + DamageRules.EnergyPerHit);

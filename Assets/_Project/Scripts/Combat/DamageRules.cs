@@ -11,8 +11,23 @@ public static class DamageRules
 {
     public const double BladeHitDamage = 10.0;
 
-    /// <summary>同一把刀对同一敌人的命中冷却（0.1s = 6 tick）。</summary>
-    public const int BladePerTargetCooldownTicks = 6;
+    /// <summary>ω_rel 的下限（弧度/秒）。低于它视为刀刃相对该以骸停滞，这把刀在它身上不再命中。</summary>
+    public const double MinOmegaRel = 1e-3;
+
+    /// <summary>
+    /// 同一把刀对同一只以骸的再次命中间隔（tick）= 2π / |ω_rel|（game-design §4.2）。
+    /// 静止时正好是一整圈；顺着刃口切向走变短、逆着走变长；ω_rel → 0 时趋于无穷。
+    /// </summary>
+    public static int BladeHitIntervalTicks(double omegaRel)
+    {
+        double w = Math.Abs(omegaRel);
+        if (w < MinOmegaRel)
+        {
+            w = MinOmegaRel;
+        }
+
+        return (int)Math.Ceiling(Math.PI * 2.0 / (w * SimConstants.Dt));
+    }
 
     public const double EnemyMaxHp = 30.0;
     public const double EnemyRadius = 0.35;

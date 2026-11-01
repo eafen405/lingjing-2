@@ -33,8 +33,19 @@ public abstract class Enemy
     public int StateTick;
     public int SpawnTick;
 
-    /// <summary>每把刀一个独立冷却（tick），防止一帧多判。</summary>
-    public readonly int[] BladeCooldown = new int[BladeRing.BladeCount];
+    int[] _bladeCooldown = new int[BladeRing.DefaultBladeCount];
+
+    /// <summary>每把刀一个独立冷却（tick）。间隔由 DamageRules.BladeHitIntervalTicks 按 ω_rel 给出。</summary>
+    public int[] BladeCooldown => _bladeCooldown;
+
+    /// <summary>刀数随成长变化，冷却槽按需扩容；新槽从 0 开始，等于新刀落地即可命中。</summary>
+    public void EnsureBladeSlots(int count)
+    {
+        if (count > _bladeCooldown.Length)
+        {
+            Array.Resize(ref _bladeCooldown, count);
+        }
+    }
 
     /// <summary>加速度（单位/秒²）：正常移动走速度插值，方向变化是弧线。</summary>
     public double Acceleration = 20.0;

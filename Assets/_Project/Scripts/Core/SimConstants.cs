@@ -21,9 +21,6 @@ public static class SimConstants
     /// <summary>1 单位 = 32px。</summary>
     public const double UnitPixels = 32.0;
 
-    /// <summary>正反切冷却 2 帧。</summary>
-    public const int ReverseCooldownTicks = 2;
-
     /// <summary>Fairy 代行 4s。</summary>
     public const int FairyDurationTicks = 240;
 

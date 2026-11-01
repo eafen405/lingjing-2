@@ -167,9 +167,15 @@ namespace Lingjing.View
         {
             var root = new GameObject("Blades");
             _bladeRoot = root.transform;
-            for (int i = 0; i < BladeRing.BladeCount; i++)
+            EnsureBladeViews(_world.World.Player.Ring.BladeCount);
+        }
+
+        /// <summary>刀数随成长增加，精灵按需补；只增不减。</summary>
+        void EnsureBladeViews(int count)
+        {
+            while (_blades.Count < count)
             {
-                var go = new GameObject("Blade" + i);
+                var go = new GameObject("Blade" + _blades.Count);
                 go.transform.SetParent(_bladeRoot, false);
                 var sr = go.AddComponent<SpriteRenderer>();
                 sr.sprite = bladeSprite;
@@ -270,7 +276,8 @@ namespace Lingjing.View
                 }
             }
 
-            for (int i = 0; i < _blades.Count; i++)
+            EnsureBladeViews(p.Ring.BladeCount);
+            for (int i = 0; i < p.Ring.BladeCount; i++)
             {
                 Vec2 tip = p.Ring.TipAt(p.Pos, i);
                 Transform blade = _blades[i];
