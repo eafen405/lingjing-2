@@ -27,6 +27,16 @@ namespace Lingjing.Editor
         const string HealthPickup = "Assets/_Project/Art/Items/pickup_health/pickup_health_00.png";
         const string EnergyPickup = "Assets/_Project/Art/Items/pickup_energy/pickup_energy_00.png";
 
+        const string WallN = "Assets/_Project/Art/Terrain/wall/wall_n.png";
+        const string WallS = "Assets/_Project/Art/Terrain/wall/wall_s.png";
+        const string WallE = "Assets/_Project/Art/Terrain/wall/wall_e.png";
+        const string WallW = "Assets/_Project/Art/Terrain/wall/wall_w.png";
+        const string WallNE = "Assets/_Project/Art/Terrain/wall/wall_ne.png";
+        const string WallNW = "Assets/_Project/Art/Terrain/wall/wall_nw.png";
+        const string WallSE = "Assets/_Project/Art/Terrain/wall/wall_se.png";
+        const string WallSW = "Assets/_Project/Art/Terrain/wall/wall_sw.png";
+        const string PropBlock = "Assets/_Project/Art/Terrain/props/prop_block.png";
+
         /// <summary>两关一起生成；场景清单统一走 SceneCatalog，避免谁后跑谁覆盖。</summary>
         public static void Run()
         {
@@ -75,6 +85,15 @@ namespace Lingjing.Editor
             runner.bladeSprite = LoadSprite(Knife);
             runner.healthSprite = LoadSprite(HealthPickup);
             runner.energySprite = LoadSprite(EnergyPickup);
+            runner.wallNorth = LoadSprite(WallN);
+            runner.wallSouth = LoadSprite(WallS);
+            runner.wallEast = LoadSprite(WallE);
+            runner.wallWest = LoadSprite(WallW);
+            runner.wallNorthEast = LoadSprite(WallNE);
+            runner.wallNorthWest = LoadSprite(WallNW);
+            runner.wallSouthEast = LoadSprite(WallSE);
+            runner.wallSouthWest = LoadSprite(WallSW);
+            runner.propBlock = LoadSprite(PropBlock);
             runner.viewCamera = cam;
             runner.levelJson = levelData;
             runner.levelId = levelId;
@@ -117,12 +136,16 @@ namespace Lingjing.Editor
             int enemies = runner.World.World.Enemies.Count;
             int bladeSprites = GameObject.FindObjectsOfType<SpriteRenderer>().Length;
 
-            Debug.Log($"[m1] probe start={start.x:0.00},{start.y:0.00} end={end.x:0.00},{end.y:0.00} enemies={enemies} sprites={bladeSprites} ticks={runner.World.Tick}");
+            GameObject terrain = GameObject.Find("Terrain");
+            int terrainTiles = terrain != null ? terrain.GetComponentsInChildren<SpriteRenderer>().Length : 0;
+
+            Debug.Log($"[m1] probe start={start.x:0.00},{start.y:0.00} end={end.x:0.00},{end.y:0.00} enemies={enemies} sprites={bladeSprites} terrain={terrainTiles} ticks={runner.World.Tick}");
 
             bool moved = Mathf.Abs(end.x - start.x) > 1f;
-            Debug.Log(moved && enemies > 0 && bladeSprites >= 10
+            // 边界一圈是 2*(96+54) 块，少于这个数说明场地根本没画出来，玩家会撞隐形墙。
+            Debug.Log(moved && enemies > 0 && bladeSprites >= 10 && terrainTiles >= 290
                 ? "[m1] PROBE PASS"
-                : "[m1] PROBE FAIL: 位置没变化或对象不全");
+                : "[m1] PROBE FAIL: 位置没变化、对象不全或地形没画");
 
             if (!moved)
             {

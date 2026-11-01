@@ -36,6 +36,17 @@ namespace Lingjing.View
         [Tooltip("voice.json（Assets/_Project/Data）：台词 id → 字幕文本")]
         public TextAsset voiceJson;
 
+        [Header("地形")]
+        public Sprite wallNorth;
+        public Sprite wallSouth;
+        public Sprite wallEast;
+        public Sprite wallWest;
+        public Sprite wallNorthEast;
+        public Sprite wallNorthWest;
+        public Sprite wallSouthEast;
+        public Sprite wallSouthWest;
+        public Sprite propBlock;
+
         [Header("引用")]
         [Tooltip("留空则运行时自动搭触屏 HUD（摇杆 + 两个按钮）")]
         public MonoBehaviour input;
@@ -129,12 +140,81 @@ namespace Lingjing.View
 
             CreatePlayer();
             CreateBlades();
+            BuildTerrain(level, grid);
 
             // 立刻投第一波，避免开场空场等一个 tick。
             _run.Tick();
             Sync();
 
             _audio?.Say("vo_fairy_level_start_1");
+        }
+
+        /// <summary>
+        /// 把场地的边界与障碍画出来。没有这一步，场地就是一片纯色——玩家会撞上看不见的墙。
+        /// 边界用 8 块朝向墙瓦（32×32，中心锚点），障碍用 prop_block（64×64，底边中心锚点）。
+        /// </summary>
+        void BuildTerrain(LevelDef level, Grid grid)
+        {
+            var root = new GameObject("Terrain");
+            var terrainRoot = root.transform;
+
+            int width = grid.Width;
+            int height = grid.Height;
+            const float terrainOrder = -10f;
+
+            for (int x = 0; x < width; x++)
+            {
+                Sprite bottom = x == 0 ? wallSouthWest : x == width - 1 ? wallSouthEast : wallSouth;
+                Sprite top = x == 0 ? wallNorthWest : x == width - 1 ? wallNorthEast : wallNorth;
+                PlaceTile(terrainRoot, bottom, x + 0.5f, 0.5f, terrainOrder);
+                PlaceTile(terrainRoot, top, x + 0.5f, height - 0.5f, terrainOrder);
+            }
+
+            for (int y = 1; y < height - 1; y++)
+            {
+                PlaceTile(terrainRoot, wallWest, 0.5f, y + 0.5f, terrainOrder);
+                PlaceTile(terrainRoot, wallEast, width - 0.5f, y + 0.5f, terrainOrder);
+            }
+
+            RectDef[] obstacles = level?.obstacles;
+            if (obstacles == null)
+            {
+                return;
+            }
+
+            // 障碍是 2×2 格一块的道具图，大矩形按块拼，不拉伸。
+            for (int i = 0; i < obstacles.Length; i++)
+            {
+                RectDef rect = obstacles[i];
+                if (rect == null)
+                {
+                    continue;
+                }
+
+                for (int y = rect.y; y + 2 <= rect.y + rect.h; y += 2)
+                {
+                    for (int x = rect.x; x + 2 <= rect.x + rect.w; x += 2)
+                    {
+                        PlaceTile(terrainRoot, propBlock, x + 1f, y, terrainOrder + 1f);
+                    }
+                }
+            }
+        }
+
+        static void PlaceTile(Transform parent, Sprite sprite, float x, float y, float sortingOrder)
+        {
+            if (sprite == null)
+            {
+                return;
+            }
+
+            var go = new GameObject("Tile");
+            go.transform.SetParent(parent, false);
+            go.transform.position = new Vector3(x, y, 0f);
+
+            var sr = go.AddComponent<SpriteRenderer>();
+            sr.sprite = sprite;
+            sr.sortingOrder = (int)sortingOrder;
         }
 
         void OnBladeHit(Enemy enemy, double damage)
