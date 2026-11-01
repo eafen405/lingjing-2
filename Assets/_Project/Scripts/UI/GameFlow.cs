@@ -60,10 +60,11 @@ namespace Lingjing.UI
         public const string MainMenuScene = "MainMenu";
         public const int LevelCount = 2;
 
-        /// <summary>关卡序号 → 场景名。第二关还没有场景，先返回 null。</summary>
+        /// <summary>关卡序号 → 场景名。两关各一个场景，关卡内容由 levels.json 的 id 决定。</summary>
         public static string SceneOf(int level) => level switch
         {
             1 => "M1",
+            2 => "M2",
             _ => null
         };
 

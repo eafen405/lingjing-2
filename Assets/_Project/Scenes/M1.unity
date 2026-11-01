@@ -122,7 +122,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &617137992
+--- !u!1 &234775157
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -130,63 +130,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 617137994}
-  - component: {fileID: 617137993}
-  m_Layer: 0
-  m_Name: Battle
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &617137993
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 617137992}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 48fb1e80f8bce9c46ae4857e6b880cec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  art: {fileID: 11400000, guid: 005b7c96895443a46bd7a4cad5085bb8, type: 2}
-  playerSprite: {fileID: 21300000, guid: 693a3f46e88714144835e6077b6e0e88, type: 3}
-  enemySprite: {fileID: 21300000, guid: bf1fe550996f30049877a2d0edc1f467, type: 3}
-  bladeSprite: {fileID: 21300000, guid: f94bce8834996724a90b0fd04979eb12, type: 3}
-  mapWidth: 40
-  mapHeight: 24
-  seed: 7
-  initialEnemies: 6
-  input: {fileID: 0}
-  viewCamera: {fileID: 1943848586}
---- !u!4 &617137994
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 617137992}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1943848585
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1943848588}
-  - component: {fileID: 1943848586}
-  - component: {fileID: 1943848587}
+  - component: {fileID: 234775160}
+  - component: {fileID: 234775158}
+  - component: {fileID: 234775159}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -194,13 +140,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!20 &1943848586
+--- !u!20 &234775158
 Camera:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1943848585}
+  m_GameObject: {fileID: 234775157}
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
@@ -245,31 +191,84 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!114 &1943848587
+--- !u!114 &234775159
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1943848585}
+  m_GameObject: {fileID: 234775157}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b6f7afe8037a2694688c65219c8885b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  runner: {fileID: 617137993}
+  runner: {fileID: 1883592385}
   pixelsPerUnit: 32
   zOffset: -10
---- !u!4 &1943848588
+--- !u!4 &234775160
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1943848585}
+  m_GameObject: {fileID: 234775157}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 20, y: 12, z: -10}
+  m_LocalPosition: {x: 48, y: 27, z: -10}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1883592384
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1883592386}
+  - component: {fileID: 1883592385}
+  m_Layer: 0
+  m_Name: Battle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1883592385
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1883592384}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48fb1e80f8bce9c46ae4857e6b880cec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  art: {fileID: 11400000, guid: 005b7c96895443a46bd7a4cad5085bb8, type: 2}
+  playerSprite: {fileID: 21300000, guid: 693a3f46e88714144835e6077b6e0e88, type: 3}
+  enemySprite: {fileID: 21300000, guid: bf1fe550996f30049877a2d0edc1f467, type: 3}
+  bladeSprite: {fileID: 21300000, guid: f94bce8834996724a90b0fd04979eb12, type: 3}
+  levelJson: {fileID: 4900000, guid: c2d562446882f3f4a85294fa130128a7, type: 3}
+  levelId: 1
+  seed: 7
+  input: {fileID: 0}
+  viewCamera: {fileID: 234775158}
+--- !u!4 &1883592386
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1883592384}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -279,5 +278,5 @@ Transform:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 1943848588}
-  - {fileID: 617137994}
+  - {fileID: 234775160}
+  - {fileID: 1883592386}

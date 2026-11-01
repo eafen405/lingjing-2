@@ -13,8 +13,8 @@ namespace Lingjing.Editor
     /// </summary>
     public static class UiSceneBuilder
     {
-        public const string ScenePath = "Assets/_Project/Scenes/MainMenu.unity";
-        public const string LevelScenePath = "Assets/_Project/Scenes/M1.unity";
+        public const string ScenePath = SceneCatalog.MainMenu;
+        public const string LevelScenePath = SceneCatalog.Level1;
 
         [MenuItem("Tools/Lingjing/Build UI Scene")]
         public static void Run()
@@ -43,12 +43,8 @@ namespace Lingjing.Editor
             EditorSceneManager.SaveScene(scene, ScenePath);
             AssetDatabase.SaveAssets();
 
-            // MainMenu 必须是第 0 个，开始游戏/返回主菜单都按场景名加载。
-            EditorBuildSettings.scenes = new[]
-            {
-                new EditorBuildSettingsScene(ScenePath, true),
-                new EditorBuildSettingsScene(LevelScenePath, true)
-            };
+            // 场景清单统一走 SceneCatalog：MainMenu 必须在第 0 位，关卡场景跟在后面。
+            SceneCatalog.Sync();
 
             Debug.Log($"[ui] scene saved: {ScenePath}; build scenes: [0]={ScenePath}, [1]={LevelScenePath} (M1 exists={File.Exists(LevelScenePath)})");
         }

@@ -72,7 +72,12 @@ public sealed class ScriptedPlayerPolicy
             else
             {
                 // 绕环风筝：目标是把最近的敌人稳定压在刀刃半径（2.0）上。
-                if (nearestDistance > 3.0)
+                if (kind == PlayerScriptKind.Kite && nearestDistance < 2.05)
+                {
+                    // 已经贴到环内：刀刃扫不到它，必须先直线拉开，别绕。
+                    desired = -toEnemy;
+                }
+                else if (nearestDistance > 3.0)
                 {
                     desired = toEnemy;
                 }

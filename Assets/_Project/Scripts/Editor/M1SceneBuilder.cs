@@ -10,20 +10,40 @@ using UnityEngine.SceneManagement;
 namespace Lingjing.Editor
 {
     /// <summary>
-    /// 无头生成 M1 竖切场景：相机 + BattleRunner + 输入，精灵引用直接烘进场景。
+    /// 无头生成关卡场景：相机 + BattleRunner + 输入，精灵与 levels.json 引用直接烘进场景。
+    /// 两关各一个场景，差别只有 levelId —— 关卡内容全在 levels.json 里。
     /// 用法：Unity.exe -batchmode -quit -projectPath . -executeMethod Lingjing.Editor.M1SceneBuilder.Run
     /// </summary>
     public static class M1SceneBuilder
     {
-        public const string ScenePath = "Assets/_Project/Scenes/M1.unity";
+        public const string ScenePath = SceneCatalog.Level1;
+        public const string SecondScenePath = SceneCatalog.Level2;
+        public const string LevelDataPath = "Assets/_Project/Data/levels.json";
 
         const string EousIdle = "Assets/_Project/Art/Characters/eous/idle/eous_idle_s_00.png";
         const string TailLightIdle = "Assets/_Project/Art/Enemies/taillight/idle/taillight_idle_s_00.png";
         const string Knife = "Assets/_Project/Art/Items/knife/knife_00.png";
 
+        /// <summary>两关一起生成；场景清单统一走 SceneCatalog，避免谁后跑谁覆盖。</summary>
         public static void Run()
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(ScenePath) ?? "Assets/_Project/Scenes");
+            var levelData = AssetDatabase.LoadAssetAtPath<TextAsset>(LevelDataPath);
+            if (levelData == null)
+            {
+                Debug.LogError($"[m1] 找不到关卡数据：{LevelDataPath}");
+            }
+
+            Build(ScenePath, 1, levelData);
+            Build(SecondScenePath, 2, levelData);
+
+            SceneCatalog.Sync();
+            AssetDatabase.SaveAssets();
+            Debug.Log($"[m1] scenes saved: {ScenePath}, {SecondScenePath}; levelData={levelData != null}");
+        }
+
+        static void Build(string scenePath, int levelId, TextAsset levelData)
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(scenePath) ?? "Assets/_Project/Scenes");
 
             Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
@@ -36,7 +56,7 @@ namespace Lingjing.Editor
             cam.backgroundColor = new Color(0.055f, 0.063f, 0.075f, 1f);
             cam.clearFlags = CameraClearFlags.SolidColor;
             cam.nearClipPlane = -100f;
-            camGo.transform.position = new Vector3(20f, 12f, -10f);
+            camGo.transform.position = new Vector3(48f, 27f, -10f);
 
             var battleGo = new GameObject("Battle");
             var runner = battleGo.AddComponent<BattleRunner>();
@@ -45,16 +65,17 @@ namespace Lingjing.Editor
             runner.enemySprite = LoadSprite(TailLightIdle);
             runner.bladeSprite = LoadSprite(Knife);
             runner.viewCamera = cam;
+            runner.levelJson = levelData;
+            runner.levelId = levelId;
 
             var follow = camGo.AddComponent<CameraFollow>();
             follow.runner = runner;
 
             EditorSceneManager.MarkSceneDirty(scene);
-            EditorSceneManager.SaveScene(scene, ScenePath);
-            AssetDatabase.SaveAssets();
+            EditorSceneManager.SaveScene(scene, scenePath);
 
-            EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(ScenePath, true) };
-            Debug.Log($"[m1] scene saved: {ScenePath} (sprites: player={runner.playerSprite != null}, enemy={runner.enemySprite != null}, blade={runner.bladeSprite != null})");
+            Debug.Log($"[m1] scene saved: {scenePath} levelId={levelId} data={levelData != null} " +
+                      $"sprites: player={runner.playerSprite != null} enemy={runner.enemySprite != null} blade={runner.bladeSprite != null}");
         }
 
         /// <summary>无头探针：打开场景、建世界、推进 600 tick，检查世界确实在动。</summary>
@@ -72,7 +93,7 @@ namespace Lingjing.Editor
             runner.Build();
             if (!runner.Ready)
             {
-                Debug.Log("[m1] PROBE FAIL: 世界没建起来");
+                Debug.Log("[m1] PROBE FAIL: 世界没建起来（看上面的 levelJson 报错）");
                 EditorApplication.Exit(1);
                 return;
             }

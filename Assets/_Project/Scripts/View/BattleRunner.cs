@@ -3,6 +3,7 @@ using Lingjing.AI;
 using Lingjing.Combat;
 using Lingjing.Core;
 using Lingjing.Fairy;
+using Lingjing.Level;
 using Lingjing.Sim;
 using Lingjing.UI;
 using UnityEngine;
@@ -23,10 +24,10 @@ namespace Lingjing.View
         public Sprite bladeSprite;
 
         [Header("关卡")]
-        public int mapWidth = 40;
-        public int mapHeight = 24;
+        [Tooltip("levels.json（Assets/_Project/Data），由场景生成器烘进来")]
+        public TextAsset levelJson;
+        public int levelId = 1;
         public ulong seed = 7;
-        public int initialEnemies = 6;
 
         [Header("引用")]
         [Tooltip("留空则运行时自动搭触屏 HUD（摇杆 + 两个按钮）")]
@@ -36,6 +37,7 @@ namespace Lingjing.View
         ICommandSource _source;
 
         BattleWorld _world;
+        LevelRun _run;
         Transform _playerTx;
         SpriteRenderer _playerSr;
         Transform _bladeRoot;
@@ -63,6 +65,7 @@ namespace Lingjing.View
 
         public BattleWorld World => _world;
         public bool Ready => _world != null;
+        public LevelRun Run => _run;
         public Transform PlayerTransform => _playerTx;
         public bool Paused => _paused;
         public bool ResultShown => _resultShown;
@@ -90,32 +93,45 @@ namespace Lingjing.View
                 return;
             }
 
-            var grid = new Grid(mapWidth, mapHeight);
-            for (int x = 0; x < mapWidth; x++)
+            LevelDef level = LoadCurrentLevel();
+            if (level == null)
             {
-                grid.SetWall(x, 0);
-                grid.SetWall(x, mapHeight - 1);
+                return;
             }
 
-            for (int y = 0; y < mapHeight; y++)
-            {
-                grid.SetWall(0, y);
-                grid.SetWall(mapWidth - 1, y);
-            }
-
-            // 两段掩体，先给走位一点形状。
-            grid.FillRect(10, 6, 1, 6);
-            grid.FillRect(26, 12, 1, 6);
-
-            _world = new BattleWorld(grid, new Vec2(mapWidth * 0.5, mapHeight * 0.5), seed);
+            Grid grid = LevelField.Build(level);
+            _world = new BattleWorld(grid, LevelField.PlayerStart(grid), seed);
             _world.SetFairyPlanner(new LexPlanner());
             _world.BladeHit += (_, __) => _hits++;
             _world.EnemyKilled += OnEnemyKilled;
 
+            // 一局的推进规则独立于世界：世界只管 1/60 步进，节与波次归 LevelRun。
+            _run = new LevelRun(level, _world, seed);
+
             CreatePlayer();
             CreateBlades();
-            SpawnInitialEnemies();
+
+            // 立刻投第一波，避免开场空场等一个 tick。
+            _run.Tick();
             Sync();
+        }
+
+        LevelDef LoadCurrentLevel()
+        {
+            if (levelJson == null)
+            {
+                Debug.LogError("[battle] 没有 levelJson：场景生成器没把 levels.json 烘进场景");
+                return null;
+            }
+
+            LevelCatalog catalog = JsonUtility.FromJson<LevelCatalog>(levelJson.text);
+            LevelDef level = catalog != null ? catalog.Find(levelId) : null;
+            if (level == null)
+            {
+                Debug.LogError($"[battle] levels.json 里找不到 id={levelId} 的关卡");
+            }
+
+            return level;
         }
 
         void CreatePlayer()
@@ -184,18 +200,6 @@ namespace Lingjing.View
             }
         }
 
-        void SpawnInitialEnemies()
-        {
-            for (int i = 0; i < initialEnemies; i++)
-            {
-                double angle = i * 6.28318530718 / Mathf.Max(1, initialEnemies);
-                var pos = new Vec2(
-                    mapWidth * 0.5 + System.Math.Cos(angle) * 7.0,
-                    mapHeight * 0.5 + System.Math.Sin(angle) * 5.0);
-                _world.Spawn(EnemyKind.TailLight, pos);
-            }
-        }
-
         void Update()
         {
             // 暂停/结算期间直接不推进世界；Time.timeScale 只负责停表现层动画。
@@ -216,6 +220,7 @@ namespace Lingjing.View
             {
                 Command command = _source != null ? _source.CurrentCommand : Command.None;
                 _world.Step(command);
+                _run?.Tick();
                 _accumulator -= SimConstants.Dt;
             }
 
@@ -226,11 +231,7 @@ namespace Lingjing.View
 
             Sync();
             UpdateHud();
-
-            if (_world.PlayerDead)
-            {
-                Finish(false);
-            }
+            CheckOutcome();
         }
 
         /// <summary>推进 n 个固定步长并同步。无头探针与回归都走这里。</summary>
@@ -244,12 +245,27 @@ namespace Lingjing.View
             for (int i = 0; i < count; i++)
             {
                 _world.Step(command);
+                _run?.Tick();
             }
 
             Sync();
             UpdateHud();
+            CheckOutcome();
+        }
 
-            if (_world.PlayerDead)
+        /// <summary>结局的唯一出口：Cleared 才推进解锁，Failed 不改任何进度。</summary>
+        void CheckOutcome()
+        {
+            if (_resultShown || _run == null)
+            {
+                return;
+            }
+
+            if (_run.Outcome == RunOutcome.Cleared)
+            {
+                Finish(true);
+            }
+            else if (_run.Outcome == RunOutcome.Failed)
             {
                 Finish(false);
             }
@@ -409,7 +425,7 @@ namespace Lingjing.View
             UiNav.MainMenu();
         }
 
-        /// <summary>死亡结算：提交占位分数后冻结世界并弹结算面板。</summary>
+        /// <summary>结算：通关推进解锁，死亡不改进度；两者都提交分数并冻结世界。</summary>
         void Finish(bool clear)
         {
             if (_resultShown || _result == null)
@@ -419,6 +435,12 @@ namespace Lingjing.View
 
             _resultShown = true;
             _paused = false;
+
+            if (clear)
+            {
+                // 解锁的唯一来源是通关本身（game-design §2 / §8）。
+                GameSave.UnlockedLevel = levelId + 1;
+            }
 
             int score = Score;
             GameSave.SubmitScore(score);

@@ -6,6 +6,7 @@
         "Lingjing.Combat",
         "Lingjing.AI",
         "Lingjing.Data",
+        "Lingjing.Level",
         "Lingjing.UI",
         "Lingjing.View",
         "Doozy.Engine"

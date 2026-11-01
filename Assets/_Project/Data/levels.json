@@ -1,0 +1,86 @@
+{
+  "levels": [
+    {
+      "id": 1,
+      "mapWidth": 96,
+      "mapHeight": 54,
+      "wallThickness": 1,
+      "obstacles": [
+        { "x": 30, "y": 18, "w": 2, "h": 9 },
+        { "x": 62, "y": 12, "w": 2, "h": 9 },
+        { "x": 44, "y": 34, "w": 9, "h": 2 },
+        { "x": 16, "y": 40, "w": 7, "h": 2 }
+      ],
+      "sections": [
+        {
+          "waves": [
+            { "units": [ { "kind": "TailLight", "count": 9 }, { "kind": "Striker", "count": 4 }, { "kind": "NailGun", "count": 2 } ] },
+            { "units": [ { "kind": "TailLight", "count": 7 }, { "kind": "Striker", "count": 6 }, { "kind": "NailGun", "count": 2 } ] },
+            { "units": [ { "kind": "TailLight", "count": 6 }, { "kind": "Striker", "count": 6 }, { "kind": "NailGun", "count": 3 } ] }
+          ]
+        },
+        {
+          "waves": [
+            { "units": [ { "kind": "TailLight", "count": 7 }, { "kind": "Striker", "count": 6 }, { "kind": "NailGun", "count": 2 } ] },
+            { "units": [ { "kind": "TailLight", "count": 6 }, { "kind": "Striker", "count": 6 }, { "kind": "NailGun", "count": 3 } ] },
+            { "units": [ { "kind": "TailLight", "count": 9 }, { "kind": "Striker", "count": 4 }, { "kind": "NailGun", "count": 2 } ] }
+          ]
+        },
+        {
+          "waves": [
+            { "units": [ { "kind": "TailLight", "count": 6 }, { "kind": "Striker", "count": 6 }, { "kind": "NailGun", "count": 3 } ] },
+            { "units": [ { "kind": "TailLight", "count": 9 }, { "kind": "Striker", "count": 4 }, { "kind": "NailGun", "count": 2 } ] },
+            { "units": [ { "kind": "TailLight", "count": 7 }, { "kind": "Striker", "count": 6 }, { "kind": "NailGun", "count": 2 } ] }
+          ]
+        },
+        {
+          "waves": [
+            { "units": [ { "kind": "TailLight", "count": 9 }, { "kind": "Striker", "count": 4 }, { "kind": "NailGun", "count": 2 } ] },
+            { "units": [ { "kind": "ChainBoss", "count": 1 }, { "kind": "TailLight", "count": 4 }, { "kind": "Striker", "count": 4 } ] }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "mapWidth": 96,
+      "mapHeight": 54,
+      "wallThickness": 1,
+      "obstacles": [
+        { "x": 26, "y": 14, "w": 2, "h": 10 },
+        { "x": 40, "y": 20, "w": 12, "h": 2 },
+        { "x": 66, "y": 16, "w": 2, "h": 10 },
+        { "x": 70, "y": 38, "w": 8, "h": 2 }
+      ],
+      "sections": [
+        {
+          "waves": [
+            { "units": [ { "kind": "TailLight", "count": 8 }, { "kind": "Striker", "count": 4 }, { "kind": "NailGun", "count": 2 }, { "kind": "Dropper", "count": 1 } ] },
+            { "units": [ { "kind": "TailLight", "count": 6 }, { "kind": "Striker", "count": 5 }, { "kind": "NailGun", "count": 3 }, { "kind": "Dropper", "count": 1 } ] },
+            { "units": [ { "kind": "TailLight", "count": 5 }, { "kind": "Striker", "count": 5 }, { "kind": "NailGun", "count": 3 }, { "kind": "Dropper", "count": 2 } ] }
+          ]
+        },
+        {
+          "waves": [
+            { "units": [ { "kind": "TailLight", "count": 6 }, { "kind": "Striker", "count": 5 }, { "kind": "NailGun", "count": 3 }, { "kind": "Dropper", "count": 1 } ] },
+            { "units": [ { "kind": "TailLight", "count": 5 }, { "kind": "Striker", "count": 5 }, { "kind": "NailGun", "count": 3 }, { "kind": "Dropper", "count": 2 } ] },
+            { "units": [ { "kind": "TailLight", "count": 8 }, { "kind": "Striker", "count": 4 }, { "kind": "NailGun", "count": 2 }, { "kind": "Dropper", "count": 1 } ] }
+          ]
+        },
+        {
+          "waves": [
+            { "units": [ { "kind": "TailLight", "count": 5 }, { "kind": "Striker", "count": 5 }, { "kind": "NailGun", "count": 3 }, { "kind": "Dropper", "count": 2 } ] },
+            { "units": [ { "kind": "TailLight", "count": 8 }, { "kind": "Striker", "count": 4 }, { "kind": "NailGun", "count": 2 }, { "kind": "Dropper", "count": 1 } ] },
+            { "units": [ { "kind": "TailLight", "count": 6 }, { "kind": "Striker", "count": 5 }, { "kind": "NailGun", "count": 3 }, { "kind": "Dropper", "count": 1 } ] }
+          ]
+        },
+        {
+          "waves": [
+            { "units": [ { "kind": "TailLight", "count": 8 }, { "kind": "Striker", "count": 4 }, { "kind": "NailGun", "count": 2 }, { "kind": "Dropper", "count": 1 } ] },
+            { "units": [ { "kind": "ChainBoss", "count": 1 }, { "kind": "TailLight", "count": 3 }, { "kind": "Striker", "count": 3 }, { "kind": "Dropper", "count": 2 } ] }
+          ]
+        }
+      ]
+    }
+  ]
+}
