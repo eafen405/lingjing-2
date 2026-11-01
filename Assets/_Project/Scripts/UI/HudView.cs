@@ -20,6 +20,9 @@ namespace Lingjing.UI
         Text _hpText;
         Text _energyText;
         Text _fairyText;
+        Text _sectionText;
+        Text _bannerText;
+        GameObject _bannerObject;
         GameObject _emblemObject;
         UiBar _hpBar;
         UiBar _energyBar;
@@ -76,6 +79,41 @@ namespace Lingjing.UI
             // 暂停键贴右上，与 HUD 数值一起远离左下摇杆和右下技能键。
             UiKit.CreateButton(root, UiText.Pause, new Vector2(1f, 1f), new Vector2(1f, 1f),
                 new Vector2(-SafeMargin, -SafeMargin), new Vector2(96f, 46f), onPause, 22);
+
+            // 节进度常驻顶部中央；换节时中间弹一次大提示。
+            _sectionText = UiKit.CreateLabel(root, string.Empty, 22, TextAnchor.MiddleCenter,
+                new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -18f),
+                new Vector2(300f, 30f), UiPalette.Muted);
+
+            var center = new Vector2(0.5f, 0.5f);
+            RectTransform banner = UiKit.CreatePanel(root, "SectionBanner", center, center,
+                new Vector2(0f, 60f), new Vector2(420f, 96f), UiPalette.Panel);
+            banner.GetComponent<Image>().raycastTarget = false;
+
+            _bannerText = UiKit.CreateTitle(banner, string.Empty, 48, TextAnchor.MiddleCenter, center, center,
+                Vector2.zero, new Vector2(400f, 80f), UiPalette.Signal);
+
+            _bannerObject = banner.gameObject;
+            _bannerObject.SetActive(false);
+        }
+
+        /// <summary>节进度：数字常驻，换节停顿期间把中间的大提示亮出来。</summary>
+        public void SetSection(int current, int total, bool intermission)
+        {
+            if (_sectionText != null)
+            {
+                _sectionText.text = UiText.SectionProgress(current, total);
+            }
+
+            if (_bannerText != null)
+            {
+                _bannerText.text = UiText.SectionBanner(current);
+            }
+
+            if (_bannerObject != null)
+            {
+                _bannerObject.SetActive(intermission);
+            }
         }
 
         /// <summary>只做显示；数值与倒计时由 BattleRunner 每帧灌进来。</summary>

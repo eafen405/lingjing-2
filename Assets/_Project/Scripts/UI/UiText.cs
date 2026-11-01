@@ -41,6 +41,12 @@ namespace Lingjing.UI
         public const string PickUpgrade = "选择一项强化";
         public const string Choose = "选择";
 
+        /// <summary>HUD 上的节进度，如「第 2/4 节」。</summary>
+        public static string SectionProgress(int current, int total) => $"第 {current}/{total} 节";
+
+        /// <summary>换节时中间那个大提示。</summary>
+        public static string SectionBanner(int current) => $"第 {current} 节";
+
         /// <summary>三选一卡面的类别名。内核不认识中文，名字只在这里。</summary>
         public static string GrowthName(GrowthKind kind) => kind switch
         {

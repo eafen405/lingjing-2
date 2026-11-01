@@ -197,6 +197,16 @@ namespace Lingjing.Editor
             bool emblemShown = emblemTx != null && emblemTx.gameObject.activeSelf;
             Expect(emblemShown, "HUD：代行中显示 Fairy 徽记");
 
+            hud.SetSection(2, 4, true);
+            Transform bannerTx = hud.transform.Find("SectionBanner");
+            bool sectionShown = HasText(hud.transform, UiText.SectionProgress(2, 4))
+                && HasText(hud.transform, UiText.SectionBanner(2))
+                && bannerTx != null && bannerTx.gameObject.activeInHierarchy;
+            hud.SetSection(2, 4, false);
+            bool bannerHidden = bannerTx != null && !bannerTx.gameObject.activeInHierarchy
+                && HasText(hud.transform, UiText.SectionProgress(2, 4));
+            Expect(sectionShown && bannerHidden, "节提示：进度常驻，换节大提示只在停顿期间亮");
+
             PauseScreen pause = PauseScreen.Build(null, null, null);
             bool pauseHidden = !pause.Visible;
             pause.Show();

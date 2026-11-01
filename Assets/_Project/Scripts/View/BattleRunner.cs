@@ -488,6 +488,11 @@ namespace Lingjing.View
             float fairySeconds = (float)(_world.FairyTicksLeft * SimConstants.Dt);
             _hud.SetStats((float)p.Hp, (float)p.MaxHp, (float)p.Energy,
                 (float)DamageRules.EnergyMax, _world.FairyActive, fairySeconds);
+
+            if (_run != null && _run.SectionCount > 0)
+            {
+                _hud.SetSection(_run.SectionIndex + 1, _run.SectionCount, _run.Intermission);
+            }
         }
 
         /// <summary>暂停：冻结时间缩放并停掉世界推进，界面只负责显示。</summary>
