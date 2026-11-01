@@ -40,18 +40,22 @@
 
 ## Fairy 徽记
 
-角色本体没有位图，是 Compose Canvas 画的。唯一的几何稿在
-`work/implementation/evidence/ui-217/{foreground,legacy,monochrome,background}.svg`，108×108：
-白环 r 30.66 / 描 4.675；蓝渐变环 `#3D8AE6→#1A35D6` r 24.89 / 描 6.875；瞳 r 11.14；高光 r 4.675。
+角色本体没有位图，是 Compose Canvas 画的；但成品图标有：
+`android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png`（432×432，透明底）。
+这是她唯一可靠的「长相」，已复制成工程内的原图 `tools/ui/source/fairy_emblem.png`；
+`python tools/ui/make_emblem.py` 按 alpha 包围盒裁掉自适应图标的安全边距，输出
+`Assets/_Project/Resources/Fairy/fairy_emblem.png`（512×512）。
 
-这枚徽记可以按「非像素 UI 元素」直接放进 Fairy 气泡或 HUD。
+**不要照 SVG 里的圆参数手画。** 那四个圆只是标记的一部分——真正的徽记是
+白色外环、蓝渐变环、**带四枚尖齿的白环**，以及偏在右下、白底蓝点的瞳。
+只按同心圆重画会丢掉尖齿和偏瞳，图形就完全不对了。
 
 ## 工程里的落点
 
 - 取色板：`Assets/_Project/Scripts/UI/UiPalette.cs`，界面里不再直接写 `new Color(...)`。
 - 标题字体：`Assets/_Project/Resources/Fonts/Lingjing-Title.ttf`（就是上面那份数黑体），
   经 `UiKit.TitleFont` 取用；正文仍走 Noto 子集。
-- 徽记：`python tools/ui/make_emblem.py` 按上面的几何重新生成
+- 徽记：`python tools/ui/make_emblem.py` 从 `tools/ui/source/fairy_emblem.png` 裁出
   `Assets/_Project/Resources/Fairy/fairy_emblem.png`，由 `UiKit.Emblem` 现搓 Sprite，
   不依赖导入设置。HUD 里只在代行期间显示。
 

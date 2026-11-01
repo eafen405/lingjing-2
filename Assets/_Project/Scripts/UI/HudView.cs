@@ -65,12 +65,12 @@ namespace Lingjing.UI
 
             // 代行时把她那枚徽记一起亮出来：这是全作唯一一件非像素的实体图形。
             Image emblem = UiKit.CreateImage(card, "Emblem", UiKit.Emblem,
-                new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(16f, -106f), new Vector2(26f, 26f));
+                new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(16f, -104f), new Vector2(30f, 30f));
             _emblemObject = emblem.gameObject;
             _emblemObject.SetActive(false);
 
             _fairyText = UiKit.CreateLabel(card, string.Empty, 20, TextAnchor.MiddleLeft,
-                new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(50f, -110f), new Vector2(230f, 26f), FairyColor);
+                new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(54f, -108f), new Vector2(226f, 26f), FairyColor);
             _fairyText.gameObject.SetActive(false);
 
             // 暂停键贴右上，与 HUD 数值一起远离左下摇杆和右下技能键。

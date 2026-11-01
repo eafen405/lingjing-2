@@ -1,91 +1,61 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-按 OurFairy 的徽记几何稿生成 Fairy 徽记 PNG。
+把 OurFairy 的 Fairy 徽记裁成工程里用的图。
 
-几何来源：OurFairy 仓库 work/implementation/evidence/ui-217/*.svg（108×108）：
-  白环     r 30.66  描 4.675
-  蓝渐变环 r 24.89  描 6.875   #3D8AE6 → #1A35D6
-  瞳       r 11.14
-  高光     r 4.675
+来源：OurFairy 仓库 android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png（432×432）。
+那份是自适应图标的前景层，四周留了安全边距，所以这里按 alpha 包围盒裁掉空白再补一点边距。
 
-这是 Fairy 层的非像素元素（game-design §10），不要按像素规则重绘。
-产物：Assets/_Project/Resources/Fairy/fairy_emblem.png（216×216，透明底）
+上一版是照着 SVG 里的四个同心圆重画的，画错了——真正的徽记是
+「白环 + 蓝环 + 带四枚尖齿的白环 + 偏右下的瞳（白底蓝点）」。
+徽记是 Fairy 层唯一的实体图形（game-design §10），不要手画，用原图。
+
+产物：Assets/_Project/Resources/Fairy/fairy_emblem.png（512×512，透明底）
 
 用法：python tools/ui/make_emblem.py
+      python tools/ui/make_emblem.py --source <另一份 png>
 """
 
-import math
+import argparse
 import os
+import sys
 
-from PIL import Image, ImageDraw
+from PIL import Image
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+SOURCE = os.path.join(ROOT, "tools", "ui", "source", "fairy_emblem.png")
 OUT_DIR = os.path.join(ROOT, "Assets", "_Project", "Resources", "Fairy")
 OUT_FILE = os.path.join(OUT_DIR, "fairy_emblem.png")
 
-# 几何稿的基准尺寸与各圆参数（单位与 SVG 一致）。
-BASE = 108.0
-OUT_SIZE = 216
-SUPERSAMPLE = 4
-
-WHITE_RING_R = 30.66
-WHITE_RING_W = 4.675
-BLUE_RING_R = 24.89
-BLUE_RING_W = 6.875
-PUPIL_R = 11.14
-HIGHLIGHT_R = 4.675
-
-BLUE_TOP = (0x3D, 0x8A, 0xE6)
-BLUE_BOTTOM = (0x1A, 0x35, 0xD6)
-PUPIL_COLOR = (0x0A, 0x16, 0x33)
-
-SEGMENTS = 96
-
-
-def lerp(a, b, t):
-    return tuple(round(a[i] + (b[i] - a[i]) * t) for i in range(3))
+OUT_SIZE = 512
+MARGIN = 0.04
 
 
 def main():
-    scale = OUT_SIZE * SUPERSAMPLE / BASE
-    size = int(BASE * scale)
-    image = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(image)
-    center = size / 2.0
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--source", default=SOURCE, help="徽记原图路径")
+    args = parser.parse_args()
 
-    def bbox(radius):
-        r = radius * scale
-        return [center - r, center - r, center + r, center + r]
+    if not os.path.exists(args.source):
+        sys.exit(f"找不到徽记原图：{args.source}")
 
-    def width(stroke):
-        return max(1, round(stroke * scale))
+    image = Image.open(args.source).convert("RGBA")
+    bbox = image.getbbox()
+    if bbox is None:
+        sys.exit("原图是全透明的")
 
-    # 1) 外白环
-    draw.arc(bbox(WHITE_RING_R), 0, 360, fill=(255, 255, 255, 255), width=width(WHITE_RING_W))
+    cropped = image.crop(bbox)
 
-    # 2) 蓝渐变环：分段画，按纵向位置取色
-    step = 360.0 / SEGMENTS
-    for i in range(SEGMENTS):
-        start = i * step
-        mid = math.radians(start + step * 0.5)
-        t = 0.5 - 0.5 * math.sin(mid)          # 上亮下暗
-        color = lerp(BLUE_TOP, BLUE_BOTTOM, t)
-        draw.arc(bbox(BLUE_RING_R), start, start + step + 1.0, fill=color + (255,), width=width(BLUE_RING_W))
+    # 补一圈透明边距，避免图标贴着控件边缘。
+    side = round(max(cropped.size) * (1.0 + MARGIN * 2))
+    canvas = Image.new("RGBA", (side, side), (0, 0, 0, 0))
+    canvas.paste(cropped, ((side - cropped.width) // 2, (side - cropped.height) // 2), cropped)
 
-    # 3) 瞳
-    draw.ellipse(bbox(PUPIL_R), fill=PUPIL_COLOR + (255,))
-
-    # 4) 高光：左上方偏一点，读起来像一颗反光的镜头
-    hx = center - PUPIL_R * 0.42 * scale
-    hy = center - PUPIL_R * 0.42 * scale
-    r = HIGHLIGHT_R * scale
-    draw.ellipse([hx - r, hy - r, hx + r, hy + r], fill=(255, 255, 255, 210))
-
-    image = image.resize((OUT_SIZE, OUT_SIZE), Image.LANCZOS)
+    canvas = canvas.resize((OUT_SIZE, OUT_SIZE), Image.LANCZOS)
 
     os.makedirs(OUT_DIR, exist_ok=True)
-    image.save(OUT_FILE)
+    canvas.save(OUT_FILE)
+    print(f"source: {os.path.relpath(args.source, ROOT)}  bbox={bbox}")
     print(f"output: {os.path.relpath(OUT_FILE, ROOT)}  ({os.path.getsize(OUT_FILE) / 1024:.1f} KB)")
 
 
