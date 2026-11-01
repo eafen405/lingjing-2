@@ -80,6 +80,25 @@ namespace Lingjing.Editor
             Expect("钉枪 HP", EnemyTuning.MaxHp(EnemyKind.NailGun), 45.0);
             Expect("坠物 HP", EnemyTuning.MaxHp(EnemyKind.Dropper), 60.0);
             Expect("恶名以骸 HP", EnemyTuning.MaxHp(EnemyKind.ChainBoss), 600.0);
+
+            // 判定体积要盖住可见身体：素材实测普通以骸体宽 36–38px（1.1–1.2 单位），
+            // 半径低于 0.45 就会出现「刀从身上划过去却没命中」。
+            EnemyKind[] normal =
+            {
+                EnemyKind.TailLight, EnemyKind.Striker, EnemyKind.NailGun, EnemyKind.Dropper
+            };
+            for (int i = 0; i < normal.Length; i++)
+            {
+                if (EnemyTuning.Radius(normal[i]) < 0.45)
+                {
+                    Fail($"{normal[i]} 的判定半径 {EnemyTuning.Radius(normal[i])} 小于可见身体的八成");
+                }
+            }
+
+            if (EnemyTuning.Radius(EnemyKind.ChainBoss) < 0.8)
+            {
+                Fail("恶名以骸的判定半径小于 0.8");
+            }
         }
 
         static void CheckEffects()
@@ -99,6 +118,17 @@ namespace Lingjing.Editor
                 {
                     Fail($"特效组 {required[i]} 缺失或没有帧");
                 }
+            }
+
+            // 飞行物与落区以前「模拟有、画面没有」，这两张图是它们的可见性保障。
+            if (AssetDatabase.LoadAssetAtPath<Sprite>("Assets/_Project/Art/Items/nail/nail_00.png") == null)
+            {
+                Fail("钉枪弹丸素材缺失（Items/nail/nail_00.png）");
+            }
+
+            if (AssetDatabase.LoadAssetAtPath<Sprite>("Assets/_Project/Art/Fx/warn/warn_danger.png") == null)
+            {
+                Fail("落区警示素材缺失（Fx/warn/warn_danger.png）");
             }
         }
 

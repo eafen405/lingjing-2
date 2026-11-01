@@ -166,24 +166,33 @@ def draw_crystal() -> Image.Image:
 
 
 def draw_block() -> Image.Image:
-    """矮墙残段：一段塌掉的砌体。顶面受光、正面压暗，用来切走位。"""
+    """矮墙残段：一段塌掉的砌体。顶面受光、正面压暗，用来切走位。
+
+    场地没有地板、背景是近黑的清屏色，所以挡路物必须先有一圈亮边（``rim``）把轮廓从背景里
+    剥出来，再用比墙更亮的两级面区分顶/正面；否则在手机上就是一团和背景糊在一起的黑色。
+    """
     c = Canvas(PROP)
 
     top = [(6, 30), (12, 26), (20, 30), (28, 25), (36, 29), (44, 24),
            (52, 29), (58, 27), (58, 40), (6, 40)]
     front = [(6, 40), (58, 40), (58, 58), (6, 58)]
 
-    c.poly(_px(top, PROP), fill=C["base"])
-    c.poly(_px(front, PROP), fill=C["shade"])
+    # 1px 亮边：把同一组轮廓往四个方向各偏 1px 先画一遍，再由本体盖住中间。
+    for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+        c.poly(_px([(x + dx, y + dy) for x, y in top], PROP), fill=C["rim"])
+        c.poly(_px([(x + dx, y + dy) for x, y in front], PROP), fill=C["rim"])
 
-    c.line(_px(top[:6], PROP), C["hi"], w=1.0, cap=False)
-    c.px_rect(6, 40, 1, 18, C["light"])
-    c.px_rect(6, 58, 53, 1, C["chasm"])
+    c.poly(_px(top, PROP), fill=C["light"])
+    c.poly(_px(front, PROP), fill=C["base"])
+
+    c.line(_px(top[:6], PROP), C["rim"], w=1.0, cap=False)
+    c.px_rect(6, 40, 1, 18, C["hi"])
+    c.px_rect(6, 58, 53, 1, C["shade"])
     c.px_rect(57, 27, 1, 32, C["grout"])
     # 两道竖缝：暗示是砌起来的，不是一整块
-    c.px_rect(24, 41, 1, 17, C["grout"])
-    c.px_rect(42, 41, 1, 17, C["grout"])
-    c.px_rect(7, 40, 50, 1, C["grout"])
+    c.px_rect(24, 41, 1, 17, C["shade"])
+    c.px_rect(42, 41, 1, 17, C["shade"])
+    c.px_rect(7, 40, 50, 1, C["shade"])
 
     return finish(c)
 

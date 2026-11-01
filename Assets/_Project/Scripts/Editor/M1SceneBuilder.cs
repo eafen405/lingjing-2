@@ -38,6 +38,8 @@ namespace Lingjing.Editor
         const string PropBlock = "Assets/_Project/Art/Terrain/props/prop_block.png";
         const string BarTrack = "Assets/_Project/Art/Fx/bar/bar_track.png";
         const string BarFill = "Assets/_Project/Art/Fx/bar/bar_fill.png";
+        const string NailShot = "Assets/_Project/Art/Items/nail/nail_00.png";
+        const string WarnDanger = "Assets/_Project/Art/Fx/warn/warn_danger.png";
 
         /// <summary>两关一起生成；场景清单统一走 SceneCatalog，避免谁后跑谁覆盖。</summary>
         public static void Run()
@@ -98,6 +100,8 @@ namespace Lingjing.Editor
             runner.propBlock = LoadSprite(PropBlock);
             runner.healthBarTrack = LoadSprite(BarTrack);
             runner.healthBarFill = LoadSprite(BarFill);
+            runner.projectileSprite = LoadSprite(NailShot);
+            runner.zoneSprite = LoadSprite(WarnDanger);
             runner.viewCamera = cam;
             runner.levelJson = levelData;
             runner.levelId = levelId;

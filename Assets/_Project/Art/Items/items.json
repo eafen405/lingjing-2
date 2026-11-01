@@ -15,6 +15,19 @@
       "pattern": "knife/knife_{frame:02}.png",
       "atlas": "knife/knife.png"
     },
+    "nail": {
+      "frames": 1,
+      "frameSize": [
+        16,
+        16
+      ],
+      "pivot": [
+        8,
+        8
+      ],
+      "pattern": "nail/nail_{frame:02}.png",
+      "atlas": "nail/nail.png"
+    },
     "pickup_health": {
       "frames": 2,
       "frameSize": [

@@ -215,6 +215,25 @@ HIT = 24
 BREAK = 16
 PICKUP_FX = 24
 PROXY = 128
+NAIL = 16
+
+
+def draw_nail(hi: bool = False) -> Image.Image:
+    """钉枪的铆钉：指东（+x）的短镖，钢身 + 预警红尖端。
+
+    它是在近黑背景上飞的小东西，所以不靠描边、靠自身亮度：杆用钢色最亮一档，
+    尖端用预警红，尾座压暗一档，旋转后仍能一眼看出「有东西过来了」。
+    """
+    c = Canvas(NAIL)
+    cy = NAIL // 2
+    shaft = C["steel_hi"] if hi else C["steel"]
+
+    c.px_rect(2, cy - 1, 3, 3, C["shell_light"])   # 尾座
+    c.px_rect(5, cy - 1, 6, 3, shaft)              # 杆
+    c.px_rect(5, cy, 6, 1, C["hood_light"])        # 高光
+    c.px_rect(11, cy - 1, 2, 3, C["warn"])         # 尖
+    c.px_rect(13, cy, 1, 1, C["warn_hi"])          # 尖端高光
+    return finish(c)
 
 
 def draw_hit(f: int) -> Image.Image:
@@ -312,6 +331,8 @@ def draw_proxy(f: int, entering: bool = True) -> Image.Image:
 ITEMS = {
     "knife": {"frames": KNIFE_FRAMES, "size": (KNIFE, KNIFE), "pivot": (8, 8),
               "fn": draw_knife},
+    "nail": {"frames": 1, "size": (NAIL, NAIL), "pivot": (NAIL // 2, NAIL // 2),
+             "fn": draw_nail},
     "pickup_health": {"frames": 2, "size": (PICKUP, PICKUP), "pivot": PICKUP_PIVOT,
                       "fn": draw_pickup_health},
     "pickup_energy": {"frames": 2, "size": (PICKUP, PICKUP), "pivot": PICKUP_PIVOT,
@@ -340,6 +361,6 @@ FX_GROUPS = {
 }
 
 __all__ = ["MISC_COLORS", "ITEMS", "FX_GROUPS", "PICKUP", "PICKUP_PIVOT",
-           "WARN", "WARN_BORDER", "PROXY", "draw_knife", "draw_pickup_health",
-           "draw_pickup_energy", "draw_pickup_blade", "draw_warn", "draw_hit",
-           "draw_break", "draw_pickup_fx", "draw_proxy"]
+           "WARN", "WARN_BORDER", "PROXY", "NAIL", "draw_knife", "draw_nail",
+           "draw_pickup_health", "draw_pickup_energy", "draw_pickup_blade", "draw_warn",
+           "draw_hit", "draw_break", "draw_pickup_fx", "draw_proxy"]

@@ -34,6 +34,12 @@ namespace Lingjing.View
         [Tooltip("以骸血条填充 1×3（Art/Fx/bar/bar_fill.png）")]
         public Sprite healthBarFill;
 
+        [Tooltip("钉枪的铆钉（Art/Items/nail/nail_00.png），飞行方向为 +x")]
+        public Sprite projectileSprite;
+
+        [Tooltip("坠物落区（Art/Fx/warn/warn_danger.png），按矩形拉伸")]
+        public Sprite zoneSprite;
+
         [Header("关卡")]
         [Tooltip("levels.json（Assets/_Project/Data），由场景生成器烘进来")]
         public TextAsset levelJson;
@@ -92,6 +98,10 @@ namespace Lingjing.View
         readonly HashSet<int> _aliveIds = new HashSet<int>();
         readonly Dictionary<int, SpriteRenderer> _pickupViews = new Dictionary<int, SpriteRenderer>();
         readonly List<int> _stalePickupIds = new List<int>();
+        readonly Dictionary<Projectile, Transform> _shotViews = new Dictionary<Projectile, Transform>();
+        readonly Dictionary<HazardZone, Transform> _zoneViews = new Dictionary<HazardZone, Transform>();
+        readonly List<Projectile> _staleShots = new List<Projectile>();
+        readonly List<HazardZone> _staleZones = new List<HazardZone>();
         ActorAnimator _playerAnim;
 
         sealed class EnemyView
@@ -558,6 +568,8 @@ namespace Lingjing.View
 
             SyncEnemies();
             SyncPickups();
+            SyncProjectiles();
+            SyncZones();
         }
 
         void SyncPlayerFlash()
@@ -760,6 +772,102 @@ namespace Lingjing.View
                 }
 
                 _pickupViews.Remove(_stalePickupIds[i]);
+            }
+        }
+
+        /// <summary>
+        /// 钉枪的铆钉。以前模拟里有、画面上没有——玩家看不见就没法躲，等于凭空掉血。
+        /// 按对象引用绑定（模拟层没给飞行物发 Id），飞完/撞墙后下一帧销毁。
+        /// </summary>
+        void SyncProjectiles()
+        {
+            List<Projectile> shots = _world.World.Projectiles;
+            for (int i = 0; i < shots.Count; i++)
+            {
+                Projectile shot = shots[i];
+                if (!_shotViews.TryGetValue(shot, out Transform tx))
+                {
+                    var go = new GameObject("Shot");
+                    var sr = go.AddComponent<SpriteRenderer>();
+                    sr.sprite = projectileSprite;
+                    sr.sortingOrder = 11;
+                    tx = go.transform;
+                    _shotViews.Add(shot, tx);
+                }
+
+                tx.position = new Vector3((float)shot.Pos.X, (float)shot.Pos.Y, 0f);
+                // 素材指向 +x，按速度方向转；像素风里斜向会被重采样，但子弹小、动得快，可以接受。
+                tx.rotation = Quaternion.Euler(0f, 0f,
+                    (float)(System.Math.Atan2(shot.Vel.Y, shot.Vel.X) * Mathf.Rad2Deg));
+            }
+
+            _staleShots.Clear();
+            foreach (KeyValuePair<Projectile, Transform> pair in _shotViews)
+            {
+                if (!shots.Contains(pair.Key))
+                {
+                    _staleShots.Add(pair.Key);
+                }
+            }
+
+            for (int i = 0; i < _staleShots.Count; i++)
+            {
+                Transform tx = _shotViews[_staleShots[i]];
+                if (tx != null)
+                {
+                    Destroy(tx.gameObject);
+                }
+
+                _shotViews.Remove(_staleShots[i]);
+            }
+        }
+
+        /// <summary>
+        /// 坠物的矩形落区。同样是「模拟有、画面没有」的那一类：不画出来，12 点伤害就是无声的。
+        /// 落区是 2×2 单位，警示区素材是 1 单位，按矩形等比拉开。
+        /// </summary>
+        void SyncZones()
+        {
+            List<HazardZone> zones = _world.World.Zones;
+            for (int i = 0; i < zones.Count; i++)
+            {
+                HazardZone zone = zones[i];
+                if (!_zoneViews.TryGetValue(zone, out Transform tx))
+                {
+                    var go = new GameObject("Zone");
+                    var sr = go.AddComponent<SpriteRenderer>();
+                    sr.sprite = zoneSprite;
+                    sr.sortingOrder = 5;
+                    sr.color = new Color(1f, 1f, 1f, 0.85f);
+                    tx = go.transform;
+                    _zoneViews.Add(zone, tx);
+                    tx.localScale = new Vector3((float)zone.Width, (float)zone.Height, 1f);
+                }
+
+                tx.position = new Vector3(
+                    (float)(zone.X + zone.Width * 0.5),
+                    (float)(zone.Y + zone.Height * 0.5),
+                    0f);
+            }
+
+            _staleZones.Clear();
+            foreach (KeyValuePair<HazardZone, Transform> pair in _zoneViews)
+            {
+                if (!zones.Contains(pair.Key))
+                {
+                    _staleZones.Add(pair.Key);
+                }
+            }
+
+            for (int i = 0; i < _staleZones.Count; i++)
+            {
+                Transform tx = _zoneViews[_staleZones[i]];
+                if (tx != null)
+                {
+                    Destroy(tx.gameObject);
+                }
+
+                _zoneViews.Remove(_staleZones[i]);
             }
         }
 

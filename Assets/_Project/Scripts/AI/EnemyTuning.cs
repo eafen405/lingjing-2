@@ -29,8 +29,20 @@ namespace Lingjing.AI
             _ => 2.4
         };
 
-        /// <summary>碰撞半径：恶名以骸块头更大。</summary>
-        public static double Radius(EnemyKind kind) => kind == EnemyKind.ChainBoss ? 0.6 : 0.35;
+        /// <summary>
+        /// 碰撞半径。按素材实测的可见轮廓定：普通以骸体宽 36–38px（1.1–1.2 单位），
+        /// 半径 0.5 才让刀口「贴着身体」就命中，而不是从透明的画布边里穿过去。
+        /// 恶名以骸的可见轮廓是 54×85px，单独一档。
+        /// </summary>
+        public static double Radius(EnemyKind kind) => kind switch
+        {
+            EnemyKind.TailLight => 0.5,
+            EnemyKind.Striker => 0.55,
+            EnemyKind.NailGun => 0.5,
+            EnemyKind.Dropper => 0.55,
+            EnemyKind.ChainBoss => 0.9,
+            _ => 0.5
+        };
 
         // ── 以骸造成的伤害 ─────────────────────────────────────
         /// <summary>尾灯贴身持续伤害：每秒 8（按 dt 摊到每 tick）。</summary>
