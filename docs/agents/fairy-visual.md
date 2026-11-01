@@ -29,14 +29,14 @@
 
 ## 字体（`android/app/src/main/res/font/`）
 
-| 文件 | 实读家族 | 授权 |
-| --- | --- | --- |
-| `display_industrial.ttf` | 阿里妈妈数黑体 Bold（name 表被改名） | 仓库内 `assets/fonts/AlimamaShuHeiTi-LICENSE.txt` |
-| `title_heavy.ttf` | MiSans Heavy | **仓库内未找到授权文件** |
-| `jetbrains_mono.ttf` | JetBrains Mono Regular | OFL 1.1（name 表） |
-| `label_black.ttf` | Outfit Thin（文件名与字重不符） | OFL 1.1（name 表） |
+| 文件 | 实读家族 |
+| --- | --- |
+| `display_industrial.ttf` | 阿里妈妈数黑体 Bold（name 表被改名） |
+| `title_heavy.ttf` | MiSans Heavy |
+| `jetbrains_mono.ttf` | JetBrains Mono Regular |
+| `label_black.ttf` | Outfit Thin（文件名与字重不符） |
 
-中文界面里：标题用数黑体，数字与代码感的地方用 JetBrains Mono，正文继续用 Noto Sans SC 子集。
+中文界面里：主标题用数黑体，需要更重的地方用 MiSans Heavy，数字（分数、等级、节号）用 JetBrains Mono，正文继续用 Noto Sans SC 子集。
 
 ## Fairy 徽记
 
