@@ -2,6 +2,9 @@ using System;
 using System.IO;
 using System.Linq;
 using Doozy.Engine.UI;
+using Lingjing.AI;
+using Lingjing.Combat;
+using Lingjing.Level;
 using Lingjing.UI;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -207,6 +210,40 @@ namespace Lingjing.Editor
             result.Hide();
             Expect(failShown && clearShown, "结算：失败/通关标题、得分与最高分");
 
+            // 升级三选一：三张牌、文案全部来自 UiText、点一张会回传它自己那类。
+            GrowthKind picked = GrowthKind.Speed;
+            int pickCount = 0;
+            ChoiceScreen choice = ChoiceScreen.Build(kind =>
+            {
+                picked = kind;
+                pickCount++;
+            });
+
+            var growth = new GrowthState(7UL);
+            var dummy = new Player();
+            growth.Award(dummy, EnemyKind.ChainBoss);   // 300 经验，直接够第一级阈值
+            bool rolled = growth.HasPendingChoice && growth.OptionCount == 3;
+            choice.Show(growth);
+            bool choiceShown = choice.Visible
+                && HasText(choice.transform, UiText.PickUpgrade)
+                && HasText(choice.transform, UiText.GrowthName(growth.OptionAt(0)))
+                && HasText(choice.transform, UiText.GrowthEffect(growth.OptionAt(0)))
+                && choice.ShownAt(0) == growth.OptionAt(0)
+                && FindButton(choice.transform, UiText.Choose) != null;
+            Expect(rolled && choiceShown, "三选一：一次性给三张牌，卡面文案与所选一致");
+
+            Button firstCard = FindButton(choice.transform, UiText.Choose);
+            firstCard?.onClick.Invoke();
+            bool pickedOk = pickCount == 1 && picked == growth.OptionAt(0) && !choice.Visible;
+            Expect(pickedOk, "三选一：点第一张会把该类别回传并关闭面板");
+
+            bool choiceViewOk = choice.View != null && choice.View.DoozyView != null
+                && choice.View.DoozyView.ViewName == DoozyViewHost.ChoiceViewName
+                && choice.View.DoozyView.Canvas.sortingOrder == DoozyViewHost.ChoiceSortingOrder
+                && DoozyViewHost.PauseSortingOrder < DoozyViewHost.ChoiceSortingOrder
+                && DoozyViewHost.ChoiceSortingOrder < DoozyViewHost.ResultSortingOrder;
+            Expect(choiceViewOk, $"三选一：UIView 名为 Choice，层级 Pause({DoozyViewHost.PauseSortingOrder}) < Choice({DoozyViewHost.ChoiceSortingOrder}) < Result({DoozyViewHost.ResultSortingOrder})");
+
             // Doozy：HUD/暂停/结算三个视图都存在且 UIView.ViewName 固定。
             bool viewNamesOk = hud.View != null && hud.View.DoozyView != null
                 && hud.View.DoozyView.ViewName == DoozyViewHost.HudViewName
@@ -231,6 +268,7 @@ namespace Lingjing.Editor
 
             UnityEngine.Object.DestroyImmediate(hud.gameObject);
             UnityEngine.Object.DestroyImmediate(pause.gameObject);
+            UnityEngine.Object.DestroyImmediate(choice.gameObject);
             UnityEngine.Object.DestroyImmediate(result.gameObject);
 
             bool hadHigh = PlayerPrefs.HasKey(HighScoreKey);

@@ -16,6 +16,9 @@ public sealed class BladeRing
     public const double DefaultOuterRadius = 2.0;
     public const double DefaultOmega = 2.5;
 
+    /// <summary>外圈刀数硬上限（game-design §7.2：初始 4，最多加到 10）。</summary>
+    public const int MaxBladeCount = 10;
+
     /// <summary>刀尖视为点；命中判定用点 vs 敌人圆。</summary>
     public const double TipRadius = 0.0;
 

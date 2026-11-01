@@ -15,11 +15,12 @@ namespace Lingjing.UI
     /// </summary>
     public sealed class DoozyViewHost
     {
-        /// <summary>五个界面的固定 ViewName，探针与界面都从这里取。</summary>
+        /// <summary>六个界面的固定 ViewName，探针与界面都从这里取。</summary>
         public const string MainMenuViewName = "MainMenu";
         public const string LevelSelectViewName = "LevelSelect";
         public const string HudViewName = "Hud";
         public const string PauseViewName = "Pause";
+        public const string ChoiceViewName = "Choice";
         public const string ResultViewName = "Result";
 
         /// <summary>每个场景共用一个 Doozy 画布（与 UICanvas.MasterCanvasName 同名），随场景销毁。</summary>
@@ -28,11 +29,12 @@ namespace Lingjing.UI
         /// <summary>Doozy 画布的 sortingOrder：压在触屏摇杆那层（0）之上。</summary>
         const int CanvasSortingOrder = 1;
 
-        // 画布内部的层级：HUD 常驻，暂停/结算必须叠在它上面，而不是互相顶掉。
+        // 画布内部的层级：HUD 常驻，暂停/三选一/结算必须叠在它上面，而不是互相顶掉。
         public const int MainMenuSortingOrder = 10;
         public const int LevelSelectSortingOrder = 20;
         public const int HudSortingOrder = 20;
         public const int PauseSortingOrder = 100;
+        public const int ChoiceSortingOrder = 105;
         public const int ResultSortingOrder = 110;
 
         static Canvas s_canvas;

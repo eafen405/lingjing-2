@@ -27,6 +27,9 @@ public sealed class Player
     /// <summary>充能 0..100。命中 +2、击杀 +15，代行期间不回能。</summary>
     public double Energy;
 
+    /// <summary>每把刀的伤害。基础值来自 DamageRules，关内成长（game-design §7.1）会改它。</summary>
+    public double BladeDamage = DamageRules.BladeHitDamage;
+
     /// <summary>旋转方向：+1 / −1。</summary>
     public int SpinSign = 1;
 

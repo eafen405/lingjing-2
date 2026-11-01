@@ -1,3 +1,4 @@
+using Lingjing.Level;
 using UnityEngine;
 
 namespace Lingjing.UI
@@ -35,5 +36,24 @@ namespace Lingjing.UI
         public const string MoveHint = "左侧摇杆移动";
         public const string SkillHint = "右下技能键：代行";
         public const string ReverseHint = "右下上键：正反切";
+
+        public const string LevelUp = "升级";
+        public const string PickUpgrade = "选择一项强化";
+        public const string Choose = "选择";
+
+        /// <summary>三选一卡面的类别名。内核不认识中文，名字只在这里。</summary>
+        public static string GrowthName(GrowthKind kind) => kind switch
+        {
+            GrowthKind.Damage => "攻击力",
+            GrowthKind.BladeCount => "刀数",
+            GrowthKind.Omega => "角速度",
+            GrowthKind.Speed => "移速",
+            _ => "?"
+        };
+
+        /// <summary>增量的显示文本。数值本身从 GrowthRules 取，改平衡不会让卡面说谎。</summary>
+        public static string GrowthEffect(GrowthKind kind) => kind == GrowthKind.BladeCount
+            ? "+1"
+            : $"+{(GrowthRules.MultiplierOf(kind) - 1.0) * 100.0:0}%";
     }
 }

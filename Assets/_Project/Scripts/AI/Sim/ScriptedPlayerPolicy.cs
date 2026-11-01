@@ -16,6 +16,8 @@ public sealed class ScriptedPlayerPolicy
 {
     private int _orbitSign = 1;
     private int _stuckTicks;
+    private int _escapeTicks;
+    private Vec2 _escapeDir;
     private Vec2 _lastPos = new(-999, -999);
     private Vec2 _lastDir;
 
@@ -53,7 +55,11 @@ public sealed class ScriptedPlayerPolicy
         _lastPos = player.Pos;
         if (_stuckTicks > 20)
         {
+            // 贴死在墙角时绕不出去：换一条垂直方向硬走一段，模仿真人"绕开挡路物"。
             _orbitSign = -_orbitSign;
+            _escapeTicks = 45;
+            Vec2 side = _lastDir == Vec2.Zero ? Vec2.UnitY : _lastDir.Perpendicular();
+            _escapeDir = side * _orbitSign;
             _stuckTicks = 0;
         }
 
@@ -88,6 +94,13 @@ public sealed class ScriptedPlayerPolicy
                     desired = (tangential + radial).Normalized();
                 }
             }
+        }
+
+        // 脱困窗口内无视常规策略，横着走一段脱离墙角。
+        if (_escapeTicks > 0)
+        {
+            _escapeTicks--;
+            desired = _escapeDir;
         }
 
         Vec2 dir = Steering.PickDirection(w.Grid, player.Pos, desired, player.Radius, 0.5, _lastDir);

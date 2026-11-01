@@ -59,7 +59,8 @@ namespace Lingjing.Editor
             Debug.Log($"[level] L1 run1 outcome={a.Outcome} kills={a.Kills}/{expected1} sections={a.LastSection + 1}/{a.SectionCount} " +
                       $"ticks={a.Ticks} hp={a.Hp:0.0} pos=({a.Pos.X:0.##},{a.Pos.Y:0.##})");
             Debug.Log($"[level] L1 run2 outcome={b.Outcome} kills={b.Kills}/{expected1} sections={b.LastSection + 1}/{b.SectionCount} ticks={b.Ticks}");
-            Debug.Log($"[level] L2      outcome={c.Outcome} kills={c.Kills}/{expected2} sections={c.LastSection + 1}/{c.SectionCount} ticks={c.Ticks}");
+            Debug.Log($"[level] L2      outcome={c.Outcome} kills={c.Kills}/{expected2} sections={c.LastSection + 1}/{c.SectionCount} ticks={c.Ticks} " +
+                      $"levels={c.Levels} blades={c.Blades} dmg={c.Damage:0.#}");
             Debug.Log($"[level] 真实血量（只作参考，不判定）：" +
                       $"L1 outcome={m1.Outcome} kills={m1.Kills}/{expected1} sections={m1.LastSection + 1} 存活{m1.Ticks / 60.0:0.0}s hp={m1.Hp:0.0}；" +
                       $"L2 outcome={m2.Outcome} kills={m2.Kills}/{expected2} sections={m2.LastSection + 1} 存活{m2.Ticks / 60.0:0.0}s hp={m2.Hp:0.0}");
@@ -71,6 +72,7 @@ namespace Lingjing.Editor
             if (!l2Cleared)
             {
                 Debug.Log($"[level] L2 卡住时 player=({c.Pos.X:0.#},{c.Pos.Y:0.#}) 场上剩余：{c.Remaining}");
+                Debug.Log($"[level] L2 落点轨迹：{c.Trail}");
             }
 
             Debug.Log($"[level] deterministic={deterministic} l1Cleared={l1Cleared} l2Cleared={l2Cleared}");
@@ -132,6 +134,7 @@ namespace Lingjing.Editor
 
             int lastSection = 0;
             int ticks = 0;
+            var trail = new System.Text.StringBuilder();
             while (ticks < MaxTicks && run.Outcome == RunOutcome.Running)
             {
                 Command command = policy.Decide(world.World, PlayerScriptKind.Kite);
@@ -144,6 +147,20 @@ namespace Lingjing.Editor
                 }
 
                 run.Tick();
+
+                // 探针代替玩家选牌：永远选第一张，只为让流程继续。真人由 ChoiceScreen 接手。
+                while (run.Growth.HasPendingChoice)
+                {
+                    run.Growth.Choose(world.World.Player, run.Growth.OptionAt(0));
+                }
+
+                // 卡住时要知道玩家到底在不在动：每 3000 tick 记一个落点。
+                if (ticks % 3000 == 0 && trail.Length < 400)
+                {
+                    Vec2 p = world.World.Player.Pos;
+                    trail.Append($"({p.X:0.#},{p.Y:0.#})s{run.SectionIndex} ");
+                }
+
                 if (run.SectionIndex > lastSection)
                 {
                     lastSection = run.SectionIndex;
@@ -161,7 +178,11 @@ namespace Lingjing.Editor
                 SectionCount = run.SectionCount,
                 Pos = world.World.Player.Pos,
                 Hp = world.World.Player.Hp,
-                Remaining = Describe(world)
+                Remaining = Describe(world),
+                Levels = run.Growth.Level,
+                Blades = world.World.Player.Ring.BladeCount,
+                Damage = world.World.Player.BladeDamage,
+                Trail = trail.ToString()
             };
         }
 
@@ -205,6 +226,10 @@ namespace Lingjing.Editor
             public Vec2 Pos;
             public double Hp;
             public string Remaining;
+            public int Levels;
+            public int Blades;
+            public double Damage;
+            public string Trail;
         }
     }
 }

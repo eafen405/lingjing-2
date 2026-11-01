@@ -59,9 +59,11 @@ namespace Lingjing.View
 
         HudView _hud;
         PauseScreen _pause;
+        ChoiceScreen _choice;
         ResultScreen _result;
         bool _paused;
         bool _resultShown;
+        bool _choiceShown;
 
         public BattleWorld World => _world;
         public bool Ready => _world != null;
@@ -202,8 +204,20 @@ namespace Lingjing.View
 
         void Update()
         {
+            if (_world == null || _resultShown)
+            {
+                return;
+            }
+
+            // 升级待选优先于一切：世界停住，等玩家选完再继续（§7.1「升级时暂停游戏」）。
+            if (_run != null && _run.Growth.HasPendingChoice)
+            {
+                ShowChoice();
+                return;
+            }
+
             // 暂停/结算期间直接不推进世界；Time.timeScale 只负责停表现层动画。
-            if (_world == null || _paused || _resultShown)
+            if (_paused)
             {
                 return;
             }
@@ -244,6 +258,12 @@ namespace Lingjing.View
 
             for (int i = 0; i < count; i++)
             {
+                // 待选期间停住：探针不会自己选牌，硬推下去只会让节卡在原地。
+                if (_run != null && _run.Growth.HasPendingChoice)
+                {
+                    break;
+                }
+
                 _world.Step(command);
                 _run?.Tick();
             }
@@ -371,7 +391,32 @@ namespace Lingjing.View
             UiKit.EnsureEventSystem();
             _hud = HudView.Build(Pause);
             _pause = PauseScreen.Build(Resume, Restart, ToMainMenu);
+            _choice = ChoiceScreen.Build(OnGrowthChosen);
             _result = ResultScreen.Build(Restart, ToMainMenu);
+            UpdateHud();
+        }
+
+        /// <summary>升级待选期间世界不推进，所以这里只需要把面板弹出来一次。</summary>
+        void ShowChoice()
+        {
+            if (_choiceShown || _choice == null || _run == null)
+            {
+                return;
+            }
+
+            _choiceShown = true;
+            _choice.Show(_run.Growth);
+        }
+
+        void OnGrowthChosen(GrowthKind kind)
+        {
+            _choiceShown = false;
+            if (_run == null || _world == null)
+            {
+                return;
+            }
+
+            _run.Growth.Choose(_world.World.Player, kind);
             UpdateHud();
         }
 
@@ -392,6 +437,12 @@ namespace Lingjing.View
         public void Pause()
         {
             if (_world == null || _paused || _resultShown || _world.PlayerDead || _pause == null)
+            {
+                return;
+            }
+
+            // 三选一优先于手动暂停：不然玩家会把待选面板压在暂停底下再也看不到。
+            if (_run != null && _run.Growth.HasPendingChoice)
             {
                 return;
             }

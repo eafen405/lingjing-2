@@ -245,7 +245,7 @@ namespace Lingjing.Sim
 
         void ApplyBladeHit(Enemy enemy, int blade, Player p, BladeRing ring)
         {
-            enemy.TakeDamage(DamageRules.BladeHitDamage);
+            enemy.TakeDamage(p.BladeDamage);
 
             // 再次命中间隔 = 2π/|ω_rel|：静止时正好一圈，顺扫更短、逆扫更长（game-design §4.2）。
             double omegaRel = DamageRules.OmegaRel(
@@ -257,7 +257,7 @@ namespace Lingjing.Sim
                 p.Energy = Math.Min(DamageRules.EnergyMax, p.Energy + DamageRules.EnergyPerHit);
             }
 
-            BladeHit?.Invoke(enemy, DamageRules.BladeHitDamage);
+            BladeHit?.Invoke(enemy, p.BladeDamage);
 
             if (!enemy.Alive)
             {

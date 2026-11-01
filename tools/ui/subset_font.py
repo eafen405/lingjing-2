@@ -7,8 +7,8 @@
 直接塞进 APK 不划算，而且每次加新文案都要重新导入。
 
 取字范围（三处并集）：
-1. docs/ 下所有 markdown 里出现过的汉字 —— UI 文案用的就是这套词汇；
-2. 脚本里写死的 UI 字表；
+1. Assets/_Project/Scripts 下所有 .cs 里出现的字符 —— 文案唯一来源是 UiText.cs，代码里写了字字体就得有；
+2. docs/ 下所有 markdown 里出现过的汉字；
 3. ASCII 可打印字符 + CJK 标点 + 全角符号。
 
 产物：Assets/_Project/Resources/Fonts/NotoSansSC-UI.ttf（OFL 授权，随仓库分发）
@@ -65,6 +65,23 @@ def collect_doc_chars() -> set[str]:
     return {c for c in chars if c.strip()}
 
 
+def collect_code_chars() -> set[str]:
+    """扫代码而不只是 docs：以前漏过一次——代码里新增的文案不在 docs 里，字体就缺字。"""
+    chars: set[str] = set()
+    scripts = os.path.join(ROOT, "Assets", "_Project", "Scripts")
+    for base, _, files in os.walk(scripts):
+        for name in files:
+            if not name.endswith(".cs"):
+                continue
+            path = os.path.join(base, name)
+            try:
+                with open(path, "r", encoding="utf-8") as handle:
+                    chars.update(handle.read())
+            except OSError:
+                continue
+    return {c for c in chars if c.strip()}
+
+
 def pick_source(explicit: str | None) -> str:
     if explicit:
         if not os.path.exists(explicit):
@@ -84,7 +101,7 @@ def main() -> None:
     args = parser.parse_args()
 
     source = pick_source(args.source)
-    charset = set(UI_TEXT) | set(ASCII) | set(PUNCT) | collect_doc_chars()
+    charset = set(UI_TEXT) | set(ASCII) | set(PUNCT) | collect_doc_chars() | collect_code_chars()
     text = "".join(sorted(charset))
 
     os.makedirs(OUT_DIR, exist_ok=True)

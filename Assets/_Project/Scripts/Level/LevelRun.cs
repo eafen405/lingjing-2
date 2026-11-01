@@ -48,7 +48,16 @@ namespace Lingjing.Level
             _level = level ?? throw new ArgumentNullException(nameof(level));
             _world = world ?? throw new ArgumentNullException(nameof(world));
             _rng = new Prng(seed);
+            Growth = new GrowthState(seed);
+
+            // 经验只由击杀产生（§7.1）。挂在这里而不是表现层，是为了让无头探针也能跑出成长。
+            _world.EnemyKilled += OnEnemyKilled;
         }
+
+        /// <summary>关内经验与三选一。待选期间整个局停住。</summary>
+        public GrowthState Growth { get; }
+
+        void OnEnemyKilled(Enemy enemy) => Growth.Award(_world.World.Player, enemy.Kind);
 
         public RunOutcome Outcome => _outcome;
 
@@ -99,6 +108,12 @@ namespace Lingjing.Level
             if (_world.PlayerDead)
             {
                 _outcome = RunOutcome.Failed;
+                return;
+            }
+
+            // 升级待选：世界由调用方停住，这里也不推进波次与节。
+            if (Growth.HasPendingChoice)
+            {
                 return;
             }
 
