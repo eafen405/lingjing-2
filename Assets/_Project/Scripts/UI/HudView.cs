@@ -68,6 +68,10 @@ namespace Lingjing.UI
 
             var hud = view.Root.AddComponent<HudView>();
             hud.View = view;
+
+            // 设备上的刘海/圆角/挖孔：把 HUD 内容收进安全区。桌面整屏时锚点回到 0..1，等于没改。
+            view.Root.gameObject.AddComponent<UiSafeArea>();
+
             hud.Init(view.Root.transform, onPause);
             view.Show(true);
             return hud;

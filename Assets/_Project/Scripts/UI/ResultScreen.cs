@@ -65,6 +65,15 @@ namespace Lingjing.UI
             _score.text = $"{UiText.Score} {score}";
             _highScore.text = $"{UiText.HighScore} {highScore}";
             View.Show(true);
+
+            // 通关/失败演出用 DOTween 补一层淡入：DoozyUI 负责显隐与层级，补间只管观感。
+            CanvasGroup group = View.Root.GetComponent<CanvasGroup>();
+            if (group == null)
+            {
+                group = View.Root.gameObject.AddComponent<CanvasGroup>();
+            }
+
+            TweenFx.FadeIn(group, 0.22f);
         }
 
         public void Hide()

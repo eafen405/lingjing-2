@@ -314,7 +314,9 @@ namespace Lingjing.View
         void OnPickupTaken(Pickup pickup)
         {
             _audio?.PlaySfx(pickup.Kind == PickupKind.Health ? "sfx_pickup_health" : "sfx_pickup_energy", 0.8f);
-            _fx?.Play("pickup", new Vector3((float)pickup.Pos.X, (float)pickup.Pos.Y, 0f));
+            var at = new Vector3((float)pickup.Pos.X, (float)pickup.Pos.Y, 0f);
+            _fx?.Play("pickup", at);
+            TweenFx.PopSprite(pickup.Kind == PickupKind.Health ? healthSprite : energySprite, at, 9);
         }
 
         void OnPlayerHurt(double amount)

@@ -1,3 +1,4 @@
+using DG.Tweening;
 using Lingjing.UI;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,10 +9,11 @@ namespace Lingjing.View
     /// 世界层伤害数字：池化的 TextMesh，命中时在敌人头顶弹出来、上浮并淡出。
     /// 为什么不用 UI Canvas：数字要贴着世界层一起缩放、跟着像素相机走，走 Canvas 反而要每帧做
     /// WorldToScreenPoint 转换，还会和 Fairy 层的界面抢层级。
+    /// 补间交给 DOTween（未缩放时间）：命中顿帧把 timeScale 打成 0 时，数字照样飘完。
     /// </summary>
     public sealed class DamageNumber : MonoBehaviour
     {
-        /// <summary>整条动画时长（秒）。用 unscaledDeltaTime，顿帧期间照样播完。</summary>
+        /// <summary>整条动画时长（秒）。</summary>
         public const float LifeSeconds = 0.55f;
 
         /// <summary>上浮距离（单位）。</summary>
@@ -24,9 +26,6 @@ namespace Lingjing.View
         static Transform _root;
 
         TextMesh _mesh;
-        MeshRenderer _meshRenderer;
-        Vector3 _origin;
-        float _age;
         Color _color = Color.white;
 
         public static void Spawn(Vector3 worldPosition, double amount)
@@ -44,15 +43,28 @@ namespace Lingjing.View
 
             DamageNumber number = Pool.Count > 0 ? Pool.Pop() : Create();
             number.transform.SetParent(_root, false);
-            number.transform.position = worldPosition + new Vector3(Random.Range(-0.2f, 0.2f), 0.45f, 0f);
-            number.transform.localScale = Vector3.one * TextScale;
-            number._origin = number.transform.position;
-            number._age = 0f;
+            number.transform.DOKill();
+
+            Vector3 start = worldPosition + new Vector3(Random.Range(-0.2f, 0.2f), 0.45f, 0f);
+            number.transform.position = start;
+            number.transform.localScale = Vector3.one * (TextScale * 0.75f);
             number._mesh.text = Mathf.Max(1, Mathf.RoundToInt((float)amount)).ToString();
-            number._color = new Color(1f, 0.87f, 0.45f);
+            number._color = new Color(1f, 0.87f, 0.45f, 1f);
             number._mesh.color = number._color;
             number.gameObject.SetActive(true);
             number.enabled = true;
+
+            float life = LifeSeconds;
+            number.transform.DOScale(Vector3.one * TextScale, 0.1f).SetEase(Ease.OutQuad).SetUpdate(true);
+            number.transform.DOMove(start + Vector3.up * RiseUnits, life)
+                .SetEase(Ease.OutQuad)
+                .SetUpdate(true);
+
+            DOTween.To(() => number._mesh.color, c => number._mesh.color = c,
+                    new Color(number._color.r, number._color.g, number._color.b, 0f), life * 0.45f)
+                .SetDelay(life * 0.55f)
+                .SetUpdate(true)
+                .OnComplete(number.Despawn);
         }
 
         static DamageNumber Create()
@@ -65,11 +77,11 @@ namespace Lingjing.View
             if (font != null)
             {
                 number._mesh.font = font;
-                number._meshRenderer = go.GetComponent<MeshRenderer>();
-                if (number._meshRenderer != null)
+                MeshRenderer meshRenderer = go.GetComponent<MeshRenderer>();
+                if (meshRenderer != null)
                 {
-                    number._meshRenderer.sharedMaterial = font.material;
-                    number._meshRenderer.sortingOrder = 30;
+                    meshRenderer.sharedMaterial = font.material;
+                    meshRenderer.sortingOrder = 30;
                 }
             }
 
@@ -80,22 +92,6 @@ namespace Lingjing.View
             number._mesh.text = "0";
             go.SetActive(false);
             return number;
-        }
-
-        void Update()
-        {
-            _age += Time.unscaledDeltaTime;
-            float t = _age / LifeSeconds;
-            if (t >= 1f)
-            {
-                Despawn();
-                return;
-            }
-
-            // 先快后慢地上浮，尾巴几乎停住，读得清数字。
-            transform.position = _origin + new Vector3(0f, RiseUnits * Mathf.Sqrt(t), 0f);
-            float alpha = 1f - Mathf.Clamp01((t - 0.5f) / 0.5f);
-            _mesh.color = new Color(_color.r, _color.g, _color.b, alpha);
         }
 
         void Despawn()
