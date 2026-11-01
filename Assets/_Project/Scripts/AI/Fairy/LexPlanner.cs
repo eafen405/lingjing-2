@@ -601,14 +601,17 @@ namespace Lingjing.Fairy
 
                     ring += Math.Max(0.0, 1.0 - ringOffset / RingKernelWidth) * StepWeight;
 
-                    if (distance < 1e-9 || ringOffset > prediction.Enemy.Radius + BladeRing.TipRadius)
+                    if (distance < 1e-9 || distance > bladeRadius + prediction.Enemy.Radius + BladeRing.BladeHalfWidth)
                     {
                         continue;
                     }
 
                     Vec2 tangent = delta.Perpendicular() / distance;
                     double relative = spinSign * omega + (playerVelocity - prediction.Velocity).Dot(tangent) / bladeRadius;
-                    v += DamageRules.HitsPerSecond(bladeCount, relative) * StepWeight;
+
+                    // 命中机会 = 刀数 × 转速，与站位无关；相对速度只改伤害倍率（与模拟层同一套规则）。
+                    v += DamageRules.HitsPerSecond(bladeCount, omega)
+                         * DamageRules.RelativeDamageFactor(relative, omega) * StepWeight;
 
                     // 前瞻结束那一刻离环有多远：只算最近的一次接触，让她真的"停在环上"。
                     if (k == HorizonTicks)

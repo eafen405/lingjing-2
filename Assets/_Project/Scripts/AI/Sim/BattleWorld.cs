@@ -124,6 +124,11 @@ namespace Lingjing.Sim
             w.Tick = Tick;
             w.AstarBudget = SimConstants.AstarBudgetPerTick;
 
+            if (w.Player.InvulnerableTicks > 0)
+            {
+                w.Player.InvulnerableTicks--;
+            }
+
             if (!w.Player.Dead)
             {
                 Command applied = command;
@@ -251,7 +256,6 @@ namespace Lingjing.Sim
 
             for (int blade = 0; blade < bladeCount; blade++)
             {
-                Vec2 tip = ring.TipAt(p.Pos, blade);
                 for (int e = 0; e < enemies.Count; e++)
                 {
                     Enemy enemy = enemies[e];
@@ -260,8 +264,7 @@ namespace Lingjing.Sim
                         continue;
                     }
 
-                    double radius = enemy.Radius + BladeRing.TipRadius;
-                    if ((tip - enemy.Pos).LengthSquared > radius * radius)
+                    if (!ring.Covers(p.Pos, blade, enemy.Pos, enemy.Radius))
                     {
                         continue;
                     }
@@ -273,19 +276,21 @@ namespace Lingjing.Sim
 
         void ApplyBladeHit(Enemy enemy, int blade, Player p, BladeRing ring)
         {
-            enemy.TakeDamage(p.BladeDamage);
-
-            // 再次命中间隔 = 2π/|ω_rel|：静止时正好一圈，顺扫更短、逆扫更长（game-design §4.2）。
+            // 走位只改伤害倍率：顺着刃口切向走最多 ×1.3，逆着走最低 ×0.8（game-design §4.2 已改）。
             double omegaRel = DamageRules.OmegaRel(
                 ring.Omega, p.SpinSign, p.Vel.Normalized(), p.Vel.Length, enemy.Pos - p.Pos, ring.OuterRadius);
-            enemy.BladeCooldown[blade] = DamageRules.BladeHitIntervalTicks(omegaRel);
+            double damage = p.BladeDamage * DamageRules.RelativeDamageFactor(omegaRel, ring.Omega);
+            enemy.TakeDamage(damage);
+
+            // 同一把刀对同一只以骸，转满一圈才能再命中：命中机会与站位、移速都无关。
+            enemy.BladeCooldown[blade] = DamageRules.BladeHitIntervalTicks(ring.Omega);
 
             if (!FairyActive)
             {
                 p.Energy = Math.Min(Tuning.EnergyMax, p.Energy + Tuning.EnergyPerHit);
             }
 
-            BladeHit?.Invoke(enemy, p.BladeDamage);
+            BladeHit?.Invoke(enemy, damage);
 
             if (!enemy.Alive)
             {
@@ -498,7 +503,7 @@ namespace Lingjing.Sim
                 switch (enemy)
                 {
                     case TailLight:
-                        Hurt(EnemyTuning.TailLightContactDps * SimConstants.Dt);
+                        Hurt(EnemyTuning.TailLightContactDps * SimConstants.Dt, burst: false);
                         break;
                     case Striker striker when striker.CanHitDuringDash:
                         Hurt(EnemyTuning.StrikerDashImpact);
@@ -508,14 +513,30 @@ namespace Lingjing.Sim
             }
         }
 
-        void Hurt(double amount)
+        /// <summary>
+        /// 结算一次玩家伤害。<paramref name="burst"/> 为 true 的是冲刺/弹丸/落区这类一次性伤害：
+        /// 会给 0.5 秒受击无敌，避免同一波里被叠着打成秒杀。尾灯的贴身持续伤害走 burst=false，
+        /// 否则无敌帧会把 8/秒 的持续伤害切成断续的。
+        /// </summary>
+        void Hurt(double amount, bool burst = true)
         {
-            if (amount <= 0.0)
+            Player p = World.Player;
+            if (amount <= 0.0 || p.Dead)
             {
                 return;
             }
 
-            World.Player.TakeDamage(amount);
+            if (burst)
+            {
+                if (p.InvulnerableTicks > 0)
+                {
+                    return;
+                }
+
+                p.InvulnerableTicks = Tuning.PlayerInvulnerableTicks;
+            }
+
+            p.TakeDamage(amount);
             PlayerHurt?.Invoke(amount);
         }
 

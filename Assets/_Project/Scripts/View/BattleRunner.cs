@@ -75,6 +75,12 @@ namespace Lingjing.View
         /// <summary>击杀顿帧时长（秒）：3–4 帧，只在击杀触发。</summary>
         public const float KillFreezeSeconds = 0.06f;
 
+        /// <summary>命中顿帧时长（秒）：约 2 帧。很轻，但要能感觉到刀刃"咬"进身体。</summary>
+        public const float HitFreezeSeconds = 0.035f;
+
+        /// <summary>两次命中顿帧之间的最小间隔（秒）：多刀同时命中时不能每击都停。</summary>
+        public const float HitFreezeCooldownSeconds = 0.12f;
+
         ICommandSource _source;
 
         BattleWorld _world;
@@ -84,6 +90,7 @@ namespace Lingjing.View
         Material _flashMaterial;
         CameraFollow _camera;
         float _freezeUntil;
+        float _nextHitFreeze;
         float _playerFlashUntil;
         bool _playerFlashApplied;
         int _lastSectionIndex = -1;
@@ -132,6 +139,11 @@ namespace Lingjing.View
         public bool Ready => _world != null;
         public LevelRun Run => _run;
         public Transform PlayerTransform => _playerTx;
+
+        /// <summary>玩家当前速度（单位/秒），给相机做前瞻用。</summary>
+        public Vector2 PlayerVelocity => _world != null
+            ? new Vector2((float)_world.World.Player.Vel.X, (float)_world.World.Player.Vel.Y)
+            : Vector2.zero;
         public bool Paused => _paused;
         public bool ResultShown => _resultShown;
 
@@ -270,6 +282,16 @@ namespace Lingjing.View
             _hits++;
             _audio?.PlaySfxThrottled("sfx_hit", 0.045f, 0.7f);
 
+            // 命中给 2 帧顿帧 + 1px 震。限频到 0.12 秒一次：多刀同时切上去时不能每击都停。
+            if (Time.unscaledTime >= _nextHitFreeze)
+            {
+                _nextHitFreeze = Time.unscaledTime + HitFreezeCooldownSeconds;
+                Freeze(HitFreezeSeconds);
+                _camera?.Shake(1, 0.08f);
+            }
+
+            DamageNumber.Spawn(new Vector3((float)enemy.Pos.X, (float)enemy.Pos.Y, 0f), damage);
+
             // 火花放在刀刃压上去的那一侧，不是敌人中心：刀从哪个方向切进来，火花就从哪儿炸。
             if (_fx != null && _world != null)
             {
@@ -297,6 +319,7 @@ namespace Lingjing.View
 
         void OnPlayerHurt(double amount)
         {
+            _audio?.PlaySfxThrottled("sfx_hurt", 0.3f, 0.85f);
             _playerFlashUntil = Time.time + HitFlashSeconds * 1.6f;
             _hud?.PulseHurt();
             _camera?.Shake(2, 0.16f);
@@ -316,6 +339,7 @@ namespace Lingjing.View
 
         void OnPlayerDied()
         {
+            _playerAnim?.SetState("death");
             _audio?.PlaySfx("sfx_death");
             _audio?.Say("vo_fairy_death");
         }

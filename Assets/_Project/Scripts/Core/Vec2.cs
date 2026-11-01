@@ -43,6 +43,24 @@ public readonly struct Vec2 : IEquatable<Vec2>
     public double DistanceTo(Vec2 o) => (this - o).Length;
     public double DistanceSquaredTo(Vec2 o) => (this - o).LengthSquared;
 
+    /// <summary>
+    /// 点到线段 [a,b] 的最短距离。刀刃是「圆心→刀尖」的一条线段，命中判定用它：
+    /// 只要以骸贴着这条线，无论它站在环上还是已经贴到身上，都会被扫到。
+    /// </summary>
+    public double DistanceToSegment(Vec2 a, Vec2 b)
+    {
+        Vec2 ab = b - a;
+        double lengthSquared = ab.LengthSquared;
+        if (lengthSquared <= 1e-12)
+        {
+            return DistanceTo(a);
+        }
+
+        double t = (this - a).Dot(ab) / lengthSquared;
+        t = t < 0.0 ? 0.0 : (t > 1.0 ? 1.0 : t);
+        return DistanceTo(a + ab * t);
+    }
+
     public static Vec2 Lerp(Vec2 a, Vec2 b, double t) => new(a.X + (b.X - a.X) * t, a.Y + (b.Y - a.Y) * t);
     public static Vec2 FromAngle(double radians) => new(Math.Cos(radians), Math.Sin(radians));
 

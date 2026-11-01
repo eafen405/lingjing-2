@@ -44,7 +44,7 @@ public abstract class Enemy
         Radius = EnemyTuning.Radius(kind);
     }
 
-    /// <summary>每把刀一个独立冷却（tick）。间隔由 DamageRules.BladeHitIntervalTicks 按 ω_rel 给出。</summary>
+    /// <summary>每把刀一个独立冷却（tick）。间隔由 DamageRules.BladeHitIntervalTicks(ω) 给出，等于这把刀转一圈的时间。</summary>
     public int[] BladeCooldown => _bladeCooldown;
 
     /// <summary>刀数随成长变化，冷却槽按需扩容；新槽从 0 开始，等于新刀落地即可命中。</summary>

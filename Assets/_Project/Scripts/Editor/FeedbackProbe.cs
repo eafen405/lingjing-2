@@ -35,9 +35,9 @@ namespace Lingjing.Editor
         static void CheckNumbers()
         {
             Expect("半径", Tuning.RingRadius, 2.2);
-            Expect("移速", Tuning.PlayerSpeed, 4.8);
-            Expect("角速度", Tuning.RingOmega, 2.5);
-            Expect("刀伤", Tuning.BladeDamage, 12.0);
+            Expect("移速", Tuning.PlayerSpeed, 5.4);
+            Expect("角速度", Tuning.RingOmega, 3.0);
+            Expect("刀伤", Tuning.BladeDamage, 18.0);
             Expect("命中回能", Tuning.EnergyPerHit, 1.0);
             Expect("击杀回能", Tuning.EnergyPerKill, 8.0);
             Expect("代行秒数", Tuning.FairySeconds, 10.0);
@@ -79,7 +79,7 @@ namespace Lingjing.Editor
             Expect("撞针 HP", EnemyTuning.MaxHp(EnemyKind.Striker), 55.0);
             Expect("钉枪 HP", EnemyTuning.MaxHp(EnemyKind.NailGun), 45.0);
             Expect("坠物 HP", EnemyTuning.MaxHp(EnemyKind.Dropper), 60.0);
-            Expect("恶名以骸 HP", EnemyTuning.MaxHp(EnemyKind.ChainBoss), 600.0);
+            Expect("恶名以骸 HP", EnemyTuning.MaxHp(EnemyKind.ChainBoss), 400.0);
 
             // 判定体积要盖住可见身体：素材实测普通以骸体宽 36–38px（1.1–1.2 单位），
             // 半径低于 0.45 就会出现「刀从身上划过去却没命中」。

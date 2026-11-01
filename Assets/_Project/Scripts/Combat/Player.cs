@@ -37,6 +37,9 @@ public sealed class Player
 
     public int ReverseCooldown;
 
+    /// <summary>受击无敌剩余 tick。一次性伤害会点亮它，贴身持续伤害不看它（见 BattleWorld.Hurt）。</summary>
+    public int InvulnerableTicks;
+
     public double DamageTakenTotal;
 
     public readonly BladeRing Ring = new();

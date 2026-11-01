@@ -24,9 +24,9 @@ namespace Lingjing.Level
         /// <summary>节间停顿 1.5s：给"第 N 节"提示与喘息留窗口。</summary>
         public const int SectionBreakTicks = 90;
 
-        /// <summary>波次落点半径：8–14 单位（半屏到接近一屏）。</summary>
-        public const double SpawnRadiusMin = 8.0;
-        public const double SpawnRadiusMax = 14.0;
+        /// <summary>波次落点半径：7–11 单位（半屏到接近一屏）。</summary>
+        public const double SpawnRadiusMin = 7.0;
+        public const double SpawnRadiusMax = 11.0;
 
         /// <summary>落点净空：以骸半径 0.35 再留一点余量，避免落地就卡在墙角。</summary>
         public const double SpawnClearance = 0.5;

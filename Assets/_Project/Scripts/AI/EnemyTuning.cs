@@ -14,7 +14,7 @@ namespace Lingjing.AI
             EnemyKind.Striker => 55.0,
             EnemyKind.NailGun => 45.0,
             EnemyKind.Dropper => 60.0,
-            EnemyKind.ChainBoss => 600.0,
+            EnemyKind.ChainBoss => 400.0,
             _ => 40.0
         };
 

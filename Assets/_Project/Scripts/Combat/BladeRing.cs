@@ -15,6 +15,12 @@ public sealed class BladeRing
     /// <summary>刀尖视为点；命中判定用点 vs 敌人圆。</summary>
     public const double TipRadius = 0.0;
 
+    /// <summary>
+    /// 刀刃的半宽（单位，≈6px）。刀不是一根数学线：判定按「圆心→刀尖」的线段向外扩这么宽，
+    /// 所以以骸贴着刀身就算命中，不必正好落在某个半径上。
+    /// </summary>
+    public const double BladeHalfWidth = 0.18;
+
     public BladeRing()
     {
         Inner = new InnerRing();
@@ -45,6 +51,14 @@ public sealed class BladeRing
     public double AngleOf(int index) => Phase + index * BladeGap;
 
     public Vec2 TipAt(Vec2 center, int index) => center + Vec2.FromAngle(AngleOf(index)) * OuterRadius;
+
+    /// <summary>
+    /// 这一刀是否扫到以骸：判定体是「圆心→刀尖」的线段，外扩刀半宽。
+    /// 旧版只判刀尖一个点，结果贴身的以骸永远落在半径之内、打不到；改成线段后，
+    /// 半径以内的任何位置都会被扫到，走位只影响伤害高低，不再影响「能不能打到」。
+    /// </summary>
+    public bool Covers(Vec2 center, int index, Vec2 target, double targetRadius)
+        => target.DistanceToSegment(center, TipAt(center, index)) <= targetRadius + BladeHalfWidth;
 
     public void Advance(int spinSign, double dt)
     {

@@ -13,12 +13,17 @@ namespace Lingjing.Core
         public const double PlayerRadius = 0.4;
 
         /// <summary>移动速度（单位/秒）。</summary>
-        public const double PlayerSpeed = 4.8;
+        public const double PlayerSpeed = 5.4;
 
         /// <summary>加速度（单位/秒²）：越大转向越硬，越小越滑。</summary>
         public const double PlayerAcceleration = 60.0;
 
         public const double PlayerMaxHp = 100.0;
+
+        /// <summary>受击无敌（秒）：只对冲刺/弹丸/落区这类一次性伤害生效。</summary>
+        public const double PlayerInvulnerableSeconds = 0.5;
+
+        public const int PlayerInvulnerableTicks = (int)(PlayerInvulnerableSeconds * 60.0);
 
         // ── 飞刀环 ─────────────────────────────────────────────
         /// <summary>外圈初始刀数。</summary>
@@ -31,10 +36,10 @@ namespace Lingjing.Core
         public const double RingRadius = 2.2;
 
         /// <summary>角速度（弧度/秒）。一圈 = 2π/ω。</summary>
-        public const double RingOmega = 2.5;
+        public const double RingOmega = 3.0;
 
-        /// <summary>每把刀的单次伤害。</summary>
-        public const double BladeDamage = 12.0;
+        /// <summary>每把刀的单次伤害。基数按 demo 节奏抬过一档：尾灯 3 刀、撞针 4 刀。</summary>
+        public const double BladeDamage = 18.0;
 
         // ── 充能 ───────────────────────────────────────────────
         public const double EnergyMax = 100.0;
