@@ -52,6 +52,8 @@ namespace Lingjing.Level
 
             // 经验只由击杀产生（§7.1）。挂在这里而不是表现层，是为了让无头探针也能跑出成长。
             _world.EnemyKilled += OnEnemyKilled;
+
+            SpawnSupplies();
         }
 
         /// <summary>关内经验与三选一。待选期间整个局停住。</summary>
@@ -157,6 +159,28 @@ namespace Lingjing.Level
             _sectionIndex++;
             _waveIndex = 0;
             _breakTicksLeft = SectionBreakTicks;
+            SpawnSupplies();
+        }
+
+        /// <summary>每节开始时把固定补给点刷出来（§7.3）。</summary>
+        void SpawnSupplies()
+        {
+            SupplyDef[] supplies = _level.supplies;
+            if (supplies == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < supplies.Length; i++)
+            {
+                SupplyDef supply = supplies[i];
+                if (supply == null || !SupplyKindNames.TryParse(supply.kind, out PickupKind kind))
+                {
+                    continue;
+                }
+
+                _world.World.SpawnPickup(kind, new Vec2(supply.x + 0.5, supply.y + 0.5));
+            }
         }
 
         void SpawnWave(WaveDef wave)

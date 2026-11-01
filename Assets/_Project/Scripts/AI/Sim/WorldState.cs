@@ -23,8 +23,11 @@ public sealed class WorldState
     public readonly List<Enemy> Enemies = new();
     public readonly List<Projectile> Projectiles = new();
     public readonly List<HazardZone> Zones = new();
+    public readonly List<Pickup> Pickups = new();
 
     public int Tick;
+
+    int _nextPickupId = 1;
 
     /// <summary>本 tick 剩余的 A* 配额（每 tick 最多 4 条）。</summary>
     public int AstarBudget;
@@ -50,6 +53,11 @@ public sealed class WorldState
     public void SpawnZone(double x, double y, int warnTicks)
     {
         Zones.Add(new HazardZone { X = x, Y = y, WarnTicksLeft = warnTicks });
+    }
+
+    public void SpawnPickup(PickupKind kind, Vec2 pos)
+    {
+        Pickups.Add(new Pickup { Id = _nextPickupId++, Kind = kind, Pos = pos, SpawnTick = Tick });
     }
 }
 }

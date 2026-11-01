@@ -23,6 +23,8 @@ namespace Lingjing.Editor
         const string EousIdle = "Assets/_Project/Art/Characters/eous/idle/eous_idle_s_00.png";
         const string TailLightIdle = "Assets/_Project/Art/Enemies/taillight/idle/taillight_idle_s_00.png";
         const string Knife = "Assets/_Project/Art/Items/knife/knife_00.png";
+        const string HealthPickup = "Assets/_Project/Art/Items/pickup_health/pickup_health_00.png";
+        const string EnergyPickup = "Assets/_Project/Art/Items/pickup_energy/pickup_energy_00.png";
 
         /// <summary>两关一起生成；场景清单统一走 SceneCatalog，避免谁后跑谁覆盖。</summary>
         public static void Run()
@@ -64,6 +66,8 @@ namespace Lingjing.Editor
             runner.playerSprite = LoadSprite(EousIdle);
             runner.enemySprite = LoadSprite(TailLightIdle);
             runner.bladeSprite = LoadSprite(Knife);
+            runner.healthSprite = LoadSprite(HealthPickup);
+            runner.energySprite = LoadSprite(EnergyPickup);
             runner.viewCamera = cam;
             runner.levelJson = levelData;
             runner.levelId = levelId;

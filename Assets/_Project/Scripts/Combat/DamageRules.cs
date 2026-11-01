@@ -39,6 +39,19 @@ public static class DamageRules
     /// <summary>尾灯贴身持续伤害：每秒 8（按 dt 摊到每 tick）。</summary>
     public const double TailLightContactDps = 8.0;
 
+    /// <summary>拾取半径（中心距）：走进 0.6 单位自动拾取，不占按键（§7.3）。</summary>
+    public const double PickupRadius = 0.6;
+
+    /// <summary>血包回复量（满血 100 的 30%）。</summary>
+    public const double HealthPickupAmount = 30.0;
+
+    /// <summary>能量球回复量（满槽 100 的 30%）。</summary>
+    public const double EnergyPickupAmount = 30.0;
+
+    /// <summary>击杀掉落概率：血包 12%、能量球 18%；恶名以骸必掉血包。</summary>
+    public const double HealthDropChance = 0.12;
+    public const double EnergyDropChance = 0.18;
+
     /// <summary>撞针冲刺撞击：一次性 15。</summary>
     public const double StrikerDashImpact = 15.0;
 

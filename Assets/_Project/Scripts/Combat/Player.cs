@@ -54,5 +54,16 @@ public sealed class Player
         Hp -= applied;
         DamageTakenTotal += applied;
     }
+
+    /// <summary>拾取回血。死了不能靠拾取复活，所以 Hp 已经是 0 时直接忽略。</summary>
+    public void Heal(double amount)
+    {
+        if (amount <= 0.0 || Hp <= 0.0)
+        {
+            return;
+        }
+
+        Hp = Math.Min(MaxHp, Hp + amount);
+    }
 }
 }

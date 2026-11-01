@@ -21,6 +21,9 @@ namespace Lingjing.Sim
 
         public bool PlayerDead => World.Player.Dead;
 
+        /// <summary>已经拾取的掉落物总数。</summary>
+        public int PickupsTaken { get; private set; }
+
         /// <summary>飞刀命中：参数为被命中的以骸与本刀伤害。</summary>
         public event Action<Enemy, double> BladeHit;
 
@@ -134,6 +137,7 @@ namespace Lingjing.Sim
             ApplySeparation();
             UpdateProjectiles();
             UpdateZones();
+            UpdatePickups();
             ApplyContactDamage();
 
             Compact();
@@ -266,6 +270,7 @@ namespace Lingjing.Sim
                     p.Energy = Math.Min(DamageRules.EnergyMax, p.Energy + DamageRules.EnergyPerKill);
                 }
 
+                RollDrop(enemy);
                 EnemyKilled?.Invoke(enemy);
             }
         }
@@ -386,6 +391,61 @@ namespace Lingjing.Sim
             }
         }
 
+        /// <summary>击杀掉落：恶名以骸必掉血包，其余按概率（game-design §7.3）。</summary>
+        void RollDrop(Enemy enemy)
+        {
+            if (enemy.Kind == EnemyKind.ChainBoss)
+            {
+                World.SpawnPickup(PickupKind.Health, enemy.Pos);
+                return;
+            }
+
+            double roll = World.Rng.NextDouble();
+            if (roll < DamageRules.HealthDropChance)
+            {
+                World.SpawnPickup(PickupKind.Health, enemy.Pos);
+            }
+            else if (roll < DamageRules.HealthDropChance + DamageRules.EnergyDropChance)
+            {
+                World.SpawnPickup(PickupKind.Energy, enemy.Pos);
+            }
+        }
+
+        /// <summary>走进 0.6 单位自动拾取，不占按键。</summary>
+        void UpdatePickups()
+        {
+            Player p = World.Player;
+            List<Pickup> pickups = World.Pickups;
+            const double reach = DamageRules.PickupRadius;
+
+            for (int i = 0; i < pickups.Count; i++)
+            {
+                Pickup pickup = pickups[i];
+                if (pickup.Taken)
+                {
+                    continue;
+                }
+
+                if ((pickup.Pos - p.Pos).LengthSquared > reach * reach)
+                {
+                    continue;
+                }
+
+                pickup.Taken = true;
+                PickupsTaken++;
+
+                switch (pickup.Kind)
+                {
+                    case PickupKind.Health:
+                        p.Heal(DamageRules.HealthPickupAmount);
+                        break;
+                    case PickupKind.Energy:
+                        p.Energy = Math.Min(DamageRules.EnergyMax, p.Energy + DamageRules.EnergyPickupAmount);
+                        break;
+                }
+            }
+        }
+
         void ApplyContactDamage()
         {
             Player p = World.Player;
@@ -438,6 +498,7 @@ namespace Lingjing.Sim
             World.Enemies.RemoveAll(static e => !e.Alive);
             World.Projectiles.RemoveAll(static p => !p.Alive);
             World.Zones.RemoveAll(static z => z.Resolved);
+            World.Pickups.RemoveAll(static x => x.Taken);
         }
     }
 }

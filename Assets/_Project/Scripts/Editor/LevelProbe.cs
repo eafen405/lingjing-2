@@ -57,13 +57,13 @@ namespace Lingjing.Editor
             Result m2 = Simulate(level2, false);
 
             Debug.Log($"[level] L1 run1 outcome={a.Outcome} kills={a.Kills}/{expected1} sections={a.LastSection + 1}/{a.SectionCount} " +
-                      $"ticks={a.Ticks} hp={a.Hp:0.0} pos=({a.Pos.X:0.##},{a.Pos.Y:0.##})");
+                      $"ticks={a.Ticks} hp={a.Hp:0.0} pos=({a.Pos.X:0.##},{a.Pos.Y:0.##}) supplies={a.Supplies} picked={a.Picked}");
             Debug.Log($"[level] L1 run2 outcome={b.Outcome} kills={b.Kills}/{expected1} sections={b.LastSection + 1}/{b.SectionCount} ticks={b.Ticks}");
             Debug.Log($"[level] L2      outcome={c.Outcome} kills={c.Kills}/{expected2} sections={c.LastSection + 1}/{c.SectionCount} ticks={c.Ticks} " +
                       $"levels={c.Levels} blades={c.Blades} dmg={c.Damage:0.#}");
             Debug.Log($"[level] 真实血量（只作参考，不判定）：" +
-                      $"L1 outcome={m1.Outcome} kills={m1.Kills}/{expected1} sections={m1.LastSection + 1} 存活{m1.Ticks / 60.0:0.0}s hp={m1.Hp:0.0}；" +
-                      $"L2 outcome={m2.Outcome} kills={m2.Kills}/{expected2} sections={m2.LastSection + 1} 存活{m2.Ticks / 60.0:0.0}s hp={m2.Hp:0.0}");
+                      $"L1 outcome={m1.Outcome} kills={m1.Kills}/{expected1} sections={m1.LastSection + 1} 存活{m1.Ticks / 60.0:0.0}s hp={m1.Hp:0.0} picked={m1.Picked}；" +
+                      $"L2 outcome={m2.Outcome} kills={m2.Kills}/{expected2} sections={m2.LastSection + 1} 存活{m2.Ticks / 60.0:0.0}s hp={m2.Hp:0.0} picked={m2.Picked}");
 
             bool deterministic = a.Kills == b.Kills && a.Ticks == b.Ticks && a.Pos.Equals(b.Pos);
             bool l1Cleared = a.Outcome == RunOutcome.Cleared && a.Kills == expected1 && a.LastSection == a.SectionCount - 1;
@@ -132,6 +132,9 @@ namespace Lingjing.Editor
             int kills = 0;
             world.EnemyKilled += _ => kills++;
 
+            // 每节的固定补给点在 LevelRun 构造时就刷出来了。
+            int supplies = world.World.Pickups.Count;
+
             int lastSection = 0;
             int ticks = 0;
             var trail = new System.Text.StringBuilder();
@@ -182,6 +185,8 @@ namespace Lingjing.Editor
                 Levels = run.Growth.Level,
                 Blades = world.World.Player.Ring.BladeCount,
                 Damage = world.World.Player.BladeDamage,
+                Supplies = supplies,
+                Picked = world.PickupsTaken,
                 Trail = trail.ToString()
             };
         }
@@ -229,6 +234,8 @@ namespace Lingjing.Editor
             public int Levels;
             public int Blades;
             public double Damage;
+            public int Supplies;
+            public int Picked;
             public string Trail;
         }
     }

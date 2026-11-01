@@ -25,6 +25,9 @@ namespace Lingjing.Level
         /// <summary>场内障碍矩形（墙角掩体、挡路物）。</summary>
         public RectDef[] obstacles;
 
+        /// <summary>每节开始时刷新到这些固定点的补给（§7.3「每节 2–3 个固定补给点」）。</summary>
+        public SupplyDef[] supplies;
+
         /// <summary>节，按顺序推进；最后一节的最后一波应含恶名以骸。</summary>
         public SectionDef[] sections;
     }
@@ -58,6 +61,17 @@ namespace Lingjing.Level
         public int y;
         public int w;
         public int h;
+    }
+
+    [Serializable]
+    public sealed class SupplyDef
+    {
+        /// <summary>格坐标；实际落点是格中心。</summary>
+        public int x;
+        public int y;
+
+        /// <summary>"Health" 或 "Energy"，映射见 <see cref="SupplyKindNames"/>。</summary>
+        public string kind;
     }
 
     /// <summary>levels.json 的根对象。JsonUtility 不支持顶层数组，所以包一层。</summary>

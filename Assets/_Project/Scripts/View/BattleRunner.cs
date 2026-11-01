@@ -22,6 +22,8 @@ namespace Lingjing.View
         public Sprite playerSprite;
         public Sprite enemySprite;
         public Sprite bladeSprite;
+        public Sprite healthSprite;
+        public Sprite energySprite;
 
         [Header("关卡")]
         [Tooltip("levels.json（Assets/_Project/Data），由场景生成器烘进来")]
@@ -44,6 +46,8 @@ namespace Lingjing.View
         readonly List<Transform> _blades = new List<Transform>();
         readonly Dictionary<int, EnemyView> _enemyViews = new Dictionary<int, EnemyView>();
         readonly List<int> _staleIds = new List<int>();
+        readonly Dictionary<int, SpriteRenderer> _pickupViews = new Dictionary<int, SpriteRenderer>();
+        readonly List<int> _stalePickupIds = new List<int>();
         ActorAnimator _playerAnim;
 
         sealed class EnemyView
@@ -383,6 +387,59 @@ namespace Lingjing.View
                 }
 
                 _enemyViews.Remove(_staleIds[i]);
+            }
+
+            SyncPickups();
+        }
+
+        /// <summary>掉落物：按 Id 绑定，被拾取后下一帧销毁。位置在生成时就定死，不会移动。</summary>
+        void SyncPickups()
+        {
+            List<Pickup> pickups = _world.World.Pickups;
+            for (int i = 0; i < pickups.Count; i++)
+            {
+                Pickup pickup = pickups[i];
+                if (_pickupViews.ContainsKey(pickup.Id))
+                {
+                    continue;
+                }
+
+                var go = new GameObject("Pickup" + pickup.Id);
+                go.transform.position = new Vector3((float)pickup.Pos.X, (float)pickup.Pos.Y, 0f);
+                var sr = go.AddComponent<SpriteRenderer>();
+                sr.sprite = pickup.Kind == PickupKind.Health ? healthSprite : energySprite;
+                sr.sortingOrder = 6;
+                _pickupViews.Add(pickup.Id, sr);
+            }
+
+            _stalePickupIds.Clear();
+            foreach (KeyValuePair<int, SpriteRenderer> pair in _pickupViews)
+            {
+                bool alive = false;
+                for (int i = 0; i < pickups.Count; i++)
+                {
+                    if (pickups[i].Id == pair.Key)
+                    {
+                        alive = true;
+                        break;
+                    }
+                }
+
+                if (!alive)
+                {
+                    _stalePickupIds.Add(pair.Key);
+                }
+            }
+
+            for (int i = 0; i < _stalePickupIds.Count; i++)
+            {
+                SpriteRenderer sr = _pickupViews[_stalePickupIds[i]];
+                if (sr != null)
+                {
+                    Destroy(sr.gameObject);
+                }
+
+                _pickupViews.Remove(_stalePickupIds[i]);
             }
         }
 
