@@ -22,6 +22,8 @@ namespace Lingjing.UI
         Text _fairyText;
         Text _sectionText;
         Text _bannerText;
+        Text _subtitleText;
+        GameObject _subtitleObject;
         GameObject _bannerObject;
         GameObject _emblemObject;
         UiBar _hpBar;
@@ -95,6 +97,33 @@ namespace Lingjing.UI
 
             _bannerObject = banner.gameObject;
             _bannerObject.SetActive(false);
+
+            // 字幕贴底居中：左右下角分别留给摇杆与技能键。
+            RectTransform subtitle = UiKit.CreatePanel(root, "Subtitle", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f),
+                new Vector2(0f, 108f), new Vector2(760f, 62f), UiPalette.Panel);
+            subtitle.GetComponent<Image>().raycastTarget = false;
+
+            _subtitleText = UiKit.CreateLabel(subtitle, string.Empty, 24, TextAnchor.MiddleCenter, center, center,
+                Vector2.zero, new Vector2(724f, 52f), UiPalette.Text);
+
+            _subtitleObject = subtitle.gameObject;
+            _subtitleObject.SetActive(false);
+        }
+
+        /// <summary>字幕：Fairy 说话时才有内容。传 null/空串即收起。</summary>
+        public void SetSubtitle(string text)
+        {
+            bool show = !string.IsNullOrEmpty(text);
+
+            if (_subtitleText != null)
+            {
+                _subtitleText.text = show ? text : string.Empty;
+            }
+
+            if (_subtitleObject != null && _subtitleObject.activeSelf != show)
+            {
+                _subtitleObject.SetActive(show);
+            }
         }
 
         /// <summary>节进度：数字常驻，换节停顿期间把中间的大提示亮出来。</summary>

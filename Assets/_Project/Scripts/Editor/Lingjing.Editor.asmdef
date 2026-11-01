@@ -5,6 +5,7 @@
         "Lingjing.Core",
         "Lingjing.Combat",
         "Lingjing.AI",
+        "Lingjing.Audio",
         "Lingjing.Data",
         "Lingjing.Level",
         "Lingjing.UI",

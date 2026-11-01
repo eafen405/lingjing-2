@@ -19,6 +19,7 @@ namespace Lingjing.Editor
         public const string ScenePath = SceneCatalog.Level1;
         public const string SecondScenePath = SceneCatalog.Level2;
         public const string LevelDataPath = "Assets/_Project/Data/levels.json";
+        public const string VoiceDataPath = "Assets/_Project/Data/voice.json";
 
         const string EousIdle = "Assets/_Project/Art/Characters/eous/idle/eous_idle_s_00.png";
         const string TailLightIdle = "Assets/_Project/Art/Enemies/taillight/idle/taillight_idle_s_00.png";
@@ -35,15 +36,21 @@ namespace Lingjing.Editor
                 Debug.LogError($"[m1] 找不到关卡数据：{LevelDataPath}");
             }
 
-            Build(ScenePath, 1, levelData);
-            Build(SecondScenePath, 2, levelData);
+            var voiceData = AssetDatabase.LoadAssetAtPath<TextAsset>(VoiceDataPath);
+            if (voiceData == null)
+            {
+                Debug.LogError($"[m1] 找不到台词数据：{VoiceDataPath}");
+            }
+
+            Build(ScenePath, 1, levelData, voiceData);
+            Build(SecondScenePath, 2, levelData, voiceData);
 
             SceneCatalog.Sync();
             AssetDatabase.SaveAssets();
-            Debug.Log($"[m1] scenes saved: {ScenePath}, {SecondScenePath}; levelData={levelData != null}");
+            Debug.Log($"[m1] scenes saved: {ScenePath}, {SecondScenePath}; levelData={levelData != null} voiceData={voiceData != null}");
         }
 
-        static void Build(string scenePath, int levelId, TextAsset levelData)
+        static void Build(string scenePath, int levelId, TextAsset levelData, TextAsset voiceData)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(scenePath) ?? "Assets/_Project/Scenes");
 
@@ -71,6 +78,7 @@ namespace Lingjing.Editor
             runner.viewCamera = cam;
             runner.levelJson = levelData;
             runner.levelId = levelId;
+            runner.voiceJson = voiceData;
 
             var follow = camGo.AddComponent<CameraFollow>();
             follow.runner = runner;

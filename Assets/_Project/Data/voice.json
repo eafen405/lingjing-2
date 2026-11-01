@@ -1,0 +1,14 @@
+{
+  "lines": [
+    { "id": "vo_fairy_level_start_1", "text": "已进入空洞入口，请主人保持移动。" },
+    { "id": "vo_fairy_first_sight_airdrop", "text": "检测到空降以骸，请主人注意躲避。" },
+    { "id": "vo_fairy_boss_intro", "text": "警告，恶名以骸接近。" },
+    { "id": "vo_fairy_daika_start", "text": "授权已确认。" },
+    { "id": "vo_fairy_daika_end", "text": "控制权已归还，请主人查看本次电费账单。" },
+    { "id": "vo_fairy_low_hp", "text": "警告，生命值过低。请脱离包围。" },
+    { "id": "vo_fairy_death", "text": "结论：数据回收完毕。" },
+    { "id": "vo_fairy_tut_knife", "text": "检测到飞刀损耗。" },
+    { "id": "vo_fairy_menu_idle", "text": "主人，您已经放弃思考了吗？" },
+    { "id": "vo_fairy_menu_idle_2", "text": "主人，我正在待机。感谢您赐予我偷懒的机会。" }
+  ]
+}

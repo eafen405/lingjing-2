@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Lingjing.AI;
+using Lingjing.Audio;
 using Lingjing.Combat;
 using Lingjing.Core;
 using Lingjing.Fairy;
@@ -31,6 +32,10 @@ namespace Lingjing.View
         public int levelId = 1;
         public ulong seed = 7;
 
+        [Header("音频")]
+        [Tooltip("voice.json（Assets/_Project/Data）：台词 id → 字幕文本")]
+        public TextAsset voiceJson;
+
         [Header("引用")]
         [Tooltip("留空则运行时自动搭触屏 HUD（摇杆 + 两个按钮）")]
         public MonoBehaviour input;
@@ -40,6 +45,9 @@ namespace Lingjing.View
 
         BattleWorld _world;
         LevelRun _run;
+        AudioDirector _audio;
+        int _lastSectionIndex = -1;
+        bool _bossAnnounced;
         Transform _playerTx;
         SpriteRenderer _playerSr;
         Transform _bladeRoot;
@@ -87,6 +95,7 @@ namespace Lingjing.View
             }
 
             _source = input as ICommandSource;
+            _audio = AudioDirector.Attach(gameObject, VoiceLineTable.Parse(voiceJson != null ? voiceJson.text : null));
             Build();
             BuildUi();
         }
@@ -108,8 +117,12 @@ namespace Lingjing.View
             Grid grid = LevelField.Build(level);
             _world = new BattleWorld(grid, LevelField.PlayerStart(grid), seed);
             _world.SetFairyPlanner(new LexPlanner());
-            _world.BladeHit += (_, __) => _hits++;
+            _world.BladeHit += OnBladeHit;
             _world.EnemyKilled += OnEnemyKilled;
+            _world.PickupTaken += OnPickupTaken;
+            _world.FairyStarted += OnFairyStarted;
+            _world.FairyEnded += OnFairyEnded;
+            _world.PlayerDied += OnPlayerDied;
 
             // 一局的推进规则独立于世界：世界只管 1/60 步进，节与波次归 LevelRun。
             _run = new LevelRun(level, _world, seed);
@@ -120,6 +133,37 @@ namespace Lingjing.View
             // 立刻投第一波，避免开场空场等一个 tick。
             _run.Tick();
             Sync();
+
+            _audio?.Say("vo_fairy_level_start_1");
+        }
+
+        void OnBladeHit(Enemy enemy, double damage)
+        {
+            _hits++;
+            _audio?.PlaySfxThrottled("sfx_hit", 0.045f, 0.7f);
+        }
+
+        void OnPickupTaken(Pickup pickup)
+        {
+            _audio?.PlaySfx(pickup.Kind == PickupKind.Health ? "sfx_pickup_health" : "sfx_pickup_energy", 0.8f);
+        }
+
+        void OnFairyStarted()
+        {
+            _audio?.PlaySfx("sfx_fairy_start");
+            _audio?.Say("vo_fairy_daika_start");
+        }
+
+        void OnFairyEnded()
+        {
+            _audio?.PlaySfx("sfx_fairy_end");
+            _audio?.Say("vo_fairy_daika_end");
+        }
+
+        void OnPlayerDied()
+        {
+            _audio?.PlaySfx("sfx_death");
+            _audio?.Say("vo_fairy_death");
         }
 
         LevelDef LoadCurrentLevel()
@@ -157,6 +201,7 @@ namespace Lingjing.View
         void OnEnemyKilled(Enemy enemy)
         {
             _kills++;
+            _audio?.PlaySfx("sfx_kill", 0.8f);
 
             var go = new GameObject("Corpse" + enemy.Id);
             go.transform.position = new Vector3((float)enemy.Pos.X, (float)enemy.Pos.Y, 0f);
@@ -462,12 +507,14 @@ namespace Lingjing.View
             }
 
             _choiceShown = true;
+            _audio?.PlaySfx("sfx_level_up");
             _choice.Show(_run.Growth);
         }
 
         void OnGrowthChosen(GrowthKind kind)
         {
             _choiceShown = false;
+            _audio?.PlaySfx("sfx_choose", 0.9f);
             if (_run == null || _world == null)
             {
                 return;
@@ -488,10 +535,47 @@ namespace Lingjing.View
             float fairySeconds = (float)(_world.FairyTicksLeft * SimConstants.Dt);
             _hud.SetStats((float)p.Hp, (float)p.MaxHp, (float)p.Energy,
                 (float)DamageRules.EnergyMax, _world.FairyActive, fairySeconds);
+            _hud.SetSubtitle(_audio != null ? _audio.Subtitle : null);
 
             if (_run != null && _run.SectionCount > 0)
             {
                 _hud.SetSection(_run.SectionIndex + 1, _run.SectionCount, _run.Intermission);
+
+                if (_run.SectionIndex != _lastSectionIndex)
+                {
+                    // -1 是开局那一节，不算"刚清掉上一节"。
+                    if (_lastSectionIndex >= 0)
+                    {
+                        _audio?.PlaySfx("sfx_section_clear", 0.8f);
+                    }
+
+                    _lastSectionIndex = _run.SectionIndex;
+                }
+            }
+
+            AnnounceBossIfAny();
+        }
+
+        /// <summary>恶名以骸第一次出现在场上时喊一次。</summary>
+        void AnnounceBossIfAny()
+        {
+            if (_bossAnnounced)
+            {
+                return;
+            }
+
+            List<Enemy> enemies = _world.World.Enemies;
+            for (int i = 0; i < enemies.Count; i++)
+            {
+                if (enemies[i].Kind != EnemyKind.ChainBoss)
+                {
+                    continue;
+                }
+
+                _bossAnnounced = true;
+                _audio?.PlaySfx("sfx_boss_intro");
+                _audio?.Say("vo_fairy_boss_intro");
+                return;
             }
         }
 
@@ -553,6 +637,7 @@ namespace Lingjing.View
             {
                 // 解锁的唯一来源是通关本身（game-design §2 / §8）。
                 GameSave.UnlockedLevel = levelId + 1;
+                _audio?.PlaySfx("sfx_win");
             }
 
             int score = Score;

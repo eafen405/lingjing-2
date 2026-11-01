@@ -33,6 +33,9 @@ namespace Lingjing.Sim
         /// <summary>玩家受伤。</summary>
         public event Action<double> PlayerHurt;
 
+        /// <summary>玩家拾取到一件掉落物。</summary>
+        public event Action<Pickup> PickupTaken;
+
         /// <summary>玩家死亡，每局只发一次。</summary>
         public event Action PlayerDied;
 
@@ -464,6 +467,8 @@ namespace Lingjing.Sim
                         p.Energy = Math.Min(DamageRules.EnergyMax, p.Energy + DamageRules.EnergyPickupAmount);
                         break;
                 }
+
+                PickupTaken?.Invoke(pickup);
             }
         }
 

@@ -66,19 +66,23 @@ def collect_doc_chars() -> set[str]:
 
 
 def collect_code_chars() -> set[str]:
-    """扫代码而不只是 docs：以前漏过一次——代码里新增的文案不在 docs 里，字体就缺字。"""
+    """扫代码与数据：界面文案在 UiText.cs，台词字幕在 Data/voice.json，两处都不能漏。"""
     chars: set[str] = set()
-    scripts = os.path.join(ROOT, "Assets", "_Project", "Scripts")
-    for base, _, files in os.walk(scripts):
-        for name in files:
-            if not name.endswith(".cs"):
-                continue
-            path = os.path.join(base, name)
-            try:
-                with open(path, "r", encoding="utf-8") as handle:
-                    chars.update(handle.read())
-            except OSError:
-                continue
+    roots = [
+        os.path.join(ROOT, "Assets", "_Project", "Scripts"),
+        os.path.join(ROOT, "Assets", "_Project", "Data"),
+    ]
+    for root_dir in roots:
+        for base, _, files in os.walk(root_dir):
+            for name in files:
+                if not (name.endswith(".cs") or name.endswith(".json")):
+                    continue
+                path = os.path.join(base, name)
+                try:
+                    with open(path, "r", encoding="utf-8") as handle:
+                        chars.update(handle.read())
+                except OSError:
+                    continue
     return {c for c in chars if c.strip()}
 
 

@@ -207,6 +207,14 @@ namespace Lingjing.Editor
                 && HasText(hud.transform, UiText.SectionProgress(2, 4));
             Expect(sectionShown && bannerHidden, "节提示：进度常驻，换节大提示只在停顿期间亮");
 
+            hud.SetSubtitle("测试字幕");
+            Transform subtitleTx = hud.transform.Find("Subtitle");
+            bool subtitleShown = subtitleTx != null && subtitleTx.gameObject.activeInHierarchy
+                && HasText(hud.transform, "测试字幕");
+            hud.SetSubtitle(null);
+            bool subtitleHidden = subtitleTx != null && !subtitleTx.gameObject.activeInHierarchy;
+            Expect(subtitleShown && subtitleHidden, "字幕：有台词时显示，播完收起");
+
             PauseScreen pause = PauseScreen.Build(null, null, null);
             bool pauseHidden = !pause.Visible;
             pause.Show();
