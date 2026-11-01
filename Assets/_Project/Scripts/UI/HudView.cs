@@ -13,13 +13,14 @@ namespace Lingjing.UI
         /// <summary>左右安全边距（参考像素）。</summary>
         public const float SafeMargin = 40f;
 
-        static readonly Color TextColor = new Color(0.92f, 0.94f, 0.96f, 1f);
-        static readonly Color FairyColor = new Color(0.95f, 0.82f, 0.45f, 1f);
-        static readonly Color BarBackground = new Color(0.055f, 0.07f, 0.09f, 0.92f);
+        static readonly Color TextColor = UiPalette.Text;
+        static readonly Color FairyColor = UiPalette.Glow;
+        static readonly Color BarBackground = UiPalette.BarTrack;
 
         Text _hpText;
         Text _energyText;
         Text _fairyText;
+        GameObject _emblemObject;
         UiBar _hpBar;
         UiBar _energyBar;
 
@@ -45,7 +46,7 @@ namespace Lingjing.UI
         {
             RectTransform card = UiKit.CreatePanel(root, "Stats", new Vector2(0f, 1f), new Vector2(0f, 1f),
                 new Vector2(SafeMargin, -SafeMargin), new Vector2(300f, 158f),
-                new Color(0.055f, 0.07f, 0.09f, 0.82f));
+                UiPalette.HudBackdrop);
             card.GetComponent<Image>().raycastTarget = false;
 
             _hpText = UiKit.CreateLabel(card, string.Empty, 22, TextAnchor.MiddleLeft,
@@ -53,17 +54,23 @@ namespace Lingjing.UI
 
             _hpBar = UiKit.CreateBar(card, new Vector2(0f, 1f), new Vector2(0f, 1f),
                 new Vector2(16f, -42f), new Vector2(268f, 12f),
-                BarBackground, new Color(0.86f, 0.33f, 0.36f, 1f));
+                BarBackground, UiPalette.Danger);
 
             _energyText = UiKit.CreateLabel(card, string.Empty, 22, TextAnchor.MiddleLeft,
                 new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(16f, -62f), new Vector2(268f, 26f), TextColor);
 
             _energyBar = UiKit.CreateBar(card, new Vector2(0f, 1f), new Vector2(0f, 1f),
                 new Vector2(16f, -92f), new Vector2(268f, 12f),
-                BarBackground, new Color(0.45f, 0.82f, 0.95f, 1f));
+                BarBackground, UiPalette.Signal);
+
+            // 代行时把她那枚徽记一起亮出来：这是全作唯一一件非像素的实体图形。
+            Image emblem = UiKit.CreateImage(card, "Emblem", UiKit.Emblem,
+                new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(16f, -106f), new Vector2(26f, 26f));
+            _emblemObject = emblem.gameObject;
+            _emblemObject.SetActive(false);
 
             _fairyText = UiKit.CreateLabel(card, string.Empty, 20, TextAnchor.MiddleLeft,
-                new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(16f, -112f), new Vector2(268f, 26f), FairyColor);
+                new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(50f, -110f), new Vector2(230f, 26f), FairyColor);
             _fairyText.gameObject.SetActive(false);
 
             // 暂停键贴右上，与 HUD 数值一起远离左下摇杆和右下技能键。
@@ -84,6 +91,11 @@ namespace Lingjing.UI
             _energyBar.SetValue(energy / energyMax);
 
             _fairyText.gameObject.SetActive(fairyActive);
+            if (_emblemObject != null)
+            {
+                _emblemObject.SetActive(fairyActive);
+            }
+
             if (fairyActive)
             {
                 _fairyText.text = $"{UiText.FairyTakeover} {Mathf.Max(0f, fairySeconds):0.0}s";

@@ -36,14 +36,14 @@ namespace Lingjing.UI
 
         void BuildUi(Transform root)
         {
-            UiKit.CreateFullScreen(root, "Dim", new Color(0f, 0f, 0f, 0.68f));
+            UiKit.CreateFullScreen(root, "Dim", UiPalette.Dim);
 
             var center = new Vector2(0.5f, 0.5f);
             RectTransform card = UiKit.CreatePanel(root, "PauseCard", center, center, Vector2.zero,
-                new Vector2(420f, 360f), new Color(0.10f, 0.13f, 0.17f, 0.98f));
+                new Vector2(420f, 360f), UiPalette.Panel);
 
-            UiKit.CreateLabel(card, UiText.Pause, 40, TextAnchor.MiddleCenter, center, center,
-                new Vector2(0f, 120f), new Vector2(360f, 56f), new Color(0.92f, 0.94f, 0.96f, 1f));
+            UiKit.CreateTitle(card, UiText.Pause, 42, TextAnchor.MiddleCenter, center, center,
+                new Vector2(0f, 120f), new Vector2(360f, 56f), UiPalette.Text);
 
             UiKit.CreateButton(card, UiText.Resume, center, center,
                 new Vector2(0f, 40f), new Vector2(260f, 54f), OnResume, 24);

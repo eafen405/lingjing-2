@@ -46,6 +46,15 @@
 
 这枚徽记可以按「非像素 UI 元素」直接放进 Fairy 气泡或 HUD。
 
+## 工程里的落点
+
+- 取色板：`Assets/_Project/Scripts/UI/UiPalette.cs`，界面里不再直接写 `new Color(...)`。
+- 标题字体：`Assets/_Project/Resources/Fonts/Lingjing-Title.ttf`（就是上面那份数黑体），
+  经 `UiKit.TitleFont` 取用；正文仍走 Noto 子集。
+- 徽记：`python tools/ui/make_emblem.py` 按上面的几何重新生成
+  `Assets/_Project/Resources/Fairy/fairy_emblem.png`，由 `UiKit.Emblem` 现搓 Sprite，
+  不依赖导入设置。HUD 里只在代行期间显示。
+
 ## CRT 质感
 
 参数：24dp 网格 @3%、1px 扫描线 @1.2%，加暗角与泛光。

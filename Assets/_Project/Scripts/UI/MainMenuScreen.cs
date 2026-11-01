@@ -12,8 +12,8 @@ namespace Lingjing.UI
         /// <summary>左右安全边距（参考像素）。</summary>
         const float Margin = 40f;
 
-        static readonly Color TextColor = new Color(0.92f, 0.94f, 0.96f, 1f);
-        static readonly Color MutedColor = new Color(0.62f, 0.68f, 0.74f, 1f);
+        static readonly Color TextColor = UiPalette.Text;
+        static readonly Color MutedColor = UiPalette.Muted;
 
         Text _highScore;
 
@@ -36,15 +36,15 @@ namespace Lingjing.UI
 
         void BuildUi(Transform root)
         {
-            UiKit.CreateFullScreen(root, "Backdrop", new Color(0.035f, 0.043f, 0.055f, 1f));
+            UiKit.CreateFullScreen(root, "Backdrop", UiPalette.Backdrop);
 
             UiKit.CreatePanel(root, "Accent", new Vector2(0f, 1f), new Vector2(0f, 1f),
                 new Vector2(Margin, -Margin), new Vector2(96f, 6f),
-                new Color(0.79f, 0.95f, 0.30f, 1f), rounded: false);
+                UiPalette.Signal, rounded: false);
 
-            UiKit.CreateLabel(root, UiText.GameTitle, 72, TextAnchor.MiddleLeft,
+            UiKit.CreateTitle(root, UiText.GameTitle, 78, TextAnchor.MiddleLeft,
                 new Vector2(0f, 1f), new Vector2(0f, 1f),
-                new Vector2(Margin, -66f), new Vector2(560f, 90f), TextColor);
+                new Vector2(Margin, -66f), new Vector2(560f, 96f), TextColor);
 
             UiKit.CreateLabel(root, UiText.Subtitle, 26, TextAnchor.MiddleLeft,
                 new Vector2(0f, 1f), new Vector2(0f, 1f),

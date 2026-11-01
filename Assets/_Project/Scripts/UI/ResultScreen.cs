@@ -37,20 +37,20 @@ namespace Lingjing.UI
 
         void BuildUi(Transform root)
         {
-            UiKit.CreateFullScreen(root, "Dim", new Color(0f, 0f, 0f, 0.78f));
+            UiKit.CreateFullScreen(root, "Dim", UiPalette.DimStrong);
 
             var center = new Vector2(0.5f, 0.5f);
             RectTransform card = UiKit.CreatePanel(root, "ResultCard", center, center, Vector2.zero,
-                new Vector2(440f, 360f), new Color(0.10f, 0.13f, 0.17f, 0.98f));
+                new Vector2(440f, 360f), UiPalette.Panel);
 
-            _title = UiKit.CreateLabel(card, string.Empty, 44, TextAnchor.MiddleCenter, center, center,
-                new Vector2(0f, 120f), new Vector2(380f, 60f), new Color(0.95f, 0.45f, 0.45f, 1f));
+            _title = UiKit.CreateTitle(card, string.Empty, 48, TextAnchor.MiddleCenter, center, center,
+                new Vector2(0f, 120f), new Vector2(380f, 60f), UiPalette.Danger);
 
             _score = UiKit.CreateLabel(card, string.Empty, 30, TextAnchor.MiddleCenter, center, center,
-                new Vector2(0f, 52f), new Vector2(380f, 40f), new Color(0.92f, 0.94f, 0.96f, 1f));
+                new Vector2(0f, 52f), new Vector2(380f, 40f), UiPalette.Text);
 
             _highScore = UiKit.CreateLabel(card, string.Empty, 24, TextAnchor.MiddleCenter, center, center,
-                new Vector2(0f, 12f), new Vector2(380f, 32f), new Color(0.62f, 0.68f, 0.74f, 1f));
+                new Vector2(0f, 12f), new Vector2(380f, 32f), UiPalette.Muted);
 
             UiKit.CreateButton(card, UiText.Restart, center, center,
                 new Vector2(0f, -58f), new Vector2(260f, 54f), OnRestart, 24);
@@ -61,9 +61,7 @@ namespace Lingjing.UI
         public void Show(bool clear, int score, int highScore)
         {
             _title.text = clear ? UiText.ResultClear : UiText.ResultFail;
-            _title.color = clear
-                ? new Color(0.55f, 0.90f, 0.65f, 1f)
-                : new Color(0.95f, 0.45f, 0.45f, 1f);
+            _title.color = clear ? UiPalette.Success : UiPalette.Danger;
             _score.text = $"{UiText.Score} {score}";
             _highScore.text = $"{UiText.HighScore} {highScore}";
             View.Show(true);

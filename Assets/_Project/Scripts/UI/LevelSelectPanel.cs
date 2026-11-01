@@ -9,10 +9,10 @@ namespace Lingjing.UI
     /// </summary>
     public sealed class LevelSelectPanel : MonoBehaviour
     {
-        static readonly Color TextColor = new Color(0.92f, 0.94f, 0.96f, 1f);
-        static readonly Color LockedTextColor = new Color(0.55f, 0.57f, 0.60f, 1f);
-        static readonly Color NodeColor = new Color(0.16f, 0.21f, 0.26f, 0.96f);
-        static readonly Color LockedNodeColor = new Color(0.12f, 0.14f, 0.16f, 0.9f);
+        static readonly Color TextColor = UiPalette.Text;
+        static readonly Color LockedTextColor = UiPalette.Disabled;
+        static readonly Color NodeColor = UiPalette.Capsule;
+        static readonly Color LockedNodeColor = UiPalette.Window;
 
         sealed class Node
         {
@@ -40,7 +40,7 @@ namespace Lingjing.UI
             var panel = view.Root.AddComponent<LevelSelectPanel>();
             panel.View = view;
             panel.Root = (RectTransform)view.Root.transform;
-            UiKit.CreateFullScreen(panel.Root, "Dim", new Color(0f, 0f, 0f, 0.72f));
+            UiKit.CreateFullScreen(panel.Root, "Dim", UiPalette.Dim);
             panel.BuildUi(panel.Root);
             return panel;
         }
@@ -49,9 +49,9 @@ namespace Lingjing.UI
         {
             var center = new Vector2(0.5f, 0.5f);
             RectTransform card = UiKit.CreatePanel(root, "Card", center, center, Vector2.zero,
-                new Vector2(600f, 400f), new Color(0.10f, 0.13f, 0.17f, 0.98f));
+                new Vector2(600f, 400f), UiPalette.Panel);
 
-            UiKit.CreateLabel(card, UiText.LevelSelect, 36, TextAnchor.MiddleCenter, center, center,
+            UiKit.CreateTitle(card, UiText.LevelSelect, 38, TextAnchor.MiddleCenter, center, center,
                 new Vector2(0f, 160f), new Vector2(520f, 40f), TextColor);
 
             _nodes = new Node[GameFlow.LevelCount];
@@ -71,7 +71,7 @@ namespace Lingjing.UI
 
                 node.Status = UiKit.CreateLabel(node.Button.transform, string.Empty, 18, TextAnchor.MiddleRight,
                     new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-24f, 0f), new Vector2(160f, 28f),
-                    new Color(0.78f, 0.62f, 0.58f, 1f));
+                    UiPalette.Warning);
 
                 _nodes[i] = node;
             }

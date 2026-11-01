@@ -188,6 +188,15 @@ namespace Lingjing.Editor
             Expect(hudBars && hudHp && hudEnergy && hudFairy && hudPause,
                 "HUD：双条 + 生命/充能/代行文本 + 暂停键");
 
+            // 视觉层：标题字体与 Fairy 徽记必须真的加载到了，否则会静默退回正文字体 / 空图。
+            bool titleFontOk = UiKit.TitleFont != null && UiKit.TitleFont != UiKit.Font;
+            Expect(titleFontOk, $"标题字体已加载（{UiKit.TitleFont?.name}）");
+            Expect(UiKit.Emblem != null, "Fairy 徽记已加载");
+
+            Transform emblemTx = hud.transform.Find("Stats/Emblem");
+            bool emblemShown = emblemTx != null && emblemTx.gameObject.activeSelf;
+            Expect(emblemShown, "HUD：代行中显示 Fairy 徽记");
+
             PauseScreen pause = PauseScreen.Build(null, null, null);
             bool pauseHidden = !pause.Visible;
             pause.Show();

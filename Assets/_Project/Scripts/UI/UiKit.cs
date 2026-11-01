@@ -15,9 +15,11 @@ namespace Lingjing.UI
         public const int RefHeight = 540;
 
         static Font _font;
+        static Font _titleFont;
         static Sprite _rounded;
         static Sprite _circle;
         static Sprite _white;
+        static Sprite _emblem;
 
         public static Font Font
         {
@@ -36,9 +38,67 @@ namespace Lingjing.UI
             }
         }
 
-        public static Canvas CreateCanvas(string name, int sortingOrder = 0)
+        /// <summary>标题字体：数黑体。只给大标题用，正文继续用 Noto 子集（可读性优先）。</summary>
+        public static Font TitleFont
         {
-            var go = new GameObject(name, typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+            get
+            {
+                if (_titleFont == null)
+                {
+                    _titleFont = Resources.Load<Font>("Fonts/Lingjing-Title");
+                    if (_titleFont == null)
+                    {
+                        _titleFont = Font;
+                    }
+                }
+
+                return _titleFont;
+            }
+        }
+
+        /// <summary>
+        /// Fairy 徽记：Fairy 层唯一的实体图形（几何来源见 docs/agents/fairy-visual.md）。
+        /// 用 Texture2D 现搓 Sprite，不去动导入设置——它不需要 9 宫格，也不需要像素过滤。
+        /// </summary>
+        public static Sprite Emblem
+        {
+            get
+            {
+                if (_emblem == null)
+                {
+                    Texture2D texture = Resources.Load<Texture2D>("Fairy/fairy_emblem");
+                    if (texture != null)
+                    {
+                        _emblem = Sprite.Create(texture, new Rect(0f, 0f, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+                        _emblem.name = "fairy_emblem";
+                    }
+                }
+
+                return _emblem;
+            }
+        }
+
+        /// <summary>放一张图；锚点/枢轴/位置/尺寸的口径与 <see cref="CreatePanel"/> 一致。</summary>
+        public static Image CreateImage(Transform parent, string name, Sprite sprite,
+            Vector2 anchorPoint, Vector2 pivot, Vector2 anchoredPos, Vector2 size)
+        {
+            var go = new GameObject(name, typeof(RectTransform), typeof(Image));
+            var rect = (RectTransform)go.transform;
+            rect.SetParent(parent, false);
+            rect.anchorMin = anchorPoint;
+            rect.anchorMax = anchorPoint;
+            rect.pivot = pivot;
+            rect.anchoredPosition = anchoredPos;
+            rect.sizeDelta = size;
+
+            var image = go.GetComponent<Image>();
+            image.sprite = sprite;
+            image.raycastTarget = false;
+            return image;
+        }
+
+        public static Canvas CreateCanvas(string name, int sortingOrder = 0)
+        {            var go = new GameObject(name, typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             var canvas = go.GetComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             canvas.sortingOrder = sortingOrder;
@@ -103,7 +163,8 @@ namespace Lingjing.UI
 
         public static Text CreateLabel(
             Transform parent, string text, int fontSize, TextAnchor anchor,
-            Vector2 anchorPoint, Vector2 pivot, Vector2 anchoredPos, Vector2 size, Color color)
+            Vector2 anchorPoint, Vector2 pivot, Vector2 anchoredPos, Vector2 size, Color color,
+            Font font = null)
         {
             var go = new GameObject("Label", typeof(RectTransform), typeof(Text));
             var rect = (RectTransform)go.transform;
@@ -115,7 +176,7 @@ namespace Lingjing.UI
             rect.sizeDelta = size;
 
             var label = go.GetComponent<Text>();
-            label.font = Font;
+            label.font = font != null ? font : Font;
             label.text = text;
             label.fontSize = fontSize;
             label.alignment = anchor;
@@ -126,10 +187,18 @@ namespace Lingjing.UI
             return label;
         }
 
+        /// <summary>大标题：走数黑体，字重与笔画都比正文硬，撑得起 Fairy 层与像素世界的落差。</summary>
+        public static Text CreateTitle(
+            Transform parent, string text, int fontSize, TextAnchor anchor,
+            Vector2 anchorPoint, Vector2 pivot, Vector2 anchoredPos, Vector2 size, Color color)
+        {
+            return CreateLabel(parent, text, fontSize, anchor, anchorPoint, pivot, anchoredPos, size, color, TitleFont);
+        }
+
         public static Text CreateStyledLabel(Transform parent, string text, int fontSize, TextAnchor anchor,
             Vector2 anchorPoint, Vector2 pivot, Vector2 anchoredPos, Vector2 size)
         {
-            return CreateLabel(parent, text, fontSize, anchor, anchorPoint, pivot, anchoredPos, size, new Color(0.92f, 0.94f, 0.96f, 1f));
+            return CreateLabel(parent, text, fontSize, anchor, anchorPoint, pivot, anchoredPos, size, UiPalette.Text);
         }
 
         public static Button CreateButton(
@@ -137,7 +206,7 @@ namespace Lingjing.UI
             Vector2 anchoredPos, Vector2 size, Action onClick, int fontSize = 26)
         {
             RectTransform rect = CreatePanel(parent, "Button_" + label, anchorPoint, pivot, anchoredPos, size,
-                new Color(0.16f, 0.21f, 0.26f, 0.92f));
+                UiPalette.Button);
             rect.gameObject.name = "Button_" + label;
 
             var button = rect.gameObject.AddComponent<Button>();
@@ -154,7 +223,7 @@ namespace Lingjing.UI
             }
 
             CreateLabel(rect, label, fontSize, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.5f),
-                new Vector2(0.5f, 0.5f), Vector2.zero, size, new Color(0.94f, 0.96f, 0.98f, 1f));
+                new Vector2(0.5f, 0.5f), Vector2.zero, size, UiPalette.Text);
 
             return button;
         }
