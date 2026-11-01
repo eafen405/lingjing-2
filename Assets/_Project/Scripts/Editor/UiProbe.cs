@@ -253,6 +253,28 @@ namespace Lingjing.Editor
                 && DoozyViewHost.ChoiceSortingOrder < DoozyViewHost.ResultSortingOrder;
             Expect(choiceViewOk, $"三选一：UIView 名为 Choice，层级 Pause({DoozyViewHost.PauseSortingOrder}) < Choice({DoozyViewHost.ChoiceSortingOrder}) < Result({DoozyViewHost.ResultSortingOrder})");
 
+            // 数黑体比正文宽，大标题容易撑出各自的面板；批处理里看不到画面，只能按首选宽度卡。
+            int overflow = 0;
+            Transform[] scopes = { hud.transform, pause.transform, choice.transform, result.transform };
+            for (int i = 0; i < scopes.Length; i++)
+            {
+                foreach (Text text in scopes[i].GetComponentsInChildren<Text>(true))
+                {
+                    if (text.font != UiKit.TitleFont)
+                    {
+                        continue;
+                    }
+
+                    if (text.preferredWidth > text.rectTransform.sizeDelta.x + 1f)
+                    {
+                        overflow++;
+                        Debug.LogWarning($"[ui] 标题溢出：{text.text} 宽 {text.preferredWidth:0} > 框 {text.rectTransform.sizeDelta.x:0}");
+                    }
+                }
+            }
+
+            Expect(overflow == 0, "标题没有溢出各自的面板");
+
             // Doozy：HUD/暂停/结算三个视图都存在且 UIView.ViewName 固定。
             bool viewNamesOk = hud.View != null && hud.View.DoozyView != null
                 && hud.View.DoozyView.ViewName == DoozyViewHost.HudViewName
