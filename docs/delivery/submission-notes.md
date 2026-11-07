@@ -47,7 +47,7 @@
 - Plastic 节点 0–2 是 10-29 的仓库基线与文档。**节点 3–24 是 2026-11-01 用 Git 快照回放补录**：逐个选定提交还原工作区后 `cm checkin`。每个节点的文件树是真实的，但**时间戳不是真实开发时刻**（集中在 11-01 19:27–19:33）。
 - 节点 25 起恢复「先 `cm checkin`、再 `git commit`」的正常流程。
 - 编号对应：导出文件里 `ChangesetId 0` 是仓库根（Root dir），不是开发节点；`ChangesetId N` 对应注释中的「节点 N−1」。因此下面清单的节点 0–26 对应 `ChangesetId 1–27`。
-- `docs/delivery/plastic-changesets.xml` 是 11-01 导出的快照，只含到 `ChangesetId 27`；其后每次提交都以 `ChangesetId 28` 起继续编号（节点 27 对应的就是 `ChangesetId 28`）。本页清单截至节点 29，节点 30 及其后是交付说明本身的修订，完整列表以云仓 `cm log` 为准。
+- `docs/delivery/plastic-changesets.xml` 于 **2026-11-07 重新导出**，含 `ChangesetId 0–34`（即节点 0–33）的全部节点、注释与文件清单。本次导出与说明更新一起作为**节点 34** 提交，所以文件内不含节点 34 本身；要最新列表直接看云仓 `cm log`。编号对应不变：`ChangesetId N` 对应注释里的「节点 N−1」。
 
 ## 开发节点清单（节点 0–29，共 30 个）
 
