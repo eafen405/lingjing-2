@@ -132,8 +132,9 @@ namespace Lingjing.UI
             _bannerObject.SetActive(false);
 
             // 字幕贴底居中：左右下角分别留给摇杆与技能键。
+            // 抬到 y=140 是为了避开技能键上沿（技能键占 32..128），不然字幕会压住按钮。
             RectTransform subtitle = UiKit.CreatePanel(root, "Subtitle", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f),
-                new Vector2(0f, 108f), new Vector2(760f, 62f), UiPalette.Panel);
+                new Vector2(0f, 140f), new Vector2(760f, 62f), UiPalette.Panel);
             subtitle.GetComponent<Image>().raycastTarget = false;
 
             _subtitleText = UiKit.CreateLabel(subtitle, string.Empty, 24, TextAnchor.MiddleCenter, center, center,
@@ -302,6 +303,8 @@ namespace Lingjing.UI
                 _lastHp = hpValue;
                 _lastMaxHp = maxHpValue;
                 _hpText.text = $"{UiText.Hp} {hpValue}/{maxHpValue}";
+                // 低血把数值本身变红：这是唯一一直可见的低血提示，不靠额外特效。
+                _hpText.color = hpValue * 100 <= maxHpValue * 35 ? UiPalette.Danger : TextColor;
             }
 
             _hpBar.SetValue(hp / maxHp);

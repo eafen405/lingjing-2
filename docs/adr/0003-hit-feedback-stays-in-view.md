@@ -1,5 +1,7 @@
 # 打击感只发生在表现层，模拟不感知
 
+> 状态：**部分过期**（2026-11-04 标注）：第 3 条「顿帧只在击杀」与「`LevelProbe` 逐 tick 断言」的表述已与实现不符，其余结论仍成立。偏差见文末「与实现的偏差（2026-11-04）」。
+
 命中火花、受击闪白、顿帧、震屏、受击抖动全部是 `BattleRunner`（表现层）对 `BattleWorld` 事件的反应；模拟层（Core / Combat / AI）不认识其中任何一个。世界仍然是唯一权威：打击感不改位置、不改 HP、不改命中冷却、不动随机序列。
 
 ## 背景
@@ -28,3 +30,10 @@
 - 关掉表现层（无头探针、纯模拟跑分）时打击感完全不存在，模拟结果一字不差 —— `LevelProbe` 的确定性断言继续成立。
 - 加新特效只需要往 `effects.json` 加一组、`ArtLibrary` 重跑一次，不动模拟与主循环。
 - 顿帧期间 UI 动画与精灵动画一起停（同一个 `timeScale`）。将来若要做「世界停、UI 继续动」，得给表现层单独一个时钟，不在本 ADR 范围内。
+
+## 与实现的偏差（2026-11-04）
+
+- **顿帧不再只在击杀**：ADR-0004 之后命中也有顿帧。`Assets/_Project/Scripts/View/BattleRunner.cs` 中击杀顿帧 `KillFreezeSeconds = 0.06f`（约 3–4 帧），命中顿帧 `HitFreezeSeconds = 0.035f`（约 2 帧）、限频 `HitFreezeCooldownSeconds = 0.12f`。本文第 3 条「命中不给顿帧」不再成立。
+- 「顿帧只发生在表现层、模拟不感知」这一层结论不变：`Freeze()` 只改 `Time.timeScale`，模拟层（Core / Combat / AI）不读它。
+- **确定性断言的位置与口径**：`Assets/_Project/Scripts/Editor/LevelProbe.cs:67` 比较的是两次运行的聚合量——`kills`、`ticks`、`Pos`；逐 tick 哈希断言在 `Assets/_Project/Scripts/Editor/KernelSmokeTest.cs`（`TickHasher.HashTick`，第 48–57 行）。本文「`LevelProbe` 靠逐 tick 一致做断言」的表述不准确，实际是「流程层比聚合量、内核层比逐 tick 哈希」；确定性结论本身成立。
+- 第 1 / 2 / 4 / 5 条（抖动只偏移渲染、闪白走 shader、震屏只加整数像素、血条归表现层）与实现一致。

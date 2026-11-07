@@ -41,10 +41,12 @@ namespace Lingjing.UI
 
         void BuildUi(Transform root)
         {
+            // Dim 留在根节点满铺；标题与三张牌收进安全区，横屏刘海机左右两张牌不被裁。
             UiKit.CreateFullScreen(root, "Dim", UiPalette.Dim);
+            RectTransform safe = DoozyViewHost.CreateSafeArea(root);
 
             var center = new Vector2(0.5f, 0.5f);
-            UiKit.CreateTitle(root, UiText.PickUpgrade, 36, TextAnchor.MiddleCenter, center, center,
+            UiKit.CreateTitle(safe, UiText.PickUpgrade, 36, TextAnchor.MiddleCenter, center, center,
                 new Vector2(0f, 190f), new Vector2(700f, 48f), UiPalette.Signal);
 
             // 三张卡：正中一张，左右各偏 ±280。
@@ -54,7 +56,7 @@ namespace Lingjing.UI
                 int index = i;
                 float x = (i - (GrowthRules.OptionCount - 1) * 0.5f) * spacing;
 
-                RectTransform card = UiKit.CreatePanel(root, "Card" + i, center, center,
+                RectTransform card = UiKit.CreatePanel(safe, "Card" + i, center, center,
                     new Vector2(x, 10f), new Vector2(250f, 300f), UiPalette.Panel);
 
                 _names[i] = UiKit.CreateTitle(card, string.Empty, 36, TextAnchor.MiddleCenter, center, center,
@@ -90,6 +92,7 @@ namespace Lingjing.UI
             }
 
             View.Show(true);
+            View.FadeIn();
         }
 
         public void Hide() => View.Hide(true);

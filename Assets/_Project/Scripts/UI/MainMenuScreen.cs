@@ -31,38 +31,43 @@ namespace Lingjing.UI
             screen.View = view;
             screen.BuildUi(view.Root.transform);
             view.Show(true);
+            // Doozy 的实例动画保持 instant，DOTween 只补一层淡入观感。
+            view.FadeIn();
             return screen;
         }
 
         void BuildUi(Transform root)
         {
+            // 全屏背景留在根节点保持满铺；可读内容收进安全区，刘海/圆角屏下标题、最高分与按钮不被裁。
             UiKit.CreateFullScreen(root, "Backdrop", UiPalette.Backdrop);
+            RectTransform safe = DoozyViewHost.CreateSafeArea(root);
 
-            UiKit.CreatePanel(root, "Accent", new Vector2(0f, 1f), new Vector2(0f, 1f),
+            UiKit.CreatePanel(safe, "Accent", new Vector2(0f, 1f), new Vector2(0f, 1f),
                 new Vector2(Margin, -Margin), new Vector2(96f, 6f),
                 UiPalette.Signal, rounded: false);
 
-            UiKit.CreateTitle(root, UiText.GameTitle, 78, TextAnchor.MiddleLeft,
+            UiKit.CreateTitle(safe, UiText.GameTitle, 78, TextAnchor.MiddleLeft,
                 new Vector2(0f, 1f), new Vector2(0f, 1f),
                 new Vector2(Margin, -66f), new Vector2(560f, 96f), TextColor);
 
-            UiKit.CreateLabel(root, UiText.Subtitle, 26, TextAnchor.MiddleLeft,
+            UiKit.CreateLabel(safe, UiText.Subtitle, 26, TextAnchor.MiddleLeft,
                 new Vector2(0f, 1f), new Vector2(0f, 1f),
                 new Vector2(Margin, -158f), new Vector2(560f, 36f), MutedColor);
 
-            _highScore = UiKit.CreateLabel(root, string.Empty, 24, TextAnchor.MiddleRight,
+            _highScore = UiKit.CreateLabel(safe, string.Empty, 24, TextAnchor.MiddleRight,
                 new Vector2(1f, 1f), new Vector2(1f, 1f),
                 new Vector2(-Margin, -50f), new Vector2(260f, 30f), MutedColor);
             RefreshHighScore();
 
             var center = new Vector2(0.5f, 0.5f);
-            UiKit.CreateButton(root, UiText.StartGame, center, center,
+            UiKit.CreateButton(safe, UiText.StartGame, center, center,
                 new Vector2(0f, 10f), new Vector2(320f, 64f), () => UiNav.LoadLevel(1), 28);
-            UiKit.CreateButton(root, UiText.LevelSelect, center, center,
+            UiKit.CreateButton(safe, UiText.LevelSelect, center, center,
                 new Vector2(0f, -70f), new Vector2(320f, 64f), () => LevelSelect.Show(), 28);
-            UiKit.CreateButton(root, UiText.Quit, center, center,
+            UiKit.CreateButton(safe, UiText.Quit, center, center,
                 new Vector2(0f, -150f), new Vector2(320f, 64f), QuitGame, 28);
 
+            // 关卡面板自带全屏 Dim 与自己的 Safe，仍挂根节点（不能收进主菜单的 Safe，否则遮罩不满铺）。
             LevelSelect = LevelSelectPanel.Build(root);
         }
 

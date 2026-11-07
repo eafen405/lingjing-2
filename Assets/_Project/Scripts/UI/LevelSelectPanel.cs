@@ -47,8 +47,10 @@ namespace Lingjing.UI
 
         void BuildUi(Transform root)
         {
+            // Dim 留在根节点满铺；卡片收进安全区，横屏刘海机左侧不会切掉标题。
+            RectTransform safe = DoozyViewHost.CreateSafeArea(root);
             var center = new Vector2(0.5f, 0.5f);
-            RectTransform card = UiKit.CreatePanel(root, "Card", center, center, Vector2.zero,
+            RectTransform card = UiKit.CreatePanel(safe, "Card", center, center, Vector2.zero,
                 new Vector2(600f, 400f), UiPalette.Panel);
 
             UiKit.CreateTitle(card, UiText.LevelSelect, 38, TextAnchor.MiddleCenter, center, center,
@@ -86,6 +88,7 @@ namespace Lingjing.UI
         {
             Refresh();
             View.Show(true);
+            View.FadeIn();
             Root.SetAsLastSibling();
         }
 

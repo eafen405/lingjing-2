@@ -28,6 +28,20 @@ namespace Lingjing.View
         TextMesh _mesh;
         Color _color = Color.white;
 
+        /// <summary>淡出补间没有 target：DOTween 不会跟着对象一起被销毁，必须自己持有并在 OnDestroy 里 Kill。</summary>
+        Tween _fadeTween;
+
+        /// <summary>
+        /// 关掉「域重载」时静态字段会从上一次播放延续，池里全是上一次已被场景销毁的引用。
+        /// SubsystemRegistration 在每次进入播放模式、任何场景加载之前跑，先清空保证新会话从空池开始。
+        /// </summary>
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetStatics()
+        {
+            Pool.Clear();
+            _root = null;
+        }
+
         public static void Spawn(Vector3 worldPosition, double amount)
         {
             if (amount < 0.5)
@@ -37,11 +51,20 @@ namespace Lingjing.View
 
             if (_root == null)
             {
+                // 根节点被销毁只可能是切了场景：池里的对象都是它的子节点，跟着一起没了，这时整池清掉，
+                // 不然失效引用会一直垫在栈底。
+                Pool.Clear();
                 var rootGo = new GameObject("DamageNumbers");
                 _root = rootGo.transform;
             }
 
-            DamageNumber number = Pool.Count > 0 ? Pool.Pop() : Create();
+            DamageNumber number = Pool.Count > 0 ? Pool.Pop() : null;
+            // 池里的对象也可能被单独销毁（Unity 假 null），拿到手先判一次，坏了就重建。
+            if (number == null)
+            {
+                number = Create();
+            }
+
             number.transform.SetParent(_root, false);
             number.transform.DOKill();
 
@@ -60,7 +83,7 @@ namespace Lingjing.View
                 .SetEase(Ease.OutQuad)
                 .SetUpdate(true);
 
-            DOTween.To(() => number._mesh.color, c => number._mesh.color = c,
+            number._fadeTween = DOTween.To(() => number._mesh.color, c => number._mesh.color = c,
                     new Color(number._color.r, number._color.g, number._color.b, 0f), life * 0.45f)
                 .SetDelay(life * 0.55f)
                 .SetUpdate(true)
@@ -96,9 +119,25 @@ namespace Lingjing.View
 
         void Despawn()
         {
+            // 补间已经播完并回收：清掉引用，免得将来对象被销毁时去 Kill 一个已经被 DOTween 复用的 Tweener。
+            _fadeTween = null;
             gameObject.SetActive(false);
             enabled = false;
             Pool.Push(this);
+        }
+
+        /// <summary>
+        /// 切场景销毁时补间还会继续跑，setter 会写已销毁的 _mesh；先 Kill 掉自己持有的补间
+        /// （含 transform 上的缩放/位移），OnComplete 也就不会再回调到池里。
+        /// </summary>
+        void OnDestroy()
+        {
+            transform.DOKill();
+            if (_fadeTween != null)
+            {
+                _fadeTween.Kill();
+                _fadeTween = null;
+            }
         }
     }
 }

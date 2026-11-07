@@ -79,7 +79,15 @@ namespace Lingjing.View
         public const float HitFreezeSeconds = 0.035f;
 
         /// <summary>两次命中顿帧之间的最小间隔（秒）：多刀同时命中时不能每击都停。</summary>
-        public const float HitFreezeCooldownSeconds = 0.12f;
+        public const float HitFreezeCooldownSeconds = 0.18f;
+
+        /// <summary>受击表现（红脉冲/震屏/闪红）的最小间隔（秒）。尾灯的贴身伤害按 tick 触发，
+        /// 表现层不节流的话红屏永远淡不出去、镜头一直在抖，看起来像坏了。
+        /// 必须大于 HUD 红脉冲本身的淡出时长（0.28s），否则会变成 4–5Hz 的频闪。</summary>
+        public const float HurtFeedbackMinInterval = 0.5f;
+
+        /// <summary>死亡到结算之间的留白（秒）：让死亡帧、震屏和台词被看见，再弹失败面板。</summary>
+        public const float DeathBeatSeconds = 0.8f;
 
         ICommandSource _source;
 
@@ -135,6 +143,19 @@ namespace Lingjing.View
         bool _resultShown;
         bool _choiceShown;
 
+        // 触屏指令源（桌面输入时为空）：按钮反馈、点击音、技能就绪都从这里走。
+        TouchInputController _touch;
+        float _nextHurtFxAt;
+        float _deathBeatUntil;
+        float _runStartAt;
+        string _hintText;
+        float _hintUntil;
+        bool _hintMoveShown;
+        bool _hintBladeShown;
+        bool _hintReverseShown;
+        bool _hintSkillShown;
+        bool _lowHpSaid;
+
         public BattleWorld World => _world;
         public bool Ready => _world != null;
         public LevelRun Run => _run;
@@ -154,7 +175,18 @@ namespace Lingjing.View
         {
             if (input == null)
             {
-                input = TouchHud.Build();
+                _touch = TouchHud.Build();
+                input = _touch;
+            }
+            else
+            {
+                _touch = input as TouchInputController;
+            }
+
+            if (_touch != null)
+            {
+                // 按钮自己不发声音：音效统一由这里播，View 层不持有 AudioSource。
+                _touch.SfxRequested += OnUiSfxRequested;
             }
 
             _source = input as ICommandSource;
@@ -163,7 +195,10 @@ namespace Lingjing.View
             _audio = AudioDirector.Attach(gameObject, VoiceLineTable.Parse(voiceJson != null ? voiceJson.text : null));
             Build();
             BuildUi();
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            // 三指长按 1.5 秒就能盖住全部界面的调试叠层，正式包里不该存在。
             DebugOverlay.Build(this);
+#endif
         }
 
         /// <summary>建世界。测试与探针可直接调用，不必进播放模式。</summary>
@@ -207,6 +242,18 @@ namespace Lingjing.View
             Sync();
 
             _audio?.Say("vo_fairy_level_start_1");
+
+            // 一局的提示时钟与一次性标记：重开/切场景会重建 BattleRunner，自然复位。
+            _runStartAt = Time.unscaledTime;
+            _deathBeatUntil = 0f;
+            _nextHurtFxAt = 0f;
+            _hintText = null;
+            _hintUntil = 0f;
+            _hintMoveShown = false;
+            _hintBladeShown = false;
+            _hintReverseShown = false;
+            _hintSkillShown = false;
+            _lowHpSaid = false;
         }
 
         /// <summary>
@@ -321,6 +368,15 @@ namespace Lingjing.View
 
         void OnPlayerHurt(double amount)
         {
+            // 尾灯的贴身伤害每个 tick 都会报一次；红脉冲/震屏/闪红必须节流，
+            // 否则贴身时整屏一直是红的、镜头一直在抖（ADR-0003 的「反馈留在表现层」）。
+            float now = Time.unscaledTime;
+            if (now < _nextHurtFxAt)
+            {
+                return;
+            }
+
+            _nextHurtFxAt = now + HurtFeedbackMinInterval;
             _audio?.PlaySfxThrottled("sfx_hurt", 0.3f, 0.85f);
             _playerFlashUntil = Time.time + HitFlashSeconds * 1.6f;
             _hud?.PulseHurt();
@@ -329,6 +385,8 @@ namespace Lingjing.View
 
         void OnFairyStarted()
         {
+            // 刚按下代行，字幕还在喊「点右下代行」就太蠢了：引导字幕立刻收掉，让位给语音字幕。
+            ClearHint();
             _audio?.PlaySfx("sfx_fairy_start");
             _audio?.Say("vo_fairy_daika_start");
         }
@@ -337,13 +395,25 @@ namespace Lingjing.View
         {
             _audio?.PlaySfx("sfx_fairy_end");
             _audio?.Say("vo_fairy_daika_end");
+
+            // 代行期间规划器会自己翻转刀环方向；交还控制权时把输入侧对齐，否则会多反一次。
+            _source?.SyncSpinSign(_world.World.Player.SpinSign);
         }
 
         void OnPlayerDied()
         {
+            _deathBeatUntil = Time.unscaledTime + DeathBeatSeconds;
+            // 死亡台词优先：把还没播完的引导字幕收掉，别让「点右下代行」压住遗言。
+            ClearHint();
             _playerAnim?.SetState("death");
             _audio?.PlaySfx("sfx_death");
             _audio?.Say("vo_fairy_death");
+        }
+
+        /// <summary>按钮点击音（View 层只发请求，播放仍在 AudioDirector）。</summary>
+        void OnUiSfxRequested(string id)
+        {
+            _audio?.PlaySfx(id, 0.55f);
         }
 
         LevelDef LoadCurrentLevel()
@@ -454,8 +524,36 @@ namespace Lingjing.View
 
         void Update()
         {
-            if (_world == null || _resultShown)
+            if (_world == null)
             {
+                return;
+            }
+
+            // 返回键可能同步切场景（失败结算 → 主菜单）：切完就必须停下，不能继续读已经销毁的表现层对象。
+            if (HandleBackKey())
+            {
+                return;
+            }
+
+            // 结算已弹出：世界保持冻结（Finish 把 timeScale 压成 0），只等返回键或界面按钮。
+            if (_resultShown)
+            {
+                return;
+            }
+
+            // 死亡留一拍：世界停止推进，但表现层照常跑（死亡帧、红屏淡出、震屏都要播完），
+            // 再由 CheckOutcome 弹结算。不能把 timeScale 压 0——动画是用 deltaTime 推进的，压 0 会定格。
+            if (_world.World.Player.Dead)
+            {
+                if (Time.timeScale != 1f)
+                {
+                    Time.timeScale = 1f;
+                }
+
+                Sync();
+                _fx?.Step(Time.deltaTime);
+                UpdateHud();
+                CheckOutcome();
                 return;
             }
 
@@ -492,7 +590,11 @@ namespace Lingjing.View
 
             if (_source != null && _source.TakeSkillPress())
             {
-                _world.TryActivateFairy();
+                if (!_world.TryActivateFairy())
+                {
+                    // 充能不足：按到了但还不能放，给一个「被拒绝」的反馈。
+                    _touch?.FlashSkillRejected();
+                }
             }
 
             int guard = 0;
@@ -513,6 +615,101 @@ namespace Lingjing.View
             _fx?.Step(Time.deltaTime);
             UpdateHud();
             CheckOutcome();
+        }
+
+        /// <summary>Android 返回键（Unity 里就是 Escape）：不拦的话会直接退出 Activity，一局白打。
+        /// 返回 true 表示这次按键已经切了场景，调用方必须立刻结束本帧。</summary>
+        bool HandleBackKey()
+        {
+            if (!Input.GetKeyDown(KeyCode.Escape))
+            {
+                return false;
+            }
+
+            if (_resultShown)
+            {
+                ToMainMenu();
+                return true;
+            }
+
+            if (_paused)
+            {
+                Resume();
+                return false;
+            }
+
+            Pause();
+            return false;
+        }
+
+        void OnApplicationPause(bool paused)
+        {
+            // 来电/切后台：直接进暂停。回来时玩家自己点继续，不会发现血已经掉了一半。
+            if (paused)
+            {
+                Pause();
+            }
+        }
+
+        /// <summary>一局内的三条一次性引导：移动 → 刀怎么造成伤害 → 充能满能代行。</summary>
+        void UpdateHints()
+        {
+            if (_world == null || _world.World.Player.Dead)
+            {
+                return;
+            }
+
+            float elapsed = Time.unscaledTime - _runStartAt;
+
+            if (!_hintMoveShown && elapsed >= 0.8f)
+            {
+                _hintMoveShown = true;
+                ShowHint(UiText.MoveHint, 3.2f);
+            }
+            else if (!_hintBladeShown && elapsed >= 6f)
+            {
+                _hintBladeShown = true;
+                ShowHint(UiText.BladeHint, 3.2f);
+            }
+            else if (!_hintReverseShown && elapsed >= 12f)
+            {
+                _hintReverseShown = true;
+                ShowHint(UiText.ReverseHint, 3.2f);
+            }
+
+            if (!_hintSkillShown)
+            {
+                Player p = _world.World.Player;
+                if (p.Energy >= Tuning.EnergyMax && !_world.FairyActive)
+                {
+                    _hintSkillShown = true;
+                    ShowHint(UiText.SkillHint, 3.5f);
+                }
+            }
+        }
+
+        void ShowHint(string text, float seconds)
+        {
+            _hintText = text;
+            _hintUntil = Time.unscaledTime + seconds;
+        }
+
+        /// <summary>收回当前引导字幕（行为已经发生、或事件字幕要优先）。</summary>
+        void ClearHint()
+        {
+            _hintText = null;
+            _hintUntil = 0f;
+        }
+
+        /// <summary>字幕优先级：一次性引导压过语音字幕，引导过期后回到语音。</summary>
+        string ActiveSubtitle()
+        {
+            if (Time.unscaledTime < _hintUntil && !string.IsNullOrEmpty(_hintText))
+            {
+                return _hintText;
+            }
+
+            return _audio != null ? _audio.Subtitle : null;
         }
 
         /// <summary>推进 n 个固定步长并同步。无头探针与回归都走这里。</summary>
@@ -554,7 +751,11 @@ namespace Lingjing.View
             }
             else if (_run.Outcome == RunOutcome.Failed)
             {
-                Finish(false);
+                // 失败先留一拍死亡演出；_deathBeatUntil 由 OnPlayerDied 写入。
+                if (Time.unscaledTime >= _deathBeatUntil)
+                {
+                    Finish(false);
+                }
             }
         }
 
@@ -570,8 +771,9 @@ namespace Lingjing.View
             _playerTx.position = new Vector3((float)p.Pos.X, (float)p.Pos.Y, 0f);
 
             bool moving = p.Vel.LengthSquared > 0.04;
-            if (_playerAnim != null)
+            if (_playerAnim != null && !p.Dead)
             {
+                // 死亡帧由 OnPlayerDied 设一次；这里每帧改回 walk/idle 会把死亡演出吞掉。
                 _playerAnim.SetState(moving ? "walk" : "idle");
                 if (moving)
                 {
@@ -903,7 +1105,7 @@ namespace Lingjing.View
             _hud = HudView.Build(Pause);
             _pause = PauseScreen.Build(Resume, Restart, ToMainMenu);
             _choice = ChoiceScreen.Build(OnGrowthChosen);
-            _result = ResultScreen.Build(Restart, ToMainMenu);
+            _result = ResultScreen.Build(Restart, ToMainMenu, NextLevel);
             UpdateHud();
         }
 
@@ -941,10 +1143,22 @@ namespace Lingjing.View
             }
 
             Player p = _world.World.Player;
+            UpdateHints();
+
             float fairySeconds = (float)(_world.FairyTicksLeft * SimConstants.Dt);
             _hud.SetStats((float)p.Hp, (float)p.MaxHp, (float)p.Energy,
                 (float)Tuning.EnergyMax, _world.FairyActive, fairySeconds);
-            _hud.SetSubtitle(_audio != null ? _audio.Subtitle : null);
+            _hud.SetSubtitle(ActiveSubtitle());
+
+            // 技能键的「满槽」状态：不亮的话玩家不知道什么时候能放。
+            _touch?.SetSkillReady(p.Energy >= Tuning.EnergyMax && !_world.FairyActive);
+
+            // 低血喊一次：血量数值变红由 HudView 负责，这里只补台词。
+            if (!_lowHpSaid && p.Hp > 0 && p.Hp * 100 <= p.MaxHp * 35)
+            {
+                _lowHpSaid = true;
+                _audio?.Say("vo_fairy_low_hp");
+            }
 
             if (_run != null && _run.SectionCount > 0)
             {
@@ -1050,6 +1264,17 @@ namespace Lingjing.View
             UiNav.Restart();
         }
 
+        /// <summary>通关结算上的「进入下一关」：只有通关且确有下一关时才出现。</summary>
+        void NextLevel()
+        {
+            Time.timeScale = 1f;
+            int next = levelId + 1;
+            if (GameFlow.HasScene(next))
+            {
+                UiNav.LoadLevel(next);
+            }
+        }
+
         void ToMainMenu()
         {
             Time.timeScale = 1f;
@@ -1066,6 +1291,7 @@ namespace Lingjing.View
 
             _resultShown = true;
             _paused = false;
+            _touch?.SetSkillReady(false);
 
             if (clear)
             {
@@ -1074,17 +1300,27 @@ namespace Lingjing.View
                 _audio?.PlaySfx("sfx_win");
             }
 
+            int previousHigh = GameSave.HighScore;
             int score = Score;
             GameSave.SubmitScore(score);
+
+            int section = _run != null ? Mathf.Min(_run.SectionIndex + 1, _run.SectionCount) : 1;
+            int sectionCount = _run != null ? _run.SectionCount : 1;
+            bool canNext = clear && GameFlow.IsUnlocked(levelId + 1) && GameFlow.HasScene(levelId + 1);
 
             Time.timeScale = 0f;
             // HUD 常驻：结算叠在 HUD 之上（Doozy sortingOrder 110 > 20），不隐藏 HUD。
             _pause?.Hide();
-            _result.Show(clear, score, GameSave.HighScore);
+            _result.Show(clear, score, GameSave.HighScore, score > previousHigh, section, sectionCount, canNext);
         }
 
         void OnDestroy()
         {
+            if (_touch != null)
+            {
+                _touch.SfxRequested -= OnUiSfxRequested;
+            }
+
             // 暂停/结算把 timeScale 压成 0，切场景或退出时恢复，避免污染后续场景。
             Time.timeScale = 1f;
         }

@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Lingjing.UI
 {
@@ -10,6 +12,9 @@ namespace Lingjing.UI
     /// </summary>
     public static class TweenFx
     {
+        static readonly List<Tween> s_uiFades = new List<Tween>(4);
+        static bool s_sceneHook;
+
         /// <summary>拾取时在原地弹一个放大淡出的图标，然后自毁。</summary>
         public static void PopSprite(Sprite sprite, Vector3 position, int sortingOrder, float seconds = 0.3f)
         {
@@ -61,7 +66,37 @@ namespace Lingjing.UI
             group.DOKill();
             group.alpha = 0f;
             // 不用 CanvasGroup.DOFade：它在 DOTween 的 UI 模块里，本工程只引用了 DOTween 核心程序集。
-            DOTween.To(() => group.alpha, a => group.alpha = a, 1f, seconds).SetUpdate(true).SetEase(Ease.OutQuad);
+            Tween tween = null;
+            tween = DOTween.To(() => group.alpha, a => group.alpha = a, 1f, seconds)
+                .SetUpdate(true)
+                .SetEase(Ease.OutQuad)
+                .OnComplete(() => s_uiFades.Remove(tween));
+
+            // 补间没有 target：界面在淡入途中被切场景销毁时，DOTween 仍会往已销毁的 CanvasGroup 写 alpha。
+            // 记一份账，场景卸载时一并 Kill（sceneUnloaded 是同步回调，坏不到下一帧）。
+            HookSceneUnload();
+            s_uiFades.Add(tween);
+        }
+
+        static void HookSceneUnload()
+        {
+            if (s_sceneHook)
+            {
+                return;
+            }
+
+            s_sceneHook = true;
+            SceneManager.sceneUnloaded += OnSceneUnloaded;
+        }
+
+        static void OnSceneUnloaded(Scene scene)
+        {
+            for (int i = 0; i < s_uiFades.Count; i++)
+            {
+                s_uiFades[i]?.Kill();
+            }
+
+            s_uiFades.Clear();
         }
     }
 }

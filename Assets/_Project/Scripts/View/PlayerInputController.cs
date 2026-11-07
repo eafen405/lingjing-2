@@ -27,6 +27,17 @@ namespace Lingjing.View
             return queued;
         }
 
+        /// <summary>把键盘侧的旋转方向对齐到世界（Fairy 交还控制权时用；0 保持原值）。</summary>
+        public void SyncSpinSign(int sign)
+        {
+            if (sign == 0)
+            {
+                return;
+            }
+
+            _spinSign = sign;
+        }
+
         void Update()
         {
             var move = new Vector2(

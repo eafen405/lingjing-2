@@ -91,6 +91,12 @@ namespace Lingjing.Editor
             bool titleOk = activeTexts.Any(t => !string.IsNullOrEmpty(t.text) && t.text == UiText.GameTitle);
             Expect(titleOk, $"标题文本 = {UiText.GameTitle}");
 
+            // 安全区：主菜单内容收进挂 UiSafeArea 的 Safe 容器，全屏 Backdrop 必须留在 Safe 外满铺。
+            Transform menuRoot = boot.Menu != null && boot.Menu.View != null ? boot.Menu.View.Root.transform : null;
+            bool menuSafe = SafeContainerOk(menuRoot, "Backdrop");
+            bool menuFaded = CanvasGroupFadedIn(menuRoot);
+            Expect(menuSafe && menuFaded, "主菜单：Safe 容器挂 UiSafeArea、Backdrop 在 Safe 外满铺，Show 后 alpha == 1");
+
             bool fontOk = UiKit.Font != null;
             Expect(fontOk, "UiKit.Font 已加载");
 
@@ -131,6 +137,11 @@ namespace Lingjing.Editor
 
             bool shown = panel != null && panel.Visible;
             Expect(shown, $"点击「{UiText.LevelSelect}」后关卡面板可见");
+
+            // LevelSelectPanel.Show 走 Safe 容器 + 淡入；Dim 必须留在 Safe 外满铺整屏。
+            bool levelSafe = SafeContainerOk(panel != null ? panel.Root : null, "Dim");
+            bool levelFaded = CanvasGroupFadedIn(panel != null ? panel.Root : null);
+            Expect(levelSafe && levelFaded, "关卡选择：Safe 容器挂 UiSafeArea、Dim 在 Safe 外满铺，Show 后 alpha == 1");
 
             Button level2Button = panel != null && panel.Root != null
                 ? FindButton(panel.Root, UiText.Level2)
@@ -215,7 +226,8 @@ namespace Lingjing.Editor
             bool subtitleHidden = subtitleTx != null && !subtitleTx.gameObject.activeInHierarchy;
             Expect(subtitleShown && subtitleHidden, "字幕：有台词时显示，播完收起");
 
-            PauseScreen pause = PauseScreen.Build(null, null, null);
+            int restartCalls = 0;
+            PauseScreen pause = PauseScreen.Build(null, () => restartCalls++, null);
             bool pauseHidden = !pause.Visible;
             pause.Show();
             bool pauseShown = pause.Visible
@@ -223,6 +235,25 @@ namespace Lingjing.Editor
                 && FindButton(pause.transform, UiText.Restart) != null
                 && FindButton(pause.transform, UiText.MainMenu) != null
                 && HasText(pause.transform, UiText.Pause);
+
+            // 暂停页：Dim 满铺在 Safe 外，卡片与按钮收进 Safe，Show 后淡入终态 alpha == 1。
+            bool pauseSafe = SafeContainerOk(pause.transform, "Dim");
+            bool pauseFaded = CanvasGroupFadedIn(pause.transform);
+            Expect(pauseSafe && pauseFaded, "暂停：Safe 容器挂 UiSafeArea、Dim 在 Safe 外满铺，Show 后 alpha == 1");
+
+            // 重开两步确认：第一次点击只把标签换成确认文案、不回调重开；再点一次才真的重开。
+            Button restartButton = FindButton(pause.transform, UiText.Restart);
+            restartButton?.onClick.Invoke();
+            bool restartPending = restartCalls == 0
+                && restartButton != null
+                && HasText(restartButton.transform, PauseScreen.RestartConfirmText)
+                && pause.Visible;
+            Expect(restartPending, "暂停：第一次点重新开始只改标签，不回调重开");
+
+            restartButton?.onClick.Invoke();
+            bool restartDone = restartCalls == 1 && !pause.Visible;
+            Expect(restartDone, "暂停：第二次点重新开始才回调重开并关闭面板");
+
             pause.Hide();
             Expect(pauseHidden && pauseShown, "暂停：默认隐藏，显示后有标题与三个按钮");
 
@@ -258,6 +289,11 @@ namespace Lingjing.Editor
                 && choice.ShownAt(0) == growth.OptionAt(0)
                 && FindButton(choice.transform, UiText.Choose) != null;
             Expect(rolled && choiceShown, "三选一：一次性给三张牌，卡面文案与所选一致");
+
+            // 三选一：Dim 满铺在 Safe 外，标题与三张卡收进 Safe，Show 后淡入终态 alpha == 1。
+            bool choiceSafe = SafeContainerOk(choice.transform, "Dim");
+            bool choiceFaded = CanvasGroupFadedIn(choice.transform);
+            Expect(choiceSafe && choiceFaded, "三选一：Safe 容器挂 UiSafeArea、Dim 在 Safe 外满铺，Show 后 alpha == 1");
 
             Button firstCard = FindButton(choice.transform, UiText.Choose);
             firstCard?.onClick.Invoke();
@@ -371,6 +407,49 @@ namespace Lingjing.Editor
                 + $"viewNames={viewNamesOk} layers={layersOk} score={scoreOk} restored={restored}");
 
             return pass;
+        }
+
+        /// <summary>界面根节点下直接挂的 Safe 内容容器（full-stretch 子 RectTransform + UiSafeArea）。</summary>
+        static RectTransform FindSafe(Transform root)
+        {
+            if (root == null)
+            {
+                return null;
+            }
+
+            Transform safe = root.Find("Safe");
+            return safe as RectTransform;
+        }
+
+        /// <summary>Safe 容器成立：full-stretch、挂了 UiSafeArea，且全屏遮罩（Backdrop/Dim）留在它外面满铺。</summary>
+        static bool SafeContainerOk(Transform root, string fullScreenChild)
+        {
+            RectTransform safe = FindSafe(root);
+            if (root == null
+                || safe == null
+                || safe.GetComponent<UiSafeArea>() == null
+                || safe.anchorMin != Vector2.zero
+                || safe.anchorMax != Vector2.one
+                || safe.offsetMin != Vector2.zero
+                || safe.offsetMax != Vector2.zero
+                || safe.Find(fullScreenChild) != null)
+            {
+                return false;
+            }
+
+            return root.Find(fullScreenChild) != null;
+        }
+
+        /// <summary>Show 之后根节点上的 CanvasGroup 必须存在且回到完全不透明。</summary>
+        static bool CanvasGroupFadedIn(Transform root)
+        {
+            if (root == null)
+            {
+                return false;
+            }
+
+            CanvasGroup group = root.GetComponent<CanvasGroup>();
+            return group != null && group.alpha > 0.99f;
         }
 
         static Button FindButton(Transform root, string label)

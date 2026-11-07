@@ -1,4 +1,5 @@
 using Lingjing.Fairy;
+using Lingjing.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -8,12 +9,22 @@ namespace Lingjing.View
     /// <summary>
     /// 触屏指令源：全屏浮动摇杆给移动，右下两个按钮给技能与正反切。
     /// 编辑器里鼠标就是手指，桌面和手机走同一条代码路径。
+    /// 按钮的身份标签、按下反馈、技能就绪呼吸都在这一层挂好，读取方只管动作本身。
     /// </summary>
     public sealed class TouchInputController : MonoBehaviour, ICommandSource
     {
+        /// <summary>按钮按下的统一音效 id（AudioProbe 已盯住这条资源）。</summary>
+        public const string ClickSfx = "sfx_ui_click";
+
         public VirtualJoystick moveStick;
         public TouchButton skillButton;
         public TouchButton reverseButton;
+
+        /// <summary>
+        /// 按钮按下时发一次，参数是音效 id；播放归 BattleRunner 的 AudioDirector，
+        /// View 层不建 AudioSource，音效资产也只在 Audio 层加载。
+        /// </summary>
+        public event System.Action<string> SfxRequested;
 
         public Command CurrentCommand { get; private set; } = Command.None;
 
@@ -25,6 +36,59 @@ namespace Lingjing.View
             bool queued = _skillQueued;
             _skillQueued = false;
             return queued;
+        }
+
+        /// <summary>技能满槽且未在代行时打开技能键的呼吸提示；false 时立即恢复常态。</summary>
+        public void SetSkillReady(bool ready)
+        {
+            if (skillButton != null)
+            {
+                skillButton.SetReady(ready);
+            }
+        }
+
+        /// <summary>充能不足却按了技能键：技能键短暂偏红，告诉玩家「按到了，但还开不了」。</summary>
+        public void FlashSkillRejected()
+        {
+            if (skillButton != null)
+            {
+                skillButton.FlashRejected();
+            }
+        }
+
+        /// <summary>
+        /// 把内部旋转方向直接对齐到世界。Fairy 代行期间规划器会自己翻转刀环，
+        /// 交还控制权时不同步的话，世界会把「方向不一致」当成一次正反切而多反一次。
+        /// 顺手刷新当前指令，交还的那一 tick 就用上（传 0 视为「不知道」，保持原值）。
+        /// </summary>
+        public void SyncSpinSign(int sign)
+        {
+            if (sign == 0)
+            {
+                return;
+            }
+
+            _spinSign = sign;
+            CurrentCommand = new Command(CurrentCommand.Move, sign, CurrentCommand.RequestReverse);
+        }
+
+        /// <summary>按钮按下 → 请求点击音效。TouchHud 里接线，探针也走这条路径。</summary>
+        internal void RequestClickSfx()
+        {
+            SfxRequested?.Invoke(ClickSfx);
+        }
+
+        void OnDestroy()
+        {
+            if (skillButton != null)
+            {
+                skillButton.Pressed -= RequestClickSfx;
+            }
+
+            if (reverseButton != null)
+            {
+                reverseButton.Pressed -= RequestClickSfx;
+            }
         }
 
         void Update()
@@ -54,9 +118,9 @@ namespace Lingjing.View
     }
 
     /// <summary>
-    /// 运行期搭 HUD：Canvas + EventSystem + 全屏摇杆可触层 + 两个按钮。
+    /// 运行期搭 HUD：Canvas + EventSystem + 全屏摇杆可触层 + 安全区容器里的两个按钮。
     /// 不依赖外部 UI 图，圆与方块都在代码里生成，保证 APK 里一定有。
-    /// 层级顺序就是命中顺序：摇杆层在最下（铺满屏幕），按钮建在它之后，压在上面。
+    /// 层级顺序就是命中顺序：摇杆层在最下（铺满屏幕），安全区容器建在它之后，按钮压在上面。
     /// </summary>
     public static class TouchHud
     {
@@ -82,8 +146,17 @@ namespace Lingjing.View
 
             var controller = canvasGo.AddComponent<TouchInputController>();
             controller.moveStick = BuildJoystick(canvasGo.transform);
-            controller.reverseButton = BuildButton(canvasGo.transform, "ReverseButton", new Vector2(-220f, 120f), new Color(0.85f, 0.85f, 0.9f, 0.35f));
-            controller.skillButton = BuildButton(canvasGo.transform, "SkillButton", new Vector2(-110f, 80f), new Color(0.79f, 0.95f, 0.3f, 0.45f));
+
+            // 两个按钮收进安全区：刘海/圆角机右下角不会被裁；摇杆层保持全屏，不跟着安全区缩。
+            RectTransform safeArea = BuildSafeArea(canvasGo.transform);
+            controller.reverseButton = BuildButton(safeArea, "ReverseButton", new Vector2(-220f, 120f),
+                new Color(0.5f, 0.62f, 0.82f, 0.5f), UiText.ReverseButton);
+            controller.skillButton = BuildButton(safeArea, "SkillButton", new Vector2(-110f, 80f),
+                new Color(0.6f, 0.88f, 0.32f, 0.55f), UiText.SkillButton);
+
+            // 点击音效只发意图：正反切与技能按下各触发一次 sfx_ui_click。
+            controller.reverseButton.Pressed += controller.RequestClickSfx;
+            controller.skillButton.Pressed += controller.RequestClickSfx;
 
             // 按钮附近不激活摇杆：拇指想按技能却把角色带偏是最伤的误触。
             controller.moveStick.blockers = new[]
@@ -148,9 +221,26 @@ namespace Lingjing.View
             return stick;
         }
 
-        static TouchButton BuildButton(Transform parent, string name, Vector2 anchored, Color color)
+        /// <summary>
+        /// 安全区容器：先按全屏锚点搭好再挂 UiSafeArea——设备上组件把锚点收进安全区，
+        /// 桌面上 safeArea 就是整屏，等于没改。顺序不能反：UiSafeArea 的 Awake 挂上就会算一次。
+        /// </summary>
+        static RectTransform BuildSafeArea(Transform parent)
         {
-            var go = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(TouchButton));
+            var go = new GameObject("SafeArea", typeof(RectTransform));
+            var rect = (RectTransform)go.transform;
+            rect.SetParent(parent, false);
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+            go.AddComponent<UiSafeArea>();
+            return rect;
+        }
+
+        static TouchButton BuildButton(RectTransform parent, string name, Vector2 anchored, Color color, string text)
+        {
+            var go = new GameObject(name, typeof(RectTransform), typeof(Image));
             var rect = (RectTransform)go.transform;
             rect.SetParent(parent, false);
             rect.anchorMin = new Vector2(1f, 0f);
@@ -162,7 +252,18 @@ namespace Lingjing.View
             var image = go.GetComponent<Image>();
             image.sprite = _circle;
             image.color = color;
-            return go.GetComponent<TouchButton>();
+
+            // 短名压在圆图之上：子节点总在父节点的 Image 之后绘制，字不会被圆盖住。
+            Text label = UiKit.CreateLabel(rect, text, 20, TextAnchor.MiddleCenter,
+                new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(160f, 40f), Color.white);
+            label.name = name + "Label";
+
+            // 组件最后加：这样 Awake 缓存到的是配好色之后的常态外观；
+            // 批处理探针在编辑器里跑、Awake 不执行，所以再显式 Bind 一次。
+            var button = go.AddComponent<TouchButton>();
+            button.label = label;
+            button.Bind();
+            return button;
         }
 
         static Sprite MakeCircle(int size)

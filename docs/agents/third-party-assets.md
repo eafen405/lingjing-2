@@ -59,10 +59,12 @@
 
 - `Assets/_Project/Scripts/UI/*`：`UiKit` 负责在运行时长出所有控件（960×540 参考分辨率），
   `DoozyViewHost` 把每个界面根节点包成 Doozy 的 `UIView`，显隐全走 `Show()/Hide()`。
-- 五个视图名固定为 `MainMenu` / `LevelSelect` / `Hud` / `Pause` / `Result`，
-  层级靠嵌套 Canvas 的 `overrideSorting + sortingOrder`（10 / 20 / 20 / 100 / 110）压住，
-  HUD 常驻、暂停与结算叠在上面。
+- 六个视图名固定为 `MainMenu` / `LevelSelect` / `Hud` / `Pause` / `Choice` / `Result`，
+  层级靠嵌套 Canvas 的 `overrideSorting + sortingOrder`（10 / 20 / 20 / 100 / 105 / 110）压住，
+  HUD 常驻，暂停、三选一与结算依次叠在上面。
 - 没有用 Nody 流程图，也没有在编辑器里拖 Prefab：界面依旧全部由代码生成，这样才能继续无头构建与探针验证。
+
+> 2026-11-04 校正：本段此前写「五个视图名 / 10-20-20-100-110」，漏了三选一视图 `Choice`（105）；以 `Assets/_Project/Scripts/UI/DoozyViewHost.cs` 的常量为准。
 
 Doozy 的运行时默认值和编辑器默认值不一致（`ViewCategory` 为 null、三个 `Disable*WhenHidden` 全 false、
 `ShowBehavior.InstantAnimation` 关闭时 `Show()` 会静默 return），这些坑都封在 `DoozyViewHost.Attach` 里，

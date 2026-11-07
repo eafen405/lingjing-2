@@ -36,8 +36,18 @@ namespace Lingjing.UI
         public const string HighScore = "最高分";
 
         public const string MoveHint = "按住屏幕拖动移动";
-        public const string SkillHint = "右下技能键：代行";
-        public const string ReverseHint = "右下上键：正反切";
+        public const string BladeHint = "飞刀自己绕圈，让以骸停在刃口上";
+        public const string SkillHint = "点右下「代行」：充能满时让 Fairy 接管";
+        public const string ReverseHint = "右下「正反切」：翻转刀环方向";
+
+        /// <summary>触屏按钮上的短名。按钮上只放得下两三个字，长句走字幕提示。</summary>
+        public const string SkillButton = "代行";
+        public const string ReverseButton = "正反切";
+        public const string NextLevel = "进入下一关";
+        public const string NewRecord = "新纪录";
+
+        /// <summary>结算页的「到达第 N/M 节」；失败时用来交代打到哪了。</summary>
+        public static string ReachedSection(int current, int total) => $"到达第 {current}/{total} 节";
 
         public const string LevelUp = "升级";
         public const string PickUpgrade = "选择一项强化";

@@ -11,7 +11,8 @@ namespace Lingjing.UI
     /// <summary>
     /// DoozyUI 薄封装：给 UiKit 在运行时长出来的界面根节点挂一个 <see cref="UIView"/>，
     /// 显隐交给 Doozy，布局仍然全部由 UiKit 生成。
-    /// 这里只做三件事——挂组件并写好 ViewName/排序、把 Show/Hide 转给 UIView、Doozy 用不了时兜底 SetActive。
+    /// 这里只做四件事——挂组件并写好 ViewName/排序、把 Show/Hide 转给 UIView、Doozy 用不了时兜底 SetActive、
+    /// 给界面根节点建安全区容器与 DOTween 淡入（显隐仍由 Doozy 决定，补间只管观感）。
     /// </summary>
     public sealed class DoozyViewHost
     {
@@ -41,6 +42,9 @@ namespace Lingjing.UI
         static bool s_fallbackLogged;
 
         readonly GameObject _root;
+
+        // 上一次淡入的结束时刻：淡入还在播（含同一帧里连续 Show）时只保留第一次，避免两条补间同写 alpha。
+        float _fadeInUntil = -1f;
 
         DoozyViewHost(GameObject root, UIView view, string viewName)
         {
@@ -188,6 +192,62 @@ namespace Lingjing.UI
         public void Hide(bool instantAction = true)
         {
             Apply(false, instantAction);
+        }
+
+        /// <summary>
+        /// 界面淡入：显隐与层级仍归 Doozy，alpha 过渡交给 DOTween（未缩放时间，暂停时也能播完）。
+        /// 根节点还没有 CanvasGroup 时先补一个——Doozy 隐藏再显示后 alpha 可能仍停在隐藏时的值，
+        /// 这里每次都从 0 补到 1，避免界面永久半透明。
+        /// </summary>
+        public void FadeIn(float seconds = 0.16f)
+        {
+            if (_root == null)
+            {
+                return;
+            }
+
+            CanvasGroup group = _root.GetComponent<CanvasGroup>();
+            if (group == null)
+            {
+                group = _root.AddComponent<CanvasGroup>();
+            }
+
+            if (!Application.isPlaying)
+            {
+                // 编辑模式（UiProbe 直接调 Build/Show）没有 Update 推进 DOTween，补间会停在 alpha=0；
+                // 这里直接落终态，探针校验的就是真机淡入结束后的状态。
+                group.alpha = 1f;
+                return;
+            }
+
+            // TweenFx.FadeIn 里的补间没有 target，group.DOKill() 停不掉上一条；淡入没播完就只沿用，
+            // 同一帧里被连续 Show 也不会叠出两条补间抢着写 alpha。
+            float now = Time.unscaledTime;
+            if (now < _fadeInUntil)
+            {
+                return;
+            }
+
+            _fadeInUntil = now + seconds;
+            TweenFx.FadeIn(group, seconds);
+        }
+
+        /// <summary>
+        /// 给界面根节点建 full-stretch 的「Safe」内容容器并挂 <see cref="UiSafeArea"/>：
+        /// 全屏 Backdrop/Dim 留在根节点保持满铺，可读控件挂 Safe 下，刘海/圆角屏才不会裁到边。
+        /// 布局数字仍按 960x540 给，只换父节点——桌面整屏时 Safe 的锚点就是 0..1，等于没改。
+        /// </summary>
+        internal static RectTransform CreateSafeArea(Transform parent, string name = "Safe")
+        {
+            var go = new GameObject(name, typeof(RectTransform));
+            var rect = (RectTransform)go.transform;
+            rect.SetParent(parent, false);
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+            go.AddComponent<UiSafeArea>();
+            return rect;
         }
 
         /// <summary>不经过协程的同步隐藏，只用于构造时的初始状态。</summary>

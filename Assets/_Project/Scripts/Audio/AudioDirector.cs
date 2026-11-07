@@ -19,12 +19,14 @@ namespace Lingjing.Audio
         readonly Dictionary<string, AudioClip> _clips = new Dictionary<string, AudioClip>();
         readonly Dictionary<string, float> _readyAt = new Dictionary<string, float>();
 
+        /// <summary>每路音效各自的下次可播时间：不同 id 各按各的窗口节流，不再共用一个时间戳。</summary>
+        readonly Dictionary<string, float> _sfxReadyAt = new Dictionary<string, float>();
+
         AudioSource _voice;
         AudioSource _sfx;
         VoiceLineTable _lines;
         string _subtitle;
         float _subtitleUntil;
-        float _lastHitAt = -1f;
 
         /// <summary>当前台词字幕；按时间到期而不是查 isPlaying——播放器状态在无声设备上不可靠。</summary>
         public string Subtitle => Time.unscaledTime < _subtitleUntil ? _subtitle : null;
@@ -87,15 +89,21 @@ namespace Lingjing.Audio
             }
         }
 
-        /// <summary>命中之类的密集事件：同一路音效有最短间隔，不然一帧十几下发糊。</summary>
+        /// <summary>密集事件音效：每路 id 各记各的最短间隔，命中 45ms 与受击 300ms 不再互相挤占。</summary>
         public void PlaySfxThrottled(string id, float minInterval, float volume = 1f)
         {
-            if (Time.unscaledTime - _lastHitAt < minInterval)
+            if (string.IsNullOrEmpty(id))
             {
                 return;
             }
 
-            _lastHitAt = Time.unscaledTime;
+            float now = Time.unscaledTime;
+            if (_sfxReadyAt.TryGetValue(id, out float readyAt) && now < readyAt)
+            {
+                return;
+            }
+
+            _sfxReadyAt[id] = now + minInterval;
             PlaySfx(id, volume);
         }
 
